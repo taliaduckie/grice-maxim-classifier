@@ -1,0 +1,9 @@
+utterance,context,maxim,violation_type
+"The weather is nice today.","Why were you late to the meeting?",Relation,flouting
+"I may or may not have seen your keys.","Have you seen my keys?",Quantity,flouting
+"The report is fine.","Is the report ready?",Manner,flouting
+"Some students passed the exam.","Did all students pass?",Quantity,flouting
+"It is possible the meeting is at 3pm.","When is the meeting?",Quality,violating
+"I think Paris is in Germany.","Where is Paris?",Quality,violating
+"I arrived at the station.","Where have you been?",Cooperative,none
+"She left.","Where did she go?",Cooperative,none
