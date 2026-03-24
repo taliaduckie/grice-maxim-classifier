@@ -34,8 +34,8 @@ from transformers import (
     Trainer,
 )
 from sklearn.metrics import classification_report
-from dataset import GriceDataset, LABEL2ID, ID2LABEL, MODEL_NAME
-from labels import MAXIMS
+from src.dataset import GriceDataset, LABEL2ID, ID2LABEL, MODEL_NAME
+from src.labels import MAXIMS
 
 OUTPUT_DIR = "../models/roberta-grice"
 

@@ -27,7 +27,7 @@ way it's also kind of the point of the whole project i guess.
 import pandas as pd
 from torch.utils.data import Dataset
 from transformers import AutoTokenizer
-from labels import MAXIMS
+from src.labels import MAXIMS
 
 LABEL2ID = {m: i for i, m in enumerate(MAXIMS)}
 ID2LABEL  = {i: m for m, i in LABEL2ID.items()}

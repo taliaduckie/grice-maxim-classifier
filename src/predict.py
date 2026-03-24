@@ -62,7 +62,7 @@ def predict(text: str, context: str = "") -> dict:
         # enough data to fine-tune. See data/annotated/ for the format.
         print("No fine-tuned model found — using zero-shot baseline.")
         print("(Add more labeled examples to data/annotated/corpus.csv to train one.)")
-        from zero_shot import classify
+        from src.zero_shot import classify
         pred = classify(text, context)
         return {
             "utterance": pred.utterance,
