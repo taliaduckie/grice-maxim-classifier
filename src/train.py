@@ -76,6 +76,8 @@ def train(data_path: str):
     The saved model will be loaded automatically by predict.py
     once it exists in OUTPUT_DIR.
     """
+    # roberta has no idea what pragmatics is but it's about to learn.
+    # or overfit trying. probably the second one with 8 examples.
     model = AutoModelForSequenceClassification.from_pretrained(
         MODEL_NAME,
         num_labels=len(MAXIMS),
@@ -95,6 +97,8 @@ def train(data_path: str):
             "until you have a bigger corpus."
         )
 
+    # 80/20 split. no stratification. living dangerously with 8 examples
+    # means your eval set is literally one or two utterances. science!!
     train_size = int(0.8 * n)
     train_ds   = dataset[:train_size]
     eval_ds    = dataset[train_size:]
@@ -124,6 +128,7 @@ def train(data_path: str):
         compute_metrics=compute_metrics,
     )
 
+    # moment of truth. or moment of overfitting. same thing at this sample size.
     trainer.train()
     trainer.save_model(OUTPUT_DIR)
     print(f"Model saved to {OUTPUT_DIR}.")

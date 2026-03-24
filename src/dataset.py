@@ -29,12 +29,14 @@ from torch.utils.data import Dataset
 from transformers import AutoTokenizer
 from src.labels import MAXIMS
 
+# turning philosophical categories into integers. grice is rolling in his grave
+# but sklearn needs numbers so here we are.
 LABEL2ID = {m: i for i, m in enumerate(MAXIMS)}
 ID2LABEL  = {i: m for m, i in LABEL2ID.items()}
 MODEL_NAME = "roberta-base"  # Change this if you want to experiment with other models.
                               # roberta-large would probably be better; it's also
                               # twice as slow and twice as expensive to fine-tune.
-                              # Your call.
+                            
 
 
 class GriceDataset(Dataset):
@@ -71,6 +73,8 @@ class GriceDataset(Dataset):
         # If not, pass empty strings — the model handles this fine.
         contexts = list(df["context"]) if "context" in df.columns else [""] * len(df)
 
+        # padding to max_length is wasteful but simple and i am choosing simple today.
+        # dynamic padding is a problem for future me who has enough data to care
         self.encodings = self.tokenizer(
             list(df["utterance"]),
             contexts,
@@ -79,7 +83,7 @@ class GriceDataset(Dataset):
             max_length=max_length,
         )
 
-        # Check that all maxim labels are valid before failing silently at training time.
+        # Check that all maxim labels are valid before failing v quiet like at training time.
         unknown = set(df["maxim"]) - set(MAXIMS)
         if unknown:
             raise ValueError(
@@ -88,6 +92,7 @@ class GriceDataset(Dataset):
                 f"Check your annotation for typos. ('Cooperative' not 'cooperative'. I know.)"
             )
 
+        # the moment where pragmatic theory becomes a list of ints. heheheheheheheh
         self.labels = [LABEL2ID[m] for m in df["maxim"]]
 
     def __len__(self):

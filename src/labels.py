@@ -37,6 +37,7 @@ MAXIMS = ["Cooperative", "Quantity", "Quality", "Relation", "Manner"]
 # cooperative in the meta sense but locally non-cooperative. Tricky.
 # Clash is when two maxims conflict and you have to break one to satisfy
 # the other. Less common but interesting when it shows up.
+# five flavors of conversational misbehavior (plus "none" for the well-behaved)
 VIOLATION_TYPES = ["none", "flouting", "violating", "opting_out", "clash"]
 
 # Human-readable descriptions. These are for annotation documentation
@@ -87,11 +88,11 @@ MAXIM_DESCRIPTIONS = {
 # ("this utterance violates the cooperative principle as described by Grice 1975").
 # The model did not care. Lesson learned.
 ZS_HYPOTHESES = {
-    "Cooperative": "This response is relevant, honest, and appropriately informative.",
-    "Quantity": "This response gives too much or too little information.",
-    "Quality": "This response says something false or unsubstantiated.",
-    "Relation": "This response is irrelevant to what was asked.",
-    "Manner": "This response is unclear, ambiguous, or unnecessarily long.",
+    "Cooperative": "This response is relevant, honest, and appropriately informative.",  # the control group
+    "Quantity": "This response gives too much or too little information.",  # goldilocks violations
+    "Quality": "This response says something false or unsubstantiated.",  # lies and/or literature
+    "Relation": "This response is irrelevant to what was asked.",  # the star of the show tbh
+    "Manner": "This response is unclear, ambiguous, or unnecessarily long.",  # the problem child
 }
 
 
@@ -115,6 +116,7 @@ class MaximPrediction:
     all_scores: dict
 
     def __str__(self):
+        # the __repr__ i wish academic papers had
         return (
             f"Utterance : {self.utterance!r}\n"
             f"Context   : {self.context!r}\n"

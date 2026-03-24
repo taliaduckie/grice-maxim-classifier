@@ -77,13 +77,19 @@ def classify(utterance: str, context: str = "") -> MaximPrediction:
     # Tested several formats; this one performed best on manual eval.
     input_text = f"[Context: {context}] {utterance}" if context else utterance
 
+    # feeding the model plain english descriptions of abstract pragmatic categories
+    # and hoping for the best. this is either clever or unhinged. possibly both.
     hypotheses = list(ZS_HYPOTHESES.values())
 
+    # multi_label=False because an utterance violates at most one maxim at a time.
+    # this is a simplification. grice would not approve. but grice is not reviewing
+    # this code so we're fine.
     result = clf(input_text, candidate_labels=hypotheses, multi_label=False)
 
     # Map hypothesis strings back to maxim names.
     # We passed the hypothesis TEXT to the model (because it doesn't know
     # what 'Relation' means), so now we need to reverse that mapping.
+    # the indignity of having to reverse your own dictionary
     hyp_to_maxim = {v: k for k, v in ZS_HYPOTHESES.items()}
     scores = {
         hyp_to_maxim[label]: score
@@ -102,6 +108,7 @@ def classify(utterance: str, context: str = "") -> MaximPrediction:
     # (Most interesting cases are flouting anyway.)
     violation_type = "none" if top_maxim == "Cooperative" else "flouting"
 
+    # ship it. this dataclass is doing more theoretical work than my undergrad thesis did.
     return MaximPrediction(
         utterance=utterance,
         context=context,
