@@ -7,3 +7,35 @@ utterance,context,maxim,violation_type
 "I think Paris is in Germany.","Where is Paris?",Quality,violating
 "I arrived at the station.","Where have you been?",Cooperative,none
 "She left.","Where did she go?",Cooperative,none
+"Have you tried the new coffee place?","Did you finish the report?",Relation,flouting
+"My cat did the funniest thing yesterday.","Can we talk about the budget?",Relation,flouting
+"I hear it might rain tomorrow.","Are you going to apologize?",Relation,flouting
+"That's a nice shirt.","Did you read my email?",Relation,flouting
+"How about those playoffs?","We need to discuss your performance review.",Relation,flouting
+"I'm thinking about getting a new plant.","When are you going to pay me back?",Relation,flouting
+"I've been to a country or two.","Have you traveled much?",Quantity,flouting
+"She's not the worst singer.","What did you think of her performance?",Quantity,flouting
+"Well, where do I even begin. So first I woke up at 6:47, not 6:45 like usual, and then I brushed my teeth for exactly two minutes...","How was your morning?",Manner,flouting
+"He has a pulse.","How's the new intern doing?",Quantity,flouting
+"There were some issues.","How did the deployment go?",Quantity,flouting
+"Oh sure, I LOVE waiting in line for three hours.","How do you feel about the DMV?",Quality,flouting
+"I've told you a million times.","Can you remind me of the password?",Quality,flouting
+"He's a real Einstein.","What do you think of the new hire?",Quality,flouting
+"My heart literally exploded.","How was the concert?",Quality,flouting
+"Yeah and I'm the Queen of England.","I finished the entire project last night.",Quality,flouting
+"That went well.","The presentation crashed halfway through and the client left.",Quality,flouting
+"The capital of Australia is Sydney.","What's the capital of Australia?",Quality,violating
+"I'm pretty sure the meeting is at 3.","When is the meeting? It's at 2.",Quality,violating
+"That word means happy.","What does 'lugubrious' mean?",Quality,violating
+"I may or may not have potentially been in a situation where something could have occurred.","What happened?",Manner,flouting
+"The thing with the stuff at the place.","What are you talking about?",Manner,flouting
+"First I did step 3, then step 1, then I went back to step 2.","How did you assemble the shelf?",Manner,flouting
+"She performed a series of bilateral contractions of the orbicularis oculi muscles.","What did she do?",Manner,flouting
+"It's not not possible that it's not untrue.","Is this correct?",Manner,flouting
+"The meeting is at 3pm in room 204.","When and where is the meeting?",Cooperative,none
+"I finished the report and sent it to Sarah.","What did you do today?",Cooperative,none
+"Yes, I'll be there.","Can you make it to dinner tonight?",Cooperative,none
+"It costs forty-five dollars.","How much is it?",Cooperative,none
+"I left them on the kitchen counter.","Have you seen my keys?",Cooperative,none
+"No, I haven't heard from her since Tuesday.","Have you talked to Maria?",Cooperative,none
+"The train arrives at 5:15.","When does the train get here?",Cooperative,none
