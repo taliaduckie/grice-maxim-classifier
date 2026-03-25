@@ -91,7 +91,7 @@ ZS_HYPOTHESES = {
     "Cooperative": "This response is relevant, honest, and appropriately informative.",  # the control group
     "Quantity": "This response gives too much or too little information.",  # goldilocks violations
     "Quality": "This response says something false or unsubstantiated.",  # lies and/or literature
-    "Relation": "This response is irrelevant to what was asked.",  # the star of the show tbh
+    "Relation": "This response changes the subject and does not answer the question.",  # the star of the show tbh
     "Manner": "This response is unclear, ambiguous, or unnecessarily long.",  # the problem child
 }
 
