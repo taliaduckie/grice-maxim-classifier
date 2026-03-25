@@ -27,15 +27,20 @@ in an afternoon: 80/20. i'm going to hopefully come back and work on this.
 """
 
 import argparse
+import sys
 import numpy as np
+from pathlib import Path
+
+# same sys.path dance as predict.py. i refuse to write a setup.py for this.
+sys.path.insert(0, str(Path(__file__).parent))
 from transformers import (
     AutoModelForSequenceClassification,
     TrainingArguments,
     Trainer,
 )
 from sklearn.metrics import classification_report
-from src.dataset import GriceDataset, LABEL2ID, ID2LABEL, MODEL_NAME
-from src.labels import MAXIMS
+from dataset import GriceDataset, LABEL2ID, ID2LABEL, MODEL_NAME
+from labels import MAXIMS
 
 OUTPUT_DIR = "../models/roberta-grice"
 

@@ -22,7 +22,7 @@ Get a coffee. Maybe two.
 """
 
 from transformers import pipeline
-from src.labels import MAXIMS, ZS_HYPOTHESES, MaximPrediction
+from labels import MAXIMS, ZS_HYPOTHESES, MaximPrediction
 
 MODEL = "facebook/bart-large-mnli"
 

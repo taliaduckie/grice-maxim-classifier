@@ -23,7 +23,12 @@ one-shot only. Use a shell loop if you need to run it on a file.
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+# make imports work whether you run from src/ or the project root.
+# this is the kind of thing that shouldn't be hard but here we are.
+sys.path.insert(0, str(Path(__file__).parent))
 
 # if this path exists you are living in the future where i annotated enough data.
 # congratulations future me. or condolences. depending on how the f1 looks.
@@ -68,7 +73,7 @@ def predict(text: str, context: str = "") -> dict:
         # enough data to fine-tune. See data/annotated/ for the format.
         print("No fine-tuned model found — using zero-shot baseline.")
         print("(Add more labeled examples to data/annotated/corpus.csv to train one.)")
-        from src.zero_shot import classify
+        from zero_shot import classify
         pred = classify(text, context)
         # manually unpacking instead of asdict() because i want the keys
         # to match the fine-tuned path above. yes this is annoying.

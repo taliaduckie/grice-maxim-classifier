@@ -27,7 +27,7 @@ way it's also kind of the point of the whole project i guess.
 import pandas as pd
 from torch.utils.data import Dataset
 from transformers import AutoTokenizer
-from src.labels import MAXIMS
+from labels import MAXIMS
 
 # turning philosophical categories into integers. grice is rolling in his grave
 # but sklearn needs numbers so here we are.
