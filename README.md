@@ -25,6 +25,23 @@ Also distinguishes *flouting* (deliberate, to generate implicature) from
 Zero-shot baseline: `facebook/bart-large-mnli`
 Fine-tuned target: `roberta-base` on a manually annotated corpus
 
+The zero-shot baseline works by passing natural-language hypothesis
+descriptions of each maxim to the NLI model and scoring entailment.
+It gets Quantity reliably, Relation sometimes, and Manner almost never.
+Quality flouting (irony, hyperbole) is hard for reasons that are hard.
+
+## Corpus
+
+40 annotated utterance-context pairs in `data/annotated/corpus.csv`.
+Distribution: 9 Cooperative, 7 Quantity, 8 Quality, 7 Relation, 6 Manner.
+Heavily skewed toward flouting (26) over violating (5) — the interesting
+cases are the deliberate ones.
+
+Bootstrapped via `src/bootstrap.py`, which runs zero-shot predictions on
+seed pairs and outputs a CSV for human correction. The model's guesses
+are wrong often enough to keep you honest and right often enough to be
+faster than annotating from scratch.
+
 ## Setup
 
 ```bash
@@ -34,7 +51,10 @@ pip install -r requirements.txt
 python src/predict.py --text "The weather is nice today." \
                       --context "Why were you late to the meeting?"
 
-# Fine-tune on your annotated data
+# Bootstrap more annotations
+python src/bootstrap.py
+
+# Fine-tune on your annotated data (once you have enough of it)
 python src/train.py --data data/annotated/corpus.csv
 ```
 
@@ -47,7 +67,8 @@ grice-maxim-classifier/
 │   ├── zero_shot.py    # zero-shot baseline (BART-MNLI)
 │   ├── dataset.py      # dataset loading and tokenization
 │   ├── train.py        # fine-tuning loop (RoBERTa)
-│   └── predict.py      # inference CLI
+│   ├── predict.py      # inference CLI
+│   └── bootstrap.py    # pre-label seed pairs for annotation
 ├── data/
 │   ├── raw/            # unannotated utterance pairs
 │   └── annotated/      # gold-labeled CSV corpus
