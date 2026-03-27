@@ -30,6 +30,7 @@ import argparse
 import sys
 import numpy as np
 from pathlib import Path
+from torch.utils.data import Subset
 
 # same sys.path dance as predict.py. i refuse to write a setup.py for this.
 sys.path.insert(0, str(Path(__file__).parent))
@@ -42,7 +43,9 @@ from sklearn.metrics import classification_report
 from dataset import GriceDataset, LABEL2ID, ID2LABEL, MODEL_NAME
 from labels import MAXIMS
 
-OUTPUT_DIR = "../models/roberta-grice"
+# resolve relative to this file so it works from anywhere.
+# learned this the hard way with predict.py's MODEL_DIR.
+OUTPUT_DIR = str(Path(__file__).parent.parent / "models" / "roberta-grice")
 
 
 def compute_metrics(eval_pred):
@@ -102,11 +105,11 @@ def train(data_path: str):
             "until you have a bigger corpus."
         )
 
-    # 80/20 split. no stratification. living dangerously with 8 examples
-    # means your eval set is literally one or two utterances. science!!
+    # 80/20 split. no stratification. living dangerously means your eval set
+    # might not even have all five classes represented. science!!
     train_size = int(0.8 * n)
-    train_ds   = dataset[:train_size]
-    eval_ds    = dataset[train_size:]
+    train_ds   = Subset(dataset, range(train_size))
+    eval_ds    = Subset(dataset, range(train_size, n))
 
     print(f"Training on {train_size} examples, evaluating on {n - train_size}.")
 
