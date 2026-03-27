@@ -56,7 +56,9 @@ def predict(text: str, context: str = "") -> dict:
         # same bracketed format as zero_shot.py. consistency! the manner maxim
         # would be proud of me. (it wouldn't. nothing satisfies manner.)
         input_text = f"[Context: {context}] {text}" if context else text
-        result = clf(input_text, return_all_scores=True)[0]
+        # top_k=None gets scores for all labels. return_all_scores is deprecated
+        # because transformers loves renaming things. keep up or get left behind.
+        result = clf(input_text, top_k=None)
         scores = {r["label"]: r["score"] for r in result}
         top = max(scores, key=scores.get)
         # no violation_type here because the fine-tuned model predicts it directly.

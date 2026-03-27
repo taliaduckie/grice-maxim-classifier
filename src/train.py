@@ -59,11 +59,15 @@ def compute_metrics(eval_pred):
     """
     logits, labels = eval_pred
     preds  = logits.argmax(axis=-1)
+    # pass explicit labels so sklearn doesn't freak out when the eval set
+    # is missing a class. which it will be. because 13 examples across 5 classes
+    # is not a number that guarantees coverage. ask me how i know.
     report = classification_report(
         labels, preds,
+        labels=list(range(len(MAXIMS))),
         target_names=MAXIMS,
         output_dict=True,
-        zero_division=0,  # don't crash if a class has no predictions
+        zero_division=0,
     )
 
     # Log the per-class breakdown too — the aggregate macro F1
@@ -93,7 +97,10 @@ def train(data_path: str):
         label2id=LABEL2ID,
     )
 
-    dataset = GriceDataset(data_path)
+    # max_length=128 because most utterance pairs are under 50 tokens
+    # and 256 was just burning memory for padding. the manner examples
+    # are the longest and even those fit in 128 comfortably.
+    dataset = GriceDataset(data_path, max_length=128)
     n = len(dataset)
     print(f"Loaded {n} examples from {data_path}.")
 
@@ -116,16 +123,20 @@ def train(data_path: str):
     args = TrainingArguments(
         output_dir=OUTPUT_DIR,
         num_train_epochs=5,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=32,
-        evaluation_strategy="epoch",
+        # batch size of 4 because your M3 ran out of GPU memory at 16.
+        # the indignity of being OOM'd by 62 examples.
+        per_device_train_batch_size=4,
+        per_device_eval_batch_size=4,
+        eval_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
         metric_for_best_model="macro_f1",
         greater_is_better=True,
-        logging_dir="../models/logs",
+        logging_dir=str(Path(__file__).parent.parent / "models" / "logs"),
         report_to="none",  # disable wandb / other experiment trackers
                            # unless you've set them up and want them
+        use_cpu=True,  # MPS on apple silicon + transformers = pain.
+                       # CPU is slower but at least it finishes.
     )
 
     trainer = Trainer(
