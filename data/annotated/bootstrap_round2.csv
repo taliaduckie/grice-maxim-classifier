@@ -1,0 +1,57 @@
+utterance,context,predicted_maxim,predicted_violation_type,confidence,gold_maxim,gold_violation_type
+The weather is nice today.,Why were you late to the meeting?,Quantity,flouting,0.355,Relation,flouting
+Have you tried the new coffee place?,Did you finish the report?,Quantity,flouting,0.593,Relation,flouting
+My cat did the funniest thing yesterday.,Can we talk about the budget?,Quantity,flouting,0.445,Relation,flouting
+I hear it might rain tomorrow.,Are you going to apologize?,Quantity,flouting,0.370,Relation,flouting
+That's a nice shirt.,Did you read my email?,Quantity,flouting,0.412,Relation,flouting
+How about those playoffs?,We need to discuss your performance review.,Quantity,flouting,0.438,Relation,flouting
+I'm thinking about getting a new plant.,When are you going to pay me back?,Quantity,flouting,0.495,Relation,flouting
+I had cereal for breakfast.,What time should we schedule the standup?,Quantity,flouting,0.483,,
+My sister lives in Portland.,Have you submitted the pull request yet?,Quantity,flouting,0.552,,
+"Oh that reminds me, I need to buy milk.",So what's the plan for the migration?,Relation,flouting,0.340,,
+Some students passed.,Did everyone pass the exam?,Quantity,flouting,0.479,Quantity,flouting
+I've been to a country or two.,Have you traveled much?,Quantity,flouting,0.447,Quantity,flouting
+She's not the worst singer.,What did you think of her performance?,Quantity,flouting,0.448,Quantity,flouting
+"Well, where do I even begin. So first I woke up at 6:47, not 6:45 like usual, and then I brushed my teeth for exactly two minutes...",How was your morning?,Manner,flouting,0.441,Manner,flouting
+He has a pulse.,How's the new intern doing?,Cooperative,none,0.765,Quantity,flouting
+There were some issues.,How did the deployment go?,Quantity,flouting,0.490,Quantity,flouting
+Yes.,Can you walk me through how the authentication flow works?,Cooperative,none,0.684,,
+It was okay I guess.,Can you give me detailed feedback on my presentation?,Quantity,flouting,0.445,,
+Well the thing is we started the project in January and at first we were thinking about using React but then someone suggested Vue and we had a whole meeting about it and then...,What framework did you end up using?,Quantity,flouting,0.350,,
+"Oh sure, I LOVE waiting in line for three hours.",How do you feel about the DMV?,Quantity,flouting,0.327,Quality,flouting
+I've told you a million times.,Can you remind me of the password?,Quantity,flouting,0.398,Quality,flouting
+He's a real Einstein.,What do you think of the new hire?,Cooperative,none,0.625,Quality,flouting
+My heart literally exploded.,How was the concert?,Cooperative,none,0.396,Quality,flouting
+Yeah and I'm the Queen of England.,I finished the entire project last night.,Quantity,flouting,0.419,Quality,flouting
+That went well.,The presentation crashed halfway through and the client left.,Quantity,flouting,0.428,Quality,flouting
+The capital of Australia is Sydney.,What's the capital of Australia?,Quantity,flouting,0.469,Quality,violating
+I'm pretty sure the meeting is at 3.,When is the meeting? It's at 2.,Quantity,flouting,0.363,Quality,violating
+That word means happy.,What does 'lugubrious' mean?,Quantity,flouting,0.591,Quality,violating
+It's a mammal.,Is a penguin a mammal?,Quantity,flouting,0.383,,
+Shakespeare wrote it in the 1800s.,When was Hamlet written?,Quantity,flouting,0.434,,
+Antibiotics should clear that right up.,I've had this cold for a few days. It's viral.,Cooperative,none,0.415,,
+I may or may not have potentially been in a situation where something could have occurred.,What happened?,Quantity,flouting,0.644,Manner,flouting
+The thing with the stuff at the place.,What are you talking about?,Relation,flouting,0.408,Manner,flouting
+"First I did step 3, then step 1, then I went back to step 2.",How did you assemble the shelf?,Quantity,flouting,0.407,Manner,flouting
+She performed a series of bilateral contractions of the orbicularis oculi muscles.,What did she do?,Quantity,flouting,0.450,Manner,flouting
+It's not not possible that it's not untrue.,Is this correct?,Quality,flouting,0.448,Manner,flouting
+So basically the thing is that it's like when you have the situation where it's not working.,What's the bug?,Quantity,flouting,0.493,,
+I need the report but not the one from last week the other one with the graphs but not the pie charts.,Which report do you need?,Quantity,flouting,0.490,,
+We should do it before after the meeting.,When should we deploy?,Quantity,flouting,0.425,,
+The function returns the thing that the other function needs to do the thing.,How does this code work?,Quantity,flouting,0.597,,
+I'm not at liberty to discuss that.,What happened in the board meeting?,Relation,flouting,0.581,,
+I'd rather not say.,How much do you make?,Relation,flouting,0.676,,
+No comment.,Did you know about the layoffs before they were announced?,Relation,flouting,0.758,,
+Someone told me it might be in building C but I'm not sure.,Where is the exam?,Quantity,flouting,0.385,,
+I think she's upset but I don't want to put words in her mouth.,How does Sarah feel about the reorg?,Quantity,flouting,0.568,,
+I heard a rumor but I really shouldn't repeat it.,What's going on with the Johnson account?,Quality,flouting,0.635,,
+The meeting is at 3pm in room 204.,When and where is the meeting?,Quantity,flouting,0.503,Cooperative,none
+I finished the report and sent it to Sarah.,What did you do today?,Quantity,flouting,0.457,Cooperative,none
+"Yes, I'll be there.",Can you make it to dinner tonight?,Quantity,flouting,0.412,Cooperative,none
+It costs forty-five dollars.,How much is it?,Quantity,flouting,0.486,Cooperative,none
+I left them on the kitchen counter.,Have you seen my keys?,Quantity,flouting,0.421,Cooperative,none
+"No, I haven't heard from her since Tuesday.",Have you talked to Maria?,Quantity,flouting,0.316,Cooperative,none
+The train arrives at 5:15.,When does the train get here?,Quantity,flouting,0.462,Cooperative,none
+It's three blocks north on the left side of the street.,How do I get to the pharmacy?,Quantity,flouting,0.382,,
+We're using PostgreSQL 15 with PostGIS.,What database are you running?,Quantity,flouting,0.411,,
+I disagree — I think we should go with option B because it's cheaper.,Should we go with option A?,Quality,flouting,0.423,,

@@ -41,6 +41,12 @@ SEED_PAIRS = [
     ("How about those playoffs?", "We need to discuss your performance review."),
     ("I'm thinking about getting a new plant.", "When are you going to pay me back?"),
 
+    # --- Relation violating ---
+    # genuinely missing the point. not evasion, just... off.
+    ("I had cereal for breakfast.", "What time should we schedule the standup?"),
+    ("My sister lives in Portland.", "Have you submitted the pull request yet?"),
+    ("Oh that reminds me, I need to buy milk.", "So what's the plan for the migration?"),
+
     # --- Quantity flouting ---
     # saying less than you know, or more than anyone asked for
     ("Some students passed.", "Did everyone pass the exam?"),
@@ -49,6 +55,13 @@ SEED_PAIRS = [
     ("Well, where do I even begin. So first I woke up at 6:47, not 6:45 like usual, and then I brushed my teeth for exactly two minutes...", "How was your morning?"),
     ("He has a pulse.", "How's the new intern doing?"),
     ("There were some issues.", "How did the deployment go?"),
+
+    # --- Quantity violating ---
+    # not strategically withholding — just failing to say enough or saying too much
+    # without any implicature payoff. the boring cousin of flouting.
+    ("Yes.", "Can you walk me through how the authentication flow works?"),
+    ("It was okay I guess.", "Can you give me detailed feedback on my presentation?"),
+    ("Well the thing is we started the project in January and at first we were thinking about using React but then someone suggested Vue and we had a whole meeting about it and then...", "What framework did you end up using?"),
 
     # --- Quality flouting ---
     # irony, hyperbole, metaphor — saying something false ON PURPOSE
@@ -64,6 +77,9 @@ SEED_PAIRS = [
     ("The capital of Australia is Sydney.", "What's the capital of Australia?"),
     ("I'm pretty sure the meeting is at 3.", "When is the meeting? It's at 2."),
     ("That word means happy.", "What does 'lugubrious' mean?"),
+    ("It's a mammal.", "Is a penguin a mammal?"),
+    ("Shakespeare wrote it in the 1800s.", "When was Hamlet written?"),
+    ("Antibiotics should clear that right up.", "I've had this cold for a few days. It's viral."),
 
     # --- Manner flouting/violating ---
     # the sin of being unclear, wordy, or weirdly structured
@@ -72,6 +88,32 @@ SEED_PAIRS = [
     ("First I did step 3, then step 1, then I went back to step 2.", "How did you assemble the shelf?"),
     ("She performed a series of bilateral contractions of the orbicularis oculi muscles.", "What did she do?"),
     ("It's not not possible that it's not untrue.", "Is this correct?"),
+
+    # --- Manner violating ---
+    # not being weird on purpose — just genuinely unclear.
+    # the difference between a poet and someone who can't write an email.
+    ("So basically the thing is that it's like when you have the situation where it's not working.", "What's the bug?"),
+    ("I need the report but not the one from last week the other one with the graphs but not the pie charts.", "Which report do you need?"),
+    ("We should do it before after the meeting.", "When should we deploy?"),
+    ("The function returns the thing that the other function needs to do the thing.", "How does this code work?"),
+
+    # --- Opting out ---
+    # "i'm not playing this game." technically uncooperative locally but
+    # cooperative in the meta sense — you're being honest about not answering.
+    # rare in the wild but theoretically important.
+    ("I'm not at liberty to discuss that.", "What happened in the board meeting?"),
+    ("I'd rather not say.", "How much do you make?"),
+    ("No comment.", "Did you know about the layoffs before they were announced?"),
+
+    # --- Clash ---
+    # when two maxims fight and one has to lose.
+    # saying "i don't know where she is" when you suspect but can't prove it —
+    # quality (don't say what you lack evidence for) wins over quantity
+    # (be as informative as required). grice acknowledged this happens
+    # but didn't dwell on it. neither will we. much.
+    ("Someone told me it might be in building C but I'm not sure.", "Where is the exam?"),
+    ("I think she's upset but I don't want to put words in her mouth.", "How does Sarah feel about the reorg?"),
+    ("I heard a rumor but I really shouldn't repeat it.", "What's going on with the Johnson account?"),
 
     # --- Cooperative ---
     # boring but necessary. the control group needs love too.
@@ -82,6 +124,9 @@ SEED_PAIRS = [
     ("I left them on the kitchen counter.", "Have you seen my keys?"),
     ("No, I haven't heard from her since Tuesday.", "Have you talked to Maria?"),
     ("The train arrives at 5:15.", "When does the train get here?"),
+    ("It's three blocks north on the left side of the street.", "How do I get to the pharmacy?"),
+    ("We're using PostgreSQL 15 with PostGIS.", "What database are you running?"),
+    ("I disagree — I think we should go with option B because it's cheaper.", "Should we go with option A?"),
 ]
 
 

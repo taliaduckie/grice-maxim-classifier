@@ -13,11 +13,17 @@ utterance,context,maxim,violation_type
 "That's a nice shirt.","Did you read my email?",Relation,flouting
 "How about those playoffs?","We need to discuss your performance review.",Relation,flouting
 "I'm thinking about getting a new plant.","When are you going to pay me back?",Relation,flouting
+"I had cereal for breakfast.","What time should we schedule the standup?",Relation,flouting
+"My sister lives in Portland.","Have you submitted the pull request yet?",Relation,flouting
+"Oh that reminds me, I need to buy milk.","So what's the plan for the migration?",Relation,flouting
 "I've been to a country or two.","Have you traveled much?",Quantity,flouting
 "She's not the worst singer.","What did you think of her performance?",Quantity,flouting
 "Well, where do I even begin. So first I woke up at 6:47, not 6:45 like usual, and then I brushed my teeth for exactly two minutes...","How was your morning?",Manner,flouting
 "He has a pulse.","How's the new intern doing?",Quantity,flouting
 "There were some issues.","How did the deployment go?",Quantity,flouting
+"Yes.","Can you walk me through how the authentication flow works?",Quantity,flouting
+"It was okay I guess.","Can you give me detailed feedback on my presentation?",Quantity,flouting
+"Well the thing is we started the project in January and at first we were thinking about using React but then someone suggested Vue and we had a whole meeting about it and then...","What framework did you end up using?",Manner,flouting
 "Oh sure, I LOVE waiting in line for three hours.","How do you feel about the DMV?",Quality,flouting
 "I've told you a million times.","Can you remind me of the password?",Quality,flouting
 "He's a real Einstein.","What do you think of the new hire?",Quality,flouting
@@ -27,11 +33,24 @@ utterance,context,maxim,violation_type
 "The capital of Australia is Sydney.","What's the capital of Australia?",Quality,violating
 "I'm pretty sure the meeting is at 3.","When is the meeting? It's at 2.",Quality,violating
 "That word means happy.","What does 'lugubrious' mean?",Quality,violating
+"It's a mammal.","Is a penguin a mammal?",Quality,violating
+"Shakespeare wrote it in the 1800s.","When was Hamlet written?",Quality,violating
+"Antibiotics should clear that right up.","I've had this cold for a few days. It's viral.",Quality,violating
 "I may or may not have potentially been in a situation where something could have occurred.","What happened?",Manner,flouting
 "The thing with the stuff at the place.","What are you talking about?",Manner,flouting
 "First I did step 3, then step 1, then I went back to step 2.","How did you assemble the shelf?",Manner,flouting
 "She performed a series of bilateral contractions of the orbicularis oculi muscles.","What did she do?",Manner,flouting
 "It's not not possible that it's not untrue.","Is this correct?",Manner,flouting
+"So basically the thing is that it's like when you have the situation where it's not working.","What's the bug?",Manner,flouting
+"I need the report but not the one from last week the other one with the graphs but not the pie charts.","Which report do you need?",Manner,flouting
+"We should do it before after the meeting.","When should we deploy?",Manner,flouting
+"The function returns the thing that the other function needs to do the thing.","How does this code work?",Manner,flouting
+"I'm not at liberty to discuss that.","What happened in the board meeting?",Quantity,flouting
+"I'd rather not say.","How much do you make?",Quantity,flouting
+"No comment.","Did you know about the layoffs before they were announced?",Quantity,flouting
+"Someone told me it might be in building C but I'm not sure.","Where is the exam?",Quality,flouting
+"I think she's upset but I don't want to put words in her mouth.","How does Sarah feel about the reorg?",Quality,flouting
+"I heard a rumor but I really shouldn't repeat it.","What's going on with the Johnson account?",Quantity,flouting
 "The meeting is at 3pm in room 204.","When and where is the meeting?",Cooperative,none
 "I finished the report and sent it to Sarah.","What did you do today?",Cooperative,none
 "Yes, I'll be there.","Can you make it to dinner tonight?",Cooperative,none
@@ -39,3 +58,6 @@ utterance,context,maxim,violation_type
 "I left them on the kitchen counter.","Have you seen my keys?",Cooperative,none
 "No, I haven't heard from her since Tuesday.","Have you talked to Maria?",Cooperative,none
 "The train arrives at 5:15.","When does the train get here?",Cooperative,none
+"It's three blocks north on the left side of the street.","How do I get to the pharmacy?",Cooperative,none
+"We're using PostgreSQL 15 with PostGIS.","What database are you running?",Cooperative,none
+"I disagree — I think we should go with option B because it's cheaper.","Should we go with option A?",Cooperative,none
