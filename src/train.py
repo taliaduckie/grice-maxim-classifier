@@ -150,6 +150,13 @@ def train(data_path: str):
     # moment of truth. or moment of overfitting. same thing at this sample size.
     trainer.train()
     trainer.save_model(OUTPUT_DIR)
+    # save the tokenizer too or pipeline can't find it and produces
+    # identical scores for every input. the model was learning fine —
+    # 0.56 macro F1 at epoch 4!! — but at inference time it couldn't
+    # understand its own inputs. a model that can't read its own
+    # tokenization is a manner violation if i ever saw one.
+    # ask me how long i debugged this. (too long. the answer is too long.)
+    dataset.tokenizer.save_pretrained(OUTPUT_DIR)
     print(f"Model saved to {OUTPUT_DIR}.")
     print("predict.py will use this model automatically from now on.")
 

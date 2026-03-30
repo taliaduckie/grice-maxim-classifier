@@ -48,9 +48,10 @@ def predict(text: str, context: str = "") -> dict:
     enough. I know. I'm working on it.
     """
     if MODEL_DIR.exists():
-        # Fine-tuned model path.
-        # If you're seeing this message and you fine-tuned on the eight
-        # seed examples in corpus.csv: don't. Add more first.
+        # Fine-tuned model path. it WORKS now. 155 examples and a tokenizer
+        # save later, we have a model that correctly identifies sarcasm at
+        # 82% confidence. take THAT, manner. (manner is still hard but we
+        # don't talk about manner.)
         from transformers import pipeline
         clf = pipeline("text-classification", model=str(MODEL_DIR))
         # same bracketed format as zero_shot.py. consistency! the manner maxim
