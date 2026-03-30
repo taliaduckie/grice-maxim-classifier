@@ -282,6 +282,45 @@ SEED_PAIRS = [
     ("It's the third door on the right, past the kitchen.", "Where's the conference room?"),
     ("About 12 milliseconds per request.", "What's the average latency?"),
     ("No, that was deprecated in version 4.", "Does the old endpoint still work?"),
+
+    # ====== ROUND 5 ======
+    # balancing act. Relation has 23, Quantity has 25, everything else
+    # is mid-30s. the model got F1=0.00 on Relation at eval because
+    # the unstratified split probably gave it zero Relation examples
+    # to evaluate on. more data won't fix the split but it'll make
+    # the split less catastrophic. law of large numbers, do your thing.
+
+    # --- Relation flouting (more) ---
+    # different flavors of "i heard your question and i am choosing violence"
+    ("So I started watching this new show last night.", "Can we talk about what happened at Thanksgiving?"),
+    ("Have you noticed the new art in the lobby?", "Why didn't you cc me on that email?"),
+    ("I should really start going to the gym.", "Are you going to address the complaint?"),
+    ("This coffee is actually pretty good today.", "Did you tell HR about the incident?"),
+    ("Oh hey, is that a new phone?", "We need to discuss your expenses."),
+    ("I was thinking about taking up pottery.", "What did the auditors say?"),
+    ("You know what, I've never been to Iceland.", "Can you explain this charge on the company card?"),
+    ("The sunset was gorgeous yesterday.", "Why were the servers down for six hours?"),
+    ("I think I'm going to repaint my kitchen.", "Have you told the client about the delay?"),
+    ("Did you know octopuses have three hearts?", "When are you going to respond to legal?"),
+    ("My neighbor got the cutest puppy.", "We need your incident report by end of day."),
+    ("I've been really into sourdough lately.", "What happened to the production database?"),
+
+    # --- Quantity flouting (more) ---
+    # strategic underinformativeness, overinformativeness, and the
+    # whole spectrum of "i know exactly how much to say and i'm
+    # choosing a different amount on purpose"
+    ("We had a conversation.", "What did the investors say about the pitch?"),
+    ("It could have gone better.", "How did your driving test go?"),
+    ("I have some concerns.", "What do you think of the merger?"),
+    ("Well, it exists.", "Have you seen the new website design?"),
+    ("Let's just say there were surprises.", "How was the product launch?"),
+    ("People had feelings.", "How did the layoffs go?"),
+    ("It was... an experience.", "How was the team offsite?"),
+    ("Some things were said.", "What happened in the meeting with the CEO?"),
+    ("I wouldn't say no.", "Do you want to grab dinner?"),
+    ("There's room for improvement.", "How did I do on the presentation?"),
+    ("Not nothing happened.", "Did anything come of the investigation?"),
+    ("Mistakes were made.", "What went wrong with the release?"),
 ]
 
 
