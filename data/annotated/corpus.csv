@@ -1,63 +1,92 @@
-utterance,context,maxim,violation_type
-"The weather is nice today.","Why were you late to the meeting?",Relation,flouting
-"I may or may not have seen your keys.","Have you seen my keys?",Quantity,flouting
-"The report is fine.","Is the report ready?",Manner,flouting
-"Some students passed the exam.","Did all students pass?",Quantity,flouting
-"It is possible the meeting is at 3pm.","When is the meeting?",Quality,violating
-"I think Paris is in Germany.","Where is Paris?",Quality,violating
-"I arrived at the station.","Where have you been?",Cooperative,none
-"She left.","Where did she go?",Cooperative,none
-"Have you tried the new coffee place?","Did you finish the report?",Relation,flouting
-"My cat did the funniest thing yesterday.","Can we talk about the budget?",Relation,flouting
-"I hear it might rain tomorrow.","Are you going to apologize?",Relation,flouting
-"That's a nice shirt.","Did you read my email?",Relation,flouting
-"How about those playoffs?","We need to discuss your performance review.",Relation,flouting
-"I'm thinking about getting a new plant.","When are you going to pay me back?",Relation,flouting
-"I had cereal for breakfast.","What time should we schedule the standup?",Relation,flouting
-"My sister lives in Portland.","Have you submitted the pull request yet?",Relation,flouting
-"Oh that reminds me, I need to buy milk.","So what's the plan for the migration?",Relation,flouting
-"I've been to a country or two.","Have you traveled much?",Quantity,flouting
-"She's not the worst singer.","What did you think of her performance?",Quantity,flouting
-"Well, where do I even begin. So first I woke up at 6:47, not 6:45 like usual, and then I brushed my teeth for exactly two minutes...","How was your morning?",Manner,flouting
-"He has a pulse.","How's the new intern doing?",Quantity,flouting
-"There were some issues.","How did the deployment go?",Quantity,flouting
-"Yes.","Can you walk me through how the authentication flow works?",Quantity,flouting
-"It was okay I guess.","Can you give me detailed feedback on my presentation?",Quantity,flouting
-"Well the thing is we started the project in January and at first we were thinking about using React but then someone suggested Vue and we had a whole meeting about it and then...","What framework did you end up using?",Manner,flouting
-"Oh sure, I LOVE waiting in line for three hours.","How do you feel about the DMV?",Quality,flouting
-"I've told you a million times.","Can you remind me of the password?",Quality,flouting
-"He's a real Einstein.","What do you think of the new hire?",Quality,flouting
-"My heart literally exploded.","How was the concert?",Quality,flouting
-"Yeah and I'm the Queen of England.","I finished the entire project last night.",Quality,flouting
-"That went well.","The presentation crashed halfway through and the client left.",Quality,flouting
-"The capital of Australia is Sydney.","What's the capital of Australia?",Quality,violating
-"I'm pretty sure the meeting is at 3.","When is the meeting? It's at 2.",Quality,violating
-"That word means happy.","What does 'lugubrious' mean?",Quality,violating
-"It's a mammal.","Is a penguin a mammal?",Quality,violating
-"Shakespeare wrote it in the 1800s.","When was Hamlet written?",Quality,violating
-"Antibiotics should clear that right up.","I've had this cold for a few days. It's viral.",Quality,violating
-"I may or may not have potentially been in a situation where something could have occurred.","What happened?",Manner,flouting
-"The thing with the stuff at the place.","What are you talking about?",Manner,flouting
-"First I did step 3, then step 1, then I went back to step 2.","How did you assemble the shelf?",Manner,flouting
-"She performed a series of bilateral contractions of the orbicularis oculi muscles.","What did she do?",Manner,flouting
-"It's not not possible that it's not untrue.","Is this correct?",Manner,flouting
-"So basically the thing is that it's like when you have the situation where it's not working.","What's the bug?",Manner,flouting
-"I need the report but not the one from last week the other one with the graphs but not the pie charts.","Which report do you need?",Manner,flouting
-"We should do it before after the meeting.","When should we deploy?",Manner,flouting
-"The function returns the thing that the other function needs to do the thing.","How does this code work?",Manner,flouting
-"I'm not at liberty to discuss that.","What happened in the board meeting?",Quantity,flouting
-"I'd rather not say.","How much do you make?",Quantity,flouting
-"No comment.","Did you know about the layoffs before they were announced?",Quantity,flouting
-"Someone told me it might be in building C but I'm not sure.","Where is the exam?",Quality,flouting
-"I think she's upset but I don't want to put words in her mouth.","How does Sarah feel about the reorg?",Quality,flouting
-"I heard a rumor but I really shouldn't repeat it.","What's going on with the Johnson account?",Quantity,flouting
-"The meeting is at 3pm in room 204.","When and where is the meeting?",Cooperative,none
-"I finished the report and sent it to Sarah.","What did you do today?",Cooperative,none
-"Yes, I'll be there.","Can you make it to dinner tonight?",Cooperative,none
-"It costs forty-five dollars.","How much is it?",Cooperative,none
-"I left them on the kitchen counter.","Have you seen my keys?",Cooperative,none
-"No, I haven't heard from her since Tuesday.","Have you talked to Maria?",Cooperative,none
-"The train arrives at 5:15.","When does the train get here?",Cooperative,none
-"It's three blocks north on the left side of the street.","How do I get to the pharmacy?",Cooperative,none
-"We're using PostgreSQL 15 with PostGIS.","What database are you running?",Cooperative,none
-"I disagree — I think we should go with option B because it's cheaper.","Should we go with option A?",Cooperative,none
+"utterance","context","maxim","violation_type"
+"The weather is nice today.","Why were you late to the meeting?","Relation","flouting"
+"Have you tried the new coffee place?","Did you finish the report?","Relation","flouting"
+"My cat did the funniest thing yesterday.","Can we talk about the budget?","Relation","flouting"
+"I hear it might rain tomorrow.","Are you going to apologize?","Relation","flouting"
+"That's a nice shirt.","Did you read my email?","Relation","flouting"
+"How about those playoffs?","We need to discuss your performance review.","Relation","flouting"
+"I'm thinking about getting a new plant.","When are you going to pay me back?","Relation","flouting"
+"I had cereal for breakfast.","What time should we schedule the standup?","Relation","flouting"
+"My sister lives in Portland.","Have you submitted the pull request yet?","Relation","flouting"
+"Oh that reminds me, I need to buy milk.","So what's the plan for the migration?","Relation","flouting"
+"Some students passed.","Did everyone pass the exam?","Quantity","flouting"
+"I've been to a country or two.","Have you traveled much?","Quantity","flouting"
+"She's not the worst singer.","What did you think of her performance?","Quality","flouting"
+"Well, where do I even begin. So first I woke up at 6:47, not 6:45 like usual, and then I brushed my teeth for exactly two minutes...","How was your morning?","Manner","flouting"
+"He has a pulse.","How's the new intern doing?","Quantity","flouting"
+"There were some issues.","How did the deployment go?","Quantity","flouting"
+"Yes.","Can you walk me through how the authentication flow works?","Quantity","flouting"
+"It was okay I guess.","Can you give me detailed feedback on my presentation?","Quantity","flouting"
+"Well the thing is we started the project in January and at first we were thinking about using React but then someone suggested Vue and we had a whole meeting about it and then...","What framework did you end up using?","Manner","flouting"
+"Oh sure, I LOVE waiting in line for three hours.","How do you feel about the DMV?","Quality","flouting"
+"I've told you a million times.","Can you remind me of the password?","Quality","flouting"
+"He's a real Einstein.","What do you think of the new hire?","Quality","flouting"
+"My heart literally exploded.","How was the concert?","Quality","flouting"
+"Yeah and I'm the Queen of England.","I finished the entire project last night.","Quality","flouting"
+"That went well.","The presentation crashed halfway through and the client left.","Quality","flouting"
+"The capital of Australia is Sydney.","What's the capital of Australia?","Quality","violating"
+"I'm pretty sure the meeting is at 3.","When is the meeting? It's at 2.","Quality","violating"
+"That word means happy.","What does 'lugubrious' mean?","Quality","violating"
+"It's a mammal.","Is a penguin a mammal?","Quality","violating"
+"Shakespeare wrote it in the 1800s.","When was Hamlet written?","Quality","violating"
+"Antibiotics should clear that right up.","I've had this cold for a few days. It's viral.","Quality","violating"
+"I may or may not have potentially been in a situation where something could have occurred.","What happened?","Manner","flouting"
+"The thing with the stuff at the place.","What are you talking about?","Manner","flouting"
+"First I did step 3, then step 1, then I went back to step 2.","How did you assemble the shelf?","Manner","flouting"
+"She performed a series of bilateral contractions of the orbicularis oculi muscles.","What did she do?","Manner","flouting"
+"It's not not possible that it's not untrue.","Is this correct?","Manner","flouting"
+"So basically the thing is that it's like when you have the situation where it's not working.","What's the bug?","Manner","flouting"
+"I need the report but not the one from last week the other one with the graphs but not the pie charts.","Which report do you need?","Manner","flouting"
+"We should do it before after the meeting.","When should we deploy?","Manner","flouting"
+"The function returns the thing that the other function needs to do the thing.","How does this code work?","Manner","flouting"
+"I'm not at liberty to discuss that.","What happened in the board meeting?","Quantity","flouting"
+"I'd rather not say.","How much do you make?","Quantity","flouting"
+"No comment.","Did you know about the layoffs before they were announced?","Quantity","flouting"
+"Someone told me it might be in building C but I'm not sure.","Where is the exam?","Quality","flouting"
+"I think she's upset but I don't want to put words in her mouth.","How does Sarah feel about the reorg?","Quantity","flouting"
+"I heard a rumor but I really shouldn't repeat it.","What's going on with the Johnson account?","Quantity","flouting"
+"The meeting is at 3pm in room 204.","When and where is the meeting?","Cooperative","none"
+"I finished the report and sent it to Sarah.","What did you do today?","Cooperative","none"
+"Yes, I'll be there.","Can you make it to dinner tonight?","Cooperative","none"
+"It costs forty-five dollars.","How much is it?","Cooperative","none"
+"I left them on the kitchen counter.","Have you seen my keys?","Cooperative","none"
+"No, I haven't heard from her since Tuesday.","Have you talked to Maria?","Cooperative","none"
+"The train arrives at 5:15.","When does the train get here?","Cooperative","none"
+"It's three blocks north on the left side of the street.","How do I get to the pharmacy?","Cooperative","none"
+"We're using PostgreSQL 15 with PostGIS.","What database are you running?","Cooperative","none"
+"I disagree — I think we should go with option B because it's cheaper.","Should we go with option A?","Cooperative","none"
+"Oh I forgot to mention, the printer is broken.","Can you review this PR by end of day?","Relation","flouting"
+"My dog is three years old.","What's the status on the API migration?","Relation","flouting"
+"I think the cafeteria closes at 2.","Have you seen the error logs from last night?","Relation","flouting"
+"We should really organize the supply closet.","What's our Q3 revenue forecast?","Relation","flouting"
+"The parking lot was full this morning.","Did the database backup complete?","Relation","flouting"
+"Fine.","Can you tell me everything that happened at the client meeting?","Quantity","flouting"
+"Good.","How did the surgery go? We've been worried sick.","Quantity","flouting"
+"So anyway after that meeting which was on a Tuesday I think or maybe Wednesday and Sarah was there and also possibly Mark though he might have left early and we discussed the thing about the budget which reminded me of last quarter when we had that other budget issue...","Did they approve the proposal?","Manner","flouting"
+"Things.","What did you buy at the store?","Quantity","flouting"
+"It went.","How was your first day at the new job? Tell me everything!","Quantity","flouting"
+"The deliverable is to be completed by the stakeholder in alignment with the synergistic framework.","What do I actually need to do?","Manner","flouting"
+"So like the thing is you go there and then you do that and then the other thing happens.","How do I set up the development environment?","Manner","flouting"
+"It's in the place where we put the thing last time we did the thing.","Where's the backup drive?","Manner","flouting"
+"You need to not un-disable the setting.","How do I turn on notifications?","Manner","flouting"
+"The meeting got rescheduled to before when it was after.","When is the meeting now?","Manner","flouting"
+"Oh great, another meeting. Just what I needed.","We have a sync at 4.","Quality","flouting"
+"Wow, you're so fast.","Sorry it took me three weeks to reply to your email.","Quality","flouting"
+"What a surprise.","The deploy failed again.","Quality","flouting"
+"Breaking news: water is wet.","Did you know the project is over budget?","Quality","flouting"
+"Sure, and pigs fly.","I'll definitely have it done by Friday.","Quality","flouting"
+"It's on the second shelf in the supply room.","Where do we keep the printer paper?","Cooperative","none"
+"I sent it to the team yesterday around 3pm.","Did you share the meeting notes?","Cooperative","none"
+"Python 3.11 with FastAPI.","What's the tech stack for the new service?","Cooperative","none"
+"About forty-five minutes if traffic is normal.","How long is the drive?","Cooperative","none"
+"She said she'd have it ready by Thursday.","When is the design review?","Cooperative","none"
+"Two years, mostly on the backend.","How long have you been on this team?","Cooperative","none"
+"No, we decided to go with the vendor option instead.","Are we building it in-house?","Cooperative","none"
+"It's in the shared drive under Q3 Reports.","Where can I find last quarter's numbers?","Cooperative","none"
+"I may or may not have seen your keys.","Have you seen my keys?","Quantity","flouting"
+"The report is fine.","Is the report ready?","Manner","flouting"
+"Some students passed the exam.","Did all students pass?","Quantity","flouting"
+"It is possible the meeting is at 3pm.","When is the meeting?","Quality","violating"
+"I think Paris is in Germany.","Where is Paris?","Quality","violating"
+"I arrived at the station.","Where have you been?","Cooperative","none"
+"She left.","Where did she go?","Cooperative","none"

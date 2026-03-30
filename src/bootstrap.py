@@ -127,6 +127,161 @@ SEED_PAIRS = [
     ("It's three blocks north on the left side of the street.", "How do I get to the pharmacy?"),
     ("We're using PostgreSQL 15 with PostGIS.", "What database are you running?"),
     ("I disagree — I think we should go with option B because it's cheaper.", "Should we go with option A?"),
+
+    # ====== ROUND 3 ======
+    # filling in the gaps. violating examples are boring but the model
+    # needs to know the difference between "doing it on purpose" and
+    # "genuinely failing at communication." also more cooperative examples
+    # because 10 is not enough for a majority class baseline.
+
+    # --- Relation violating ---
+    # not evasion — just genuinely losing the thread.
+    # the conversational equivalent of walking into a room and forgetting why.
+    ("Oh I forgot to mention, the printer is broken.", "Can you review this PR by end of day?"),
+    ("My dog is three years old.", "What's the status on the API migration?"),
+    ("I think the cafeteria closes at 2.", "Have you seen the error logs from last night?"),
+    ("We should really organize the supply closet.", "What's our Q3 revenue forecast?"),
+    ("The parking lot was full this morning.", "Did the database backup complete?"),
+
+    # --- Quantity violating ---
+    # not strategically withholding or over-sharing — just misjudging
+    # how much information is appropriate. no implicature, just miscalibration.
+    ("Fine.", "Can you tell me everything that happened at the client meeting?"),
+    ("Good.", "How did the surgery go? We've been worried sick."),
+    ("So anyway after that meeting which was on a Tuesday I think or maybe Wednesday and Sarah was there and also possibly Mark though he might have left early and we discussed the thing about the budget which reminded me of last quarter when we had that other budget issue...", "Did they approve the proposal?"),
+    ("Things.", "What did you buy at the store?"),
+    ("It went.", "How was your first day at the new job? Tell me everything!"),
+
+    # --- Manner violating ---
+    # not artfully obscure — just bad at saying things clearly.
+    # the person who writes emails you have to read three times.
+    ("The deliverable is to be completed by the stakeholder in alignment with the synergistic framework.", "What do I actually need to do?"),
+    ("So like the thing is you go there and then you do that and then the other thing happens.", "How do I set up the development environment?"),
+    ("It's in the place where we put the thing last time we did the thing.", "Where's the backup drive?"),
+    ("You need to not un-disable the setting.", "How do I turn on notifications?"),
+    ("The meeting got rescheduled to before when it was after.", "When is the meeting now?"),
+
+    # --- Quality flouting (more) ---
+    # the model struggles here. more irony and hyperbole to train on.
+    # every one of these is literally false and everyone knows it.
+    ("Oh great, another meeting. Just what I needed.", "We have a sync at 4."),
+    ("Wow, you're so fast.", "Sorry it took me three weeks to reply to your email."),
+    ("What a surprise.", "The deploy failed again."),
+    ("Breaking news: water is wet.", "Did you know the project is over budget?"),
+    ("Sure, and pigs fly.", "I'll definitely have it done by Friday."),
+
+    # --- Cooperative (more) ---
+    # the model needs more examples of people just... answering the question.
+    # radical honesty. appropriate informativeness. what a concept.
+    ("It's on the second shelf in the supply room.", "Where do we keep the printer paper?"),
+    ("I sent it to the team yesterday around 3pm.", "Did you share the meeting notes?"),
+    ("Python 3.11 with FastAPI.", "What's the tech stack for the new service?"),
+    ("About forty-five minutes if traffic is normal.", "How long is the drive?"),
+    ("She said she'd have it ready by Thursday.", "When is the design review?"),
+    ("Two years, mostly on the backend.", "How long have you been on this team?"),
+    ("No, we decided to go with the vendor option instead.", "Are we building it in-house?"),
+    ("It's in the shared drive under Q3 Reports.", "Where can I find last quarter's numbers?"),
+
+    # ====== ROUND 4 ======
+    # going for volume now. 91 examples is not 200 examples.
+    # leaning hard into areas the model keeps getting wrong and
+    # categories with thin representation. the goal is to get to
+    # "fine-tuning might actually work" territory.
+
+    # --- Relation flouting (more variety) ---
+    # the model STILL thinks these are Quantity. more examples = more signal.
+    # trying different flavors of deflection: humor, discomfort, power moves.
+    ("Did you see the game last night?", "We need to talk about your attendance."),
+    ("I wonder what's for lunch.", "Have you thought about what I said?"),
+    ("Anyway, how's your mom doing?", "Are you going to sign the divorce papers?"),
+    ("Look, a squirrel!", "Can you explain why the tests are failing?"),
+    ("You know what I love about this office? The lighting.", "Did you take the money from petty cash?"),
+    ("Speaking of which, have you been to that new Thai place?", "So about the missing inventory..."),
+    ("Isn't it someone's birthday this week?", "When are you going to finish the migration?"),
+    ("I really need to clean my desk.", "What did you say to the client?"),
+
+    # --- Quantity flouting (more variety) ---
+    # scalar implicatures, strategic understatement, damning with faint praise.
+    # the horn scale is doing overtime here.
+    ("It's not terrible.", "What do you think of my thesis?"),
+    ("I've read a book or two on the subject.", "Are you qualified for this?"),
+    ("We've had some feedback.", "How did the users react to the redesign?"),
+    ("There have been... developments.", "What happened while I was on vacation?"),
+    ("I have thoughts.", "What do you think about the CEO's new strategy?"),
+    ("Not everyone was thrilled.", "How did the team take the news?"),
+    ("I've seen worse.", "How's the code quality on this legacy project?"),
+    ("Parts of it were interesting.", "Did you like the movie?"),
+
+    # --- Quality flouting (more irony/sarcasm/hyperbole) ---
+    # the model's nemesis. if it can learn to spot sarcasm it deserves
+    # a PhD and tenure. or at least a nice cookie.
+    ("Oh absolutely, I live for spreadsheets.", "Can you update the tracking sheet?"),
+    ("Clearly I'm the problem here.", "The server crashed after your deploy."),
+    ("Because that worked so well last time.", "Let's try the same approach again."),
+    ("I'm drowning in free time.", "Can you take on one more project?"),
+    ("Oh no, my heart bleeds for you.", "I only got a 15% raise this year."),
+    ("What a tragedy.", "The vending machine is out of chips."),
+    ("I'm sure it'll be a page-turner.", "We have a new compliance document to review."),
+    ("Right, because that's totally how databases work.", "Can't we just delete the duplicates?"),
+
+    # --- Quality violating (more) ---
+    # confidently wrong. the most dangerous kind of wrong.
+    # no ironic intent, no mutual knowledge of falsity. just... wrong.
+    ("The Great Wall of China is visible from space.", "Can you see it from up there?"),
+    ("Humans only use 10% of their brains.", "Why can't I remember anything?"),
+    ("Lightning never strikes the same place twice.", "Should we worry about that tree?"),
+    ("It takes seven years to digest gum.", "I accidentally swallowed my gum."),
+    ("We lose most of our body heat through our heads.", "Should I bring a hat?"),
+    ("Goldfish have a three-second memory.", "Do you think the fish recognizes me?"),
+    ("Cracking your knuckles causes arthritis.", "Can you stop doing that?"),
+    ("You should wait 30 minutes after eating to swim.", "Can we go to the pool now?"),
+
+    # --- Manner flouting (more variety) ---
+    # deliberately obscure, weirdly structured, or performatively unclear.
+    # the verbal equivalent of a modern art installation: you know
+    # someone meant something, you're just not sure what.
+    ("In a manner of speaking, through a lens of contextual reframing, one might suggest it was suboptimal.", "How was the meeting?"),
+    ("Step 1: don't. Step 2: see step 1.", "How should I respond to this angry email?"),
+    ("It's like that thing, but the other way, and also sideways.", "Can you describe the architecture?"),
+    ("The answer is yes, no, and it depends, in that order.", "Should we launch on Monday?"),
+    ("Let me put it this way: imagine a duck.", "Can you explain the billing system?"),
+    ("It's not not a problem, but it's not a not-problem either.", "Is this a bug?"),
+    ("Think of it as aggressively adequate.", "How would you rate the contractor's work?"),
+    ("Chronologically? Alphabetically? By emotional intensity?", "What happened today?"),
+
+    # --- Manner violating (more) ---
+    # genuinely unclear communication. not art — just bad signal.
+    # the kind of message that makes you close your laptop and stare at the wall.
+    ("So the thing with the API is that it does the thing when you call it but sometimes it doesn't do the thing and then you have to do the other thing.", "What's wrong with the API?"),
+    ("I put it over there by the thing next to where we had the meeting about the stuff.", "Where did you put the contract?"),
+    ("Yeah so basically you just kind of do it and then it works or it doesn't.", "How do I configure the load balancer?"),
+    ("The issue is related to the implementation of the functionality pertaining to the user-facing interface.", "What's the bug?"),
+    ("First you do the last part, then skip to the middle, then do the beginning.", "How do I file an expense report?"),
+    ("It's like email but not email, more like a message but not a text.", "What platform should I use to contact them?"),
+    ("The system does what it does when it does it.", "Can you document how the cron job works?"),
+    ("We need to leverage the synergies of the cross-functional paradigm shift.", "What's the plan for next quarter?"),
+
+    # --- Cooperative (lots more) ---
+    # the boring backbone. you need enough of these that the model learns
+    # "most conversation is actually cooperative" as a prior. otherwise
+    # it'll see violations everywhere, which is either a bad model
+    # or a very cynical worldview. maybe both.
+    ("Three bugs, all in the auth module.", "What did you find in the code review?"),
+    ("Sure, I'll send it over after lunch.", "Can you share the slide deck?"),
+    ("It's a React app with a Node backend.", "What are we building?"),
+    ("Tuesday at 2pm works for me.", "When can we meet to discuss the roadmap?"),
+    ("I'd recommend the salmon.", "What's good here?"),
+    ("About 200 lines, mostly tests.", "How big is the PR?"),
+    ("She's on PTO until next Wednesday.", "Is Sarah available for a meeting?"),
+    ("Version 3.2, released last month.", "What version of the SDK are you using?"),
+    ("It's a known issue, fix is in the next release.", "Why does the export keep failing?"),
+    ("Yep, merged it this morning.", "Did the hotfix go out?"),
+    ("Chicken parm, if they still have it.", "What do you want for lunch?"),
+    ("I think we should wait for the test results first.", "Should we ship this today?"),
+    ("The deadline is March 15th.", "When is the proposal due?"),
+    ("It's the third door on the right, past the kitchen.", "Where's the conference room?"),
+    ("About 12 milliseconds per request.", "What's the average latency?"),
+    ("No, that was deprecated in version 4.", "Does the old endpoint still work?"),
 ]
 
 
