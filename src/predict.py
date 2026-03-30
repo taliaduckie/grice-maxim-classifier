@@ -62,12 +62,16 @@ def predict(text: str, context: str = "") -> dict:
         result = clf(input_text, top_k=None)
         scores = {r["label"]: r["score"] for r in result}
         top = max(scores, key=scores.get)
-        # no violation_type here because the fine-tuned model predicts it directly.
-        # the zero-shot path has to guess. we don't have to guess. progress!!
+        # same heuristic as zero_shot.py: cooperative = none, everything else = flouting.
+        # eventually this should be a second head or a separate model but today
+        # is not that day. today is "make the return dicts match so downstream
+        # code doesn't explode when switching between fine-tuned and zero-shot" day.
+        violation_type = "none" if top == "Cooperative" else "flouting"
         return {
             "utterance": text,
             "context": context,
             "predicted_maxim": top,
+            "violation_type": violation_type,
             "confidence": scores[top],
             "all_scores": scores,
         }
