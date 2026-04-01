@@ -127,15 +127,19 @@ def train(data_path: str):
     train_ds = Subset(dataset, train_idx)
     eval_ds  = Subset(dataset, eval_idx)
 
-    print(f"Training on {train_size} examples, evaluating on {n - train_size}.")
+    print(f"Training on {len(train_idx)} examples, evaluating on {len(eval_idx)}.")
 
     args = TrainingArguments(
         output_dir=OUTPUT_DIR,
-        num_train_epochs=5,
+        num_train_epochs=10,
         # batch size of 4 because your M3 ran out of GPU memory at 16.
         # the indignity of being OOM'd by 62 examples.
         per_device_train_batch_size=4,
         per_device_eval_batch_size=4,
+        # lower lr because the default 5e-5 wasn't converging with
+        # stratified split. 2e-5 is the "i've been hurt before" setting.
+        learning_rate=2e-5,
+        warmup_ratio=0.1,
         eval_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
