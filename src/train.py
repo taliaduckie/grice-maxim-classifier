@@ -31,6 +31,7 @@ import sys
 import numpy as np
 from pathlib import Path
 from torch.utils.data import Subset
+from sklearn.model_selection import train_test_split
 
 # same sys.path dance as predict.py. i refuse to write a setup.py for this.
 sys.path.insert(0, str(Path(__file__).parent))
@@ -112,11 +113,19 @@ def train(data_path: str):
             "until you have a bigger corpus."
         )
 
-    # 80/20 split. no stratification. living dangerously means your eval set
-    # might not even have all five classes represented. science!!
-    train_size = int(0.8 * n)
-    train_ds   = Subset(dataset, range(train_size))
-    eval_ds    = Subset(dataset, range(train_size, n))
+    # stratified 80/20 split so every class actually shows up in eval.
+    # the previous naive split gave Relation F1=0.00 because the eval set
+    # had zero Relation examples. which is technically a valid split but
+    # also technically useless. sklearn to the rescue.
+    indices = list(range(n))
+    train_idx, eval_idx = train_test_split(
+        indices,
+        test_size=0.2,
+        stratify=dataset.labels,
+        random_state=42,  # reproducibility is a cooperative maxim
+    )
+    train_ds = Subset(dataset, train_idx)
+    eval_ds  = Subset(dataset, eval_idx)
 
     print(f"Training on {train_size} examples, evaluating on {n - train_size}.")
 
