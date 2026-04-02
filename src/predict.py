@@ -33,6 +33,19 @@ sys.path.insert(0, str(Path(__file__).parent))
 # congratulations future me. or condolences. depending on how the f1 looks.
 MODEL_DIR = Path(__file__).parent.parent / "models" / "roberta-grice"
 
+# lazy-loaded pipeline cache. loading the model 229 times in batch mode
+# was a manner violation of the highest order. now it loads once and
+# stays loaded like a responsible adult.
+_pipeline = None
+
+
+def _get_pipeline():
+    global _pipeline
+    if _pipeline is None:
+        from transformers import pipeline
+        _pipeline = pipeline("text-classification", model=str(MODEL_DIR))
+    return _pipeline
+
 
 def predict(text: str, context: str = "") -> dict:
     """
@@ -47,12 +60,10 @@ def predict(text: str, context: str = "") -> dict:
     enough. I know. I'm working on it.
     """
     if MODEL_DIR.exists():
-        # Fine-tuned model path. it WORKS now. 155 examples and a tokenizer
-        # save later, we have a model that correctly identifies sarcasm at
-        # 82% confidence. take THAT, manner. (manner is still hard but we
-        # don't talk about manner.)
-        from transformers import pipeline
-        clf = pipeline("text-classification", model=str(MODEL_DIR))
+        # Fine-tuned model path. it WORKS now. 229 examples and a tokenizer
+        # save later, we have a model that hits 0.84 macro F1. take THAT,
+        # manner. (manner is still hard but we don't talk about manner.)
+        clf = _get_pipeline()
         # same bracketed format as zero_shot.py. consistency! the manner maxim
         # would be proud of me. (it wouldn't. nothing satisfies manner.)
         input_text = f"[Context: {context}] {text}" if context else text
