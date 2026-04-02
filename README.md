@@ -22,39 +22,51 @@ Also distinguishes *flouting* (deliberate, to generate implicature) from
 
 ## Model
 
-Zero-shot baseline: `facebook/bart-large-mnli`
-Fine-tuned target: `roberta-base` on a manually annotated corpus
+Fine-tuned: `roberta-base` on 229 hand-annotated examples. Macro F1 = **0.84**
+on a stratified 80/20 eval split. Per-class on the full corpus:
 
-The zero-shot baseline works by passing natural-language hypothesis
-descriptions of each maxim to the NLI model and scoring entailment.
-It gets Quantity reliably, Relation sometimes, and Manner almost never.
-Quality flouting (irony, hyperbole) is hard for reasons that are hard.
+| Maxim | Accuracy |
+|---|---|
+| Relation | 100% |
+| Quantity | 96% |
+| Manner | 93% |
+| Cooperative | 90% |
+| Quality | 88% |
+
+Fallback: `facebook/bart-large-mnli` zero-shot baseline if no fine-tuned model
+exists. Works by passing natural-language hypothesis descriptions to the NLI
+model and scoring entailment. Good enough to bootstrap annotation but not
+much else. Quality flouting (irony, hyperbole) is hard for reasons that are hard.
 
 ## Corpus
 
-40 annotated utterance-context pairs in `data/annotated/corpus.csv`.
-Distribution: 9 Cooperative, 7 Quantity, 8 Quality, 7 Relation, 6 Manner.
-Heavily skewed toward flouting (26) over violating (5) — the interesting
-cases are the deliberate ones.
+229 annotated utterance-context pairs in `data/annotated/corpus.csv`.
+Distribution: 49 Quantity, 49 Quality, 46 Manner, 45 Relation, 40 Cooperative.
+127 flouting, 62 violating, 40 none.
 
 Bootstrapped via `src/bootstrap.py`, which runs zero-shot predictions on
 seed pairs and outputs a CSV for human correction. The model's guesses
 are wrong often enough to keep you honest and right often enough to be
-faster than annotating from scratch.
+faster than annotating from scratch. Five rounds of bootstrap + annotate
+got us from 8 examples to 229.
 
 ## Setup
 
 ```bash
 pip install -r requirements.txt
 
-# Zero-shot inference (no training needed)
+# Single utterance inference
 python src/predict.py --text "The weather is nice today." \
                       --context "Why were you late to the meeting?"
+
+# Batch mode — run on a CSV, compare against gold labels
+python src/predict.py --batch data/annotated/corpus.csv
+python src/predict.py --batch data/annotated/corpus.csv --output results.csv
 
 # Bootstrap more annotations
 python src/bootstrap.py
 
-# Fine-tune on your annotated data (once you have enough of it)
+# Fine-tune on your annotated data
 python src/train.py --data data/annotated/corpus.csv
 ```
 
