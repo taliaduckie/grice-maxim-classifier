@@ -175,6 +175,28 @@ def predict_batch(csv_path: str, output_path: str = None) -> list:
             c, t = class_correct[maxim], class_total[maxim]
             print(f"  {maxim:<12} {c}/{t} ({c/t:.0%})")
 
+        # confusion matrix — the part where you find out your model thinks
+        # all sarcasm is Quantity and all Cooperative responses are Quality.
+        # or at least it used to. hopefully the 20 sarcasm examples fixed that.
+        from labels import MAXIMS
+        all_labels = sorted(set(MAXIMS) & (set(class_total) | set(r["predicted_maxim"] for r in results)))
+        label_to_idx = {l: i for i, l in enumerate(all_labels)}
+        matrix = [[0] * len(all_labels) for _ in all_labels]
+        for r in results:
+            gold_idx = label_to_idx.get(r["gold_maxim"])
+            pred_idx = label_to_idx.get(r["predicted_maxim"])
+            if gold_idx is not None and pred_idx is not None:
+                matrix[gold_idx][pred_idx] += 1
+
+        # print it. it's not pretty but it's informative. manner would
+        # have opinions about the formatting. manner always has opinions.
+        col_width = max(len(l) for l in all_labels) + 2
+        header = " " * col_width + "".join(l[:6].rjust(7) for l in all_labels)
+        print(f"\nConfusion matrix (rows=gold, cols=predicted):\n{header}")
+        for i, label in enumerate(all_labels):
+            row = label.ljust(col_width) + "".join(str(matrix[i][j]).rjust(7) for j in range(len(all_labels)))
+            print(row)
+
     # write output CSV if requested
     if output_path:
         with open(output_path, "w", newline="") as f:
