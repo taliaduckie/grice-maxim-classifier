@@ -83,3 +83,8 @@ grice-maxim-classifier/
 └── tests/
     └── test_labels.py
 ```
+
+## TODO
+
+- **K-fold cross-validation** — the single 80/20 stratified split means F1 numbers depend on which 50 examples land in eval. K-fold would give more stable estimates and catch classes that happen to get lucky or unlucky in a given split.
+- **Violation type prediction** — right now `violation_type` is a heuristic: cooperative = none, everything else = flouting. The corpus has 147 flouting, 62 violating, 40 none — enough to train a second classification head or a separate model. The flouting/violating distinction is the interesting part of Gricean pragmatics and we're currently just guessing.
