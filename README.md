@@ -22,33 +22,28 @@ Also distinguishes *flouting* (deliberate, to generate implicature) from
 
 ## Model
 
-Fine-tuned: `roberta-base` on 229 hand-annotated examples. Macro F1 = **0.84**
-on a stratified 80/20 eval split. Per-class on the full corpus:
+Fine-tuned: `roberta-base` on 249 hand-annotated examples. Macro F1 = **0.81**
+on a stratified 80/20 eval split. Training: 10 epochs, lr=2e-5, batch size 4.
 
-| Maxim | Accuracy |
-|---|---|
-| Relation | 100% |
-| Quantity | 96% |
-| Manner | 93% |
-| Cooperative | 90% |
-| Quality | 88% |
+Sarcasm detection was the hardest problem. 20 targeted workplace sarcasm
+examples got Quality flouting from ~65% confidence to 99%+.
 
 Fallback: `facebook/bart-large-mnli` zero-shot baseline if no fine-tuned model
 exists. Works by passing natural-language hypothesis descriptions to the NLI
 model and scoring entailment. Good enough to bootstrap annotation but not
-much else. Quality flouting (irony, hyperbole) is hard for reasons that are hard.
+much else.
 
 ## Corpus
 
-229 annotated utterance-context pairs in `data/annotated/corpus.csv`.
-Distribution: 49 Quantity, 49 Quality, 46 Manner, 45 Relation, 40 Cooperative.
-127 flouting, 62 violating, 40 none.
+249 annotated utterance-context pairs in `data/annotated/corpus.csv`.
+Distribution: 69 Quality, 49 Quantity, 46 Manner, 45 Relation, 40 Cooperative.
+147 flouting, 62 violating, 40 none.
 
 Bootstrapped via `src/bootstrap.py`, which runs zero-shot predictions on
 seed pairs and outputs a CSV for human correction. The model's guesses
 are wrong often enough to keep you honest and right often enough to be
 faster than annotating from scratch. Five rounds of bootstrap + annotate
-got us from 8 examples to 229.
+got us from 8 examples to 249.
 
 ## Setup
 
