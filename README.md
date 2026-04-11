@@ -22,8 +22,19 @@ Also distinguishes *flouting* (deliberate, to generate implicature) from
 
 ## Model
 
-Fine-tuned: `roberta-base` on 249 hand-annotated examples. Macro F1 = **0.81**
-on a stratified 80/20 eval split. Training: 10 epochs, lr=2e-5, batch size 4.
+Fine-tuned: `roberta-base` on 367 hand-annotated examples. Macro F1 = **0.86**
+on a stratified 80/20 eval split. Training: 10 epochs, lr=2e-5, batch size 4,
+~9 minutes on CPU.
+
+Per-class accuracy on the full corpus:
+
+| Maxim | Accuracy |
+|---|---|
+| Quantity | 99% |
+| Relation | 99% |
+| Manner | 97% |
+| Cooperative | 96% |
+| Quality | 93% |
 
 Sarcasm detection was the hardest problem. 20 targeted workplace sarcasm
 examples got Quality flouting from ~65% confidence to 99%+.
@@ -35,15 +46,15 @@ much else.
 
 ## Corpus
 
-249 annotated utterance-context pairs in `data/annotated/corpus.csv`.
-Distribution: 69 Quality, 49 Quantity, 46 Manner, 45 Relation, 40 Cooperative.
-147 flouting, 62 violating, 40 none.
+367 annotated utterance-context pairs in `data/annotated/corpus.csv`.
+Distribution: 86 Quality, 72 Quantity, 70 Relation, 70 Cooperative, 69 Manner.
+150 violating, 147 flouting, 70 none.
 
 Bootstrapped via `src/bootstrap.py`, which runs zero-shot predictions on
 seed pairs and outputs a CSV for human correction. The model's guesses
 are wrong often enough to keep you honest and right often enough to be
 faster than annotating from scratch. Five rounds of bootstrap + annotate
-got us from 8 examples to 249.
+plus targeted rebalancing got us from 8 examples to 367.
 
 ## Setup
 
@@ -87,4 +98,4 @@ grice-maxim-classifier/
 ## TODO
 
 - **K-fold cross-validation** — the single 80/20 stratified split means F1 numbers depend on which 50 examples land in eval. K-fold would give more stable estimates and catch classes that happen to get lucky or unlucky in a given split.
-- **Violation type prediction** — right now `violation_type` is a heuristic: cooperative = none, everything else = flouting. The corpus has 147 flouting, 62 violating, 40 none — enough to train a second classification head or a separate model. The flouting/violating distinction is the interesting part of Gricean pragmatics and we're currently just guessing.
+- **Violation type prediction** — right now `violation_type` is a heuristic: cooperative = none, everything else = flouting. The corpus has 147 flouting, 150 violating, 70 none — enough to train a second classification head or a separate model. The flouting/violating distinction is the interesting part of Gricean pragmatics and we're currently just guessing.
