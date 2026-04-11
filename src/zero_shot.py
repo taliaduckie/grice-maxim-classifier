@@ -100,13 +100,12 @@ def classify(utterance: str, context: str = "") -> MaximPrediction:
     top_maxim = hyp_to_maxim[top_hyp]
     confidence = result["scores"][0]
 
-    # For zero-shot, we can only reliably distinguish cooperative from
-    # non-cooperative. The flouting/violating distinction requires either
-    # a fine-tuned model or more context than we typically have.
-    # So: if the top label is Cooperative, mark as none.
-    # Otherwise, mark as flouting — the optimistic default.
-    # (Most interesting cases are flouting anyway.)
-    violation_type = "none" if top_maxim == "Cooperative" else "flouting"
+    # For zero-shot, we genuinely don't know if it's flouting or violating.
+    # the old default was "flouting" which sounds reasonable until you realize
+    # these predictions seed the annotation pipeline and annotators anchor
+    # on whatever they see first. "flouting" as a default = flouting-heavy
+    # corpus = biased fine-tuning. the model doesn't know. say so.
+    violation_type = "none" if top_maxim == "Cooperative" else "unknown"
 
     # ship it. this dataclass is doing more theoretical work than my undergrad thesis did.
     return MaximPrediction(

@@ -86,7 +86,8 @@ grice-maxim-classifier/
 │   ├── dataset.py      # dataset loading and tokenization
 │   ├── train.py        # fine-tuning loop (RoBERTa)
 │   ├── predict.py      # inference CLI
-│   └── bootstrap.py    # pre-label seed pairs for annotation
+│   ├── bootstrap.py    # pre-label seed pairs for annotation
+│   └── app.py          # Gradio web demo
 ├── data/
 │   ├── raw/            # unannotated utterance pairs
 │   └── annotated/      # gold-labeled CSV corpus
@@ -99,3 +100,7 @@ grice-maxim-classifier/
 
 - **K-fold cross-validation** — the single 80/20 stratified split means F1 numbers depend on which 50 examples land in eval. K-fold would give more stable estimates and catch classes that happen to get lucky or unlucky in a given split.
 - **Violation type prediction** — right now `violation_type` is a heuristic: cooperative = none, everything else = flouting. The corpus has 147 flouting, 150 violating, 70 none — enough to train a second classification head or a separate model. The flouting/violating distinction is the interesting part of Gricean pragmatics and we're currently just guessing.
+- **Error analysis** — the model gets 13/367 wrong. Are those genuinely ambiguous or is there a pattern worth fixing with more targeted data?
+- **Held-out test set** — eval is currently part of the training loop. A true out-of-sample set (50 examples the model never sees during training) would give a more honest score.
+- **Try roberta-large** — twice the parameters, probably a few F1 points for free. Slower to train but we're at 9 minutes on CPU so there's room.
+- **Run on real data** — everything in the corpus is synthetic. Reddit threads, meeting transcripts, customer support logs — see how it holds up when people are actually talking and not performing pragmatics for a dataset.
