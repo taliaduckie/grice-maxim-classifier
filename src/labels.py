@@ -37,6 +37,8 @@ MAXIMS = ["Cooperative", "Quantity", "Quality", "Relation", "Manner"]
 # cooperative in the meta sense but locally non-cooperative. Tricky.
 # Clash is when two maxims conflict and you have to break one to satisfy
 # the other. Less common but interesting when it shows up.
+# NOTE: clash is unreachable in the zero-shot path because multi_label=False
+# forces a single winner. it's here for fine-tuned models and human annotation.
 # five flavors of conversational misbehavior (plus "none" for the well-behaved
 # and "unknown" for when the model genuinely can't tell — which is most of the
 # time in zero-shot. honesty is a quality maxim thing.)

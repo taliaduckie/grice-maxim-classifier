@@ -81,9 +81,12 @@ def classify(utterance: str, context: str = "") -> MaximPrediction:
     # and hoping for the best. this is either clever or unhinged. possibly both.
     hypotheses = list(ZS_HYPOTHESES.values())
 
-    # multi_label=False because an utterance violates at most one maxim at a time.
-    # this is a simplification. grice would not approve. but grice is not reviewing
-    # this code so we're fine.
+    # multi_label=False forces winner-take-all: exactly one maxim wins.
+    # this means "clash" (two maxims violated simultaneously) is architecturally
+    # unreachable in this path. clash is defined in VIOLATION_TYPES but the
+    # zero-shot setup literally cannot produce it — you'd need multi_label=True
+    # with a threshold and logic to detect when two maxims score high.
+    # that's a TODO. for now, clash is reserved for fine-tuned + human annotation.
     result = clf(input_text, candidate_labels=hypotheses, multi_label=False)
 
     # Map hypothesis strings back to maxim names.
