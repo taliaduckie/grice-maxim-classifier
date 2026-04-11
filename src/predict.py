@@ -72,11 +72,11 @@ def predict(text: str, context: str = "") -> dict:
         result = clf(input_text, top_k=None)
         scores = {r["label"]: r["score"] for r in result}
         top = max(scores, key=scores.get)
-        # same heuristic as zero_shot.py: cooperative = none, everything else = flouting.
-        # eventually this should be a second head or a separate model but today
-        # is not that day. today is "make the return dicts match so downstream
-        # code doesn't explode when switching between fine-tuned and zero-shot" day.
-        violation_type = "none" if top == "Cooperative" else "flouting"
+        # the model only predicts the maxim, not the violation type.
+        # we don't know if it's flouting or violating and we're not going
+        # to pretend we do. "unknown" until there's a second head or a
+        # separate model. cooperative gets "none" because that one's obvious.
+        violation_type = "none" if top == "Cooperative" else "unknown"
         return {
             "utterance": text,
             "context": context,

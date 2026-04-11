@@ -37,8 +37,10 @@ MAXIMS = ["Cooperative", "Quantity", "Quality", "Relation", "Manner"]
 # cooperative in the meta sense but locally non-cooperative. Tricky.
 # Clash is when two maxims conflict and you have to break one to satisfy
 # the other. Less common but interesting when it shows up.
-# five flavors of conversational misbehavior (plus "none" for the well-behaved)
-VIOLATION_TYPES = ["none", "flouting", "violating", "opting_out", "clash"]
+# five flavors of conversational misbehavior (plus "none" for the well-behaved
+# and "unknown" for when the model genuinely can't tell — which is most of the
+# time in zero-shot. honesty is a quality maxim thing.)
+VIOLATION_TYPES = ["none", "flouting", "violating", "opting_out", "clash", "unknown"]
 
 # Human-readable descriptions. These are for annotation documentation
 # and for anyone reading this who hasn't committed Grice (1975) to memory,
