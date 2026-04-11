@@ -74,7 +74,13 @@ def classify(utterance: str, context: str = "") -> MaximPrediction:
     clf = get_classifier()
 
     # Combine context and utterance into a single input string.
-    # Tested several formats; this one performed best on manual eval.
+    # The bracket format probably works because BART was trained on text where
+    # brackets signal metadata/non-primary content, so it treats the context
+    # as framing rather than part of the utterance. that's the theory anyway.
+    # "tested several formats; this one performed best on manual eval" was the
+    # original comment but there's no record of what the other formats were
+    # or how many examples were tested. this has not been formally ablated.
+    # it works well enough that i haven't been motivated to fix that. yet.
     input_text = f"[Context: {context}] {utterance}" if context else utterance
 
     # feeding the model plain english descriptions of abstract pragmatic categories
