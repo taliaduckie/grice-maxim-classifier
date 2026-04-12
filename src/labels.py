@@ -65,7 +65,10 @@ MAXIM_DESCRIPTIONS = {
         "Classic flouting: say 'some' when you could say 'all' and let the listener "
         "do the math. The scalar implicature cases live here. "
         "Also includes when someone answers a yes/no question with a paragraph — "
-        "that's quantity too, just in the other direction."
+        "that's quantity too, just in the other direction. "
+        "Note: opting_out lives under Quantity — 'no comment', 'i'd rather not say' "
+        "are technically underinformative but the pragmatic move is refusal, not "
+        "implicature. use opting_out, not flouting, for these."
     ),
     "Quality": (
         "Saying something false, or something you don't have evidence for. "
@@ -88,6 +91,20 @@ MAXIM_DESCRIPTIONS = {
         "well. That's the whole problem, isn't it."
     ),
 }
+
+# The flouting/violating distinction for Relation is not empirically grounded.
+# Coherence scoring (L = cosine similarity between Q and A embeddings) shows
+# Relation flouting and violating cluster identically (mean L=0.094 vs 0.049,
+# within one std dev). The surface form of a deliberate deflection and a genuine
+# non-sequitur is the same — the difference is speaker intent, which isn't in
+# the text. All Relation examples should use violation_type="unknown" unless
+# you have strong extralinguistic evidence for flouting or violating.
+RELATION_NOTE = (
+    "The flouting/violating distinction is not empirically separable for Relation. "
+    "Coherence scoring shows no meaningful difference between deliberate deflection "
+    "and genuine irrelevance at the surface level. Use violation_type='unknown' "
+    "for Relation examples unless you have extralinguistic evidence of intent."
+)
 
 # These are the hypotheses we pass to the NLI model for zero-shot inference.
 # Each one is a natural language description of what it would mean for an
