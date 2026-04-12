@@ -39,10 +39,17 @@ MAXIMS = ["Cooperative", "Quantity", "Quality", "Relation", "Manner"]
 # the other. Less common but interesting when it shows up.
 # NOTE: clash is unreachable in the zero-shot path because multi_label=False
 # forces a single winner. it's here for fine-tuned models and human annotation.
-# five flavors of conversational misbehavior (plus "none" for the well-behaved
+# Failed_flout is the gray zone: speaker might be deflecting on purpose but
+# there's no surface signal distinguishing it from genuine irrelevance. the
+# L+O coherence scoring pass is the empirical check — low coherence between
+# Q and A suggests the non-sequitur isn't doing communicative work, which
+# means it's either violating or a failed attempt at flouting. either way
+# it's not the clean implicature-generating move that "flouting" implies.
+#
+# six flavors of conversational misbehavior (plus "none" for the well-behaved
 # and "unknown" for when the model genuinely can't tell — which is most of the
 # time in zero-shot. honesty is a quality maxim thing.)
-VIOLATION_TYPES = ["none", "flouting", "violating", "opting_out", "clash", "unknown"]
+VIOLATION_TYPES = ["none", "flouting", "violating", "failed_flout", "opting_out", "clash", "unknown"]
 
 # Human-readable descriptions. These are for annotation documentation
 # and for anyone reading this who hasn't committed Grice (1975) to memory,
