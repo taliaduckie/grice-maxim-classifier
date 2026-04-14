@@ -1,0 +1,41 @@
+utterance,context,exchange_type,maxim,flout_or_violate,surface_proxy_present
+"The presentation covered the main points.","How did the presentation go?",performance_eval,Quantity,unknown,false
+"The client seemed interested in the contract terms.","Did the client sign the contract?",performance_eval,Quantity,unknown,false
+"The proposal had some good sections.","What did you think of my proposal?",performance_eval,Quantity,unknown,false
+"The new hire completed her project on time.","How did the new hire do on her first project?",performance_eval,Quantity,unknown,false
+"The review touched on a few areas.","How was your performance review?",performance_eval,Quantity,unknown,false
+"I looked at the auth module code.","Did you find the bug in the auth module?",technical,Quantity,unknown,false
+"The API errors might be resolved now.","Why is the API returning 500 errors?",technical,Quality,unknown,false
+"The database timeout could be a config issue.","The database is timing out on every query.",technical,Quality,unknown,false
+"I adjusted some memory settings.","What did you do to fix the memory leak?",technical,Quantity,unknown,false
+"The endpoint should handle errors already.","Should we add error handling to this endpoint?",technical,Quality,unknown,false
+"The Q3 deadline work is progressing.","Are we going to hit the Q3 deadline?",status_update,Quantity,unknown,false
+"The redesign has had some updates.","Where are we on the redesign?",status_update,Quantity,unknown,false
+"The migration is in a reasonable state.","Is the migration on track?",status_update,Quality,unknown,false
+"The vendor contract went through some changes.","What happened with the vendor contract?",status_update,Quantity,unknown,false
+"The security audit follow-up is underway.","Did anyone follow up on the security audit?",status_update,Quantity,unknown,false
+"The stress has been manageable lately.","You seem really stressed lately. Is everything alright?",personal,Quantity,unknown,false
+"The layoffs were a lot to process.","How are you doing after the layoffs?",personal,Quantity,unknown,false
+"The workload is about what I expected.","Are you handling the workload okay?",personal,Quantity,unknown,false
+"The team dynamic shifted after Sarah left.","How's the team since Sarah left?",personal,Quantity,unknown,false
+"The situation with my manager is complicated.","What happened between you and your manager?",personal,Quantity,unknown,false
+"The new architecture has some trade-offs.","Should we commit to the new architecture?",decision,Quantity,unknown,false
+"Both the monolith and microservices have merits.","Do you prefer the monolith or microservices?",decision,Quantity,unknown,false
+"Hiring externally and promoting internally both work.","Should we hire externally or promote from within?",decision,Quantity,unknown,false
+"A two-week delay would affect the launch timeline.","Should we delay the launch by two weeks?",decision,Quantity,unknown,false
+"Dropping the feature is one approach to consider.","I think we should drop the feature entirely.",decision,Quantity,unknown,false
+"Garbage collection in Go involves memory management.","How does garbage collection work in Go?",knowledge,Manner,unknown,false
+"The slow page load is related to how data is fetched.","Why is the page loading slowly?",knowledge,Manner,unknown,false
+"Staging server access depends on permission settings.","Why can't I access the staging server?",knowledge,Manner,unknown,false
+"The service restart relates to how the system handles state.","Why do we need to restart the service every time?",knowledge,Manner,unknown,false
+"Setting up a reverse proxy involves some configuration.","Do you know how to set up a reverse proxy?",knowledge,Manner,unknown,false
+"I communicated the deadline change to the team.","Did you tell the team about the deadline change?",conflict,Quality,unknown,false
+"My recollection of the feature status is different.","You said the feature was ready to ship.",conflict,Quality,unknown,false
+"I thought the client notification was being handled.","Why wasn't the client notified?",conflict,Quality,unknown,false
+"What I said about the data was slightly different.","You told me to delete the old data.",conflict,Quality,unknown,false
+"My understanding of the spec was different regarding auth.","The spec says we need OAuth, not API keys.",conflict,Quality,unknown,false
+"The CI pipeline settings need some configuration changes.","How do I configure the CI pipeline?",instruction,Manner,unknown,false
+"The production deployment follows a set of steps.","How do I deploy to production?",instruction,Manner,unknown,false
+"The onboarding process has several parts to it.","Can you walk me through the onboarding process?",instruction,Manner,unknown,false
+"The test suite requires some initial setup.","How do I run the test suite?",instruction,Manner,unknown,false
+"VPN access involves a request through the access system.","How do I request access to the VPN?",instruction,Manner,unknown,false
