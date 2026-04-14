@@ -10,13 +10,13 @@ utterance,context,exchange_type,maxim,flout_or_violate,surface_proxy_present
 "I adjusted some memory settings.","What did you do to fix the memory leak?",technical,Quantity,unknown,false
 "The endpoint should handle errors already.","Should we add error handling to this endpoint?",technical,Quality,unknown,false
 "The Q3 deadline work is progressing.","Are we going to hit the Q3 deadline?",status_update,Quantity,unknown,false
-"The redesign has had some updates.","Where are we on the redesign?",status_update,Quantity,unknown,false
+"The redesign has had some updates.","Where are we on the redesign?",status_update,Manner,unknown,false
 "The migration is in a reasonable state.","Is the migration on track?",status_update,Quality,unknown,false
 "The vendor contract went through some changes.","What happened with the vendor contract?",status_update,Quantity,unknown,false
 "The security audit follow-up is underway.","Did anyone follow up on the security audit?",status_update,Quantity,unknown,false
-"The stress has been manageable lately.","You seem really stressed lately. Is everything alright?",personal,Quantity,unknown,false
-"The layoffs were a lot to process.","How are you doing after the layoffs?",personal,Quantity,unknown,false
-"The workload is about what I expected.","Are you handling the workload okay?",personal,Quantity,unknown,false
+"The stress has been manageable lately.","You seem really stressed lately. Is everything alright?",personal,Cooperative,unknown,false
+"The layoffs were a lot to process.","How are you doing after the layoffs?",personal,Cooperative,unknown,false
+"The workload is about what I expected.","Are you handling the workload okay?",personal,Cooperative,unknown,false
 "The team dynamic shifted after Sarah left.","How's the team since Sarah left?",personal,Quantity,unknown,false
 "The situation with my manager is complicated.","What happened between you and your manager?",personal,Quantity,unknown,false
 "The new architecture has some trade-offs.","Should we commit to the new architecture?",decision,Quantity,unknown,false
