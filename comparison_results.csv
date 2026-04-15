@@ -1,256 +1,251 @@
 utterance,context,exchange_type,gold_maxim,roberta_label,roberta_confidence,claude_label,agree,claude_reasoning
-The presentation covered the main points.,How did the presentation go?,performance_eval,Quantity,Quantity,0.998,Quantity,True,"**Classification: Quantity**
+The presentation covered the main points.,How did the presentation go?,performance_eval,Quantity,Quantity,0.999,Quantity,True,"**Classification: Quantity**
 
-This utterance violates the maxim of quantity by being underinformative for a performance evaluation context. The response merely states what the presentation did (covered main points) without providing any evaluative assessment, specific feedback, or actionable details about the quality, effectiveness, or areas for improvement. In performance evaluation exchanges, cooperative responses require concrete assessment and examples, which this response entirely lacks.
-
-**Surface proxy question: No**
-
-My reasoning was based on the semantic content and informativeness of the response relative to the evaluation context, not on any surface-level linguistic markers."
-The client seemed interested in the contract terms.,Did the client sign the contract?,performance_eval,Quantity,Manner,0.600,Quantity,False,"**Classification: Quantity**
-
-The utterance violates the Quantity maxim by being underinformative. The question directly asks whether the client signed the contract (a yes/no question requiring a specific factual answer), but the response only provides vague information about the client's apparent interest level. This fails to provide the specific, actionable information expected in a performance evaluation context - the evaluator needs to know the concrete outcome (signed or not signed) to properly assess performance.
+This utterance violates the maxim of Quantity by being underinformative for a performance evaluation context. When asked ""How did the presentation go?"", the response merely states what was covered without providing any evaluative assessment of quality, effectiveness, audience reception, or specific feedback that would be expected in a performance evaluation. The response fails to meet the clarity norm requiring ""specific, actionable assessment"" and instead offers only a basic factual observation.
 
 **Surface proxy question: No**
 
-My reasoning was based on the semantic content and informativeness of the response relative to the question asked, not on any surface-level linguistic markers."
-The proposal had some good sections.,What did you think of my proposal?,performance_eval,Quantity,Quantity,0.998,Quantity,True,"**Classification: Quantity**
+My reasoning did not rely on surface-level linguistic markers like capitalization, scare quotes, or hedging language, but rather on the content's failure to provide adequate evaluative information for the context."
+The client seemed interested in the contract terms.,Did the client sign the contract?,performance_eval,Quantity,Cooperative,0.901,Quantity,False,"**Classification: Quantity**
 
-This utterance violates the maxim of quantity by being underinformative for a performance evaluation context. The response fails to provide the specific, actionable assessment expected in this exchange type - it doesn't identify which sections were good, what made them good, or offer concrete feedback the evaluatee can use. The vague praise without examples leaves the evaluatee without useful guidance for understanding their strengths or areas for improvement.
+This utterance violates the maxim of quantity by providing insufficient information. The question directly asks whether the client signed the contract (requiring a yes/no answer), but the response only mentions that the client ""seemed interested"" without addressing the actual signing. In a performance evaluation context where specific, actionable information is expected, this vague response fails to provide the concrete detail needed to assess what actually happened with the contract.
 
-**Surface proxy question: Did you rely on surface-level linguistic markers?**
+**Surface proxy: No**"
+The proposal had some good sections.,What did you think of my proposal?,performance_eval,Quantity,Quantity,0.999,Quantity,True,"**Classification: Quantity**
 
-No"
-The new hire completed her project on time.,How did the new hire do on her first project?,performance_eval,Quantity,Manner,0.653,Quantity,False,"**Classification: Quantity**
-
-The utterance violates the Quantity maxim by being underinformative for a performance evaluation context. While it provides one factual detail (completing on time), it fails to meet the clarity norm's requirement for ""specific, actionable assessment"" and ""concrete details."" A cooperative performance evaluation response should include information about quality of work, specific strengths/weaknesses, areas for improvement, and examples of performance beyond just meeting deadlines.
+This response violates the maxim of Quantity by being underinformative for a performance evaluation context. The utterance provides only vague praise (""some good sections"") without specifying which sections were good, what made them good, or providing actionable feedback. Given the clarity norm expectation for concrete details and specific assessment in performance evaluations, this response fails to provide sufficient information for meaningful evaluation.
 
 **Surface proxy question: No**
 
-My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language. The violation stems from the substantive lack of evaluative content rather than any particular linguistic features."
-The review touched on a few areas.,How was your performance review?,performance_eval,Quantity,Quantity,0.998,Quantity,True,"**Classification: Quantity**
+My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the lack of specificity and actionable content in the response."
+The new hire completed her project on time.,How did the new hire do on her first project?,performance_eval,Quantity,Quality,0.401,Quantity,False,"**Classification: Quantity**
 
-This utterance violates the maxim of quantity by being severely underinformative for a performance evaluation context. The response fails to provide the specific, actionable details that both parties expect in this exchange type - it doesn't specify which areas were discussed, whether the feedback was positive or negative, or what concrete steps might be needed. The vague phrase ""touched on a few areas"" provides virtually no useful information about the actual content or outcomes of the performance review.
-
-**Surface proxy question: No**
-
-My reasoning was based on the semantic content and informativeness relative to context expectations, not on surface-level linguistic markers like capitalization, quotation marks, or hedging language."
-I looked at the auth module code.,Did you find the bug in the auth module?,technical,Quantity,Quantity,0.493,Quantity,True,"**Classification: Quantity**
-
-The utterance violates the maxim of quantity by being underinformative. In a technical troubleshooting context, simply stating ""I looked at the auth module code"" fails to provide the specific information needed - whether a bug was found, what was discovered during the review, or what the next steps should be. The response doesn't answer the direct question about finding the bug or provide any diagnostic information that would help resolve the technical issue.
-
-**Surface proxy question: no**"
-The API errors might be resolved now.,Why is the API returning 500 errors?,technical,Quality,Cooperative,0.997,Quality,False,"**Classification: Quality**
-
-This utterance violates the maxim of Quality because it makes an unsupported claim about the API errors being ""might be resolved"" without providing any evidence, diagnostic steps, or verification. In a technical troubleshooting context, stating that errors ""might be resolved"" without demonstrating how this was determined or what specific actions were taken constitutes providing information without adequate justification. The response fails to meet the technical clarity norm by offering a potentially false statement rather than identifying root causes or describing diagnostic steps.
-
-**Surface proxy question: Yes**
-
-The hedging language ""might be"" serves as a surface-level linguistic marker that indicates uncertainty and lack of concrete evidence."
-The database timeout could be a config issue.,The database is timing out on every query.,technical,Quality,Manner,0.722,Quantity,False,"**Classification: Quantity**
-
-This utterance violates the maxim of quantity by being underinformative for a technical troubleshooting context. While it offers a potential category of cause (""config issue""), it fails to provide the specific diagnostic steps, root cause analysis, or clarifying questions that would make it cooperative according to the technical exchange norm. The response is too vague and doesn't advance the troubleshooting process meaningfully.
-
-**Surface proxy question: no**"
-I adjusted some memory settings.,What did you do to fix the memory leak?,technical,Quantity,Quantity,0.998,Quantity,True,"**Classification: Quantity**
-
-The utterance violates the maxim of Quantity by being underinformative for a technical troubleshooting context. The response fails to identify specific root causes or describe the actual steps taken to address the memory leak, instead providing only a vague description (""adjusted some memory settings"") that doesn't help with understanding the solution or replicating the fix. According to the clarity norm, cooperative technical responses should specify what was actually done, not just give generic descriptions.
-
-**Surface-level linguistic markers: No**"
-The endpoint should handle errors already.,Should we add error handling to this endpoint?,technical,Quality,Cooperative,0.563,Quality,False,"**Classification: Quality**
-
-This response violates the maxim of Quality because it makes an unsubstantiated claim that ""the endpoint should handle errors already"" without providing evidence or verification. In a technical context, stating what ""should"" be the case without confirming the actual implementation or providing supporting details (like pointing to specific error handling code) constitutes potentially false information, as the speaker cannot know this with certainty without investigation.
+This response violates the Quantity maxim by being underinformative for a performance evaluation context. While it provides one factual detail (on-time completion), it fails to meet the cooperative norm of providing specific, actionable assessment with concrete examples. The evaluator would reasonably expect more comprehensive feedback about the quality of work, specific strengths or areas for improvement, and other performance indicators beyond just meeting deadlines.
 
 **Surface proxy question: No**
 
-The reasoning did not rely on surface-level linguistic markers but rather on the semantic content and the unsubstantiated nature of the claim in a technical context."
-The Q3 deadline work is progressing.,Are we going to hit the Q3 deadline?,status_update,Quantity,Cooperative,0.611,Quantity,False,"**Classification: Quantity**
+My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the insufficient informational content relative to the contextual expectations of a performance evaluation."
+The review touched on a few areas.,How was your performance review?,performance_eval,Quantity,Quantity,0.999,Quantity,True,"**Classification: Quantity**
 
-This utterance violates the maxim of Quantity by being underinformative. The response ""progressing"" provides no concrete details about what specific work has been completed, what obstacles exist, or what remains to be done. Given the direct question about meeting the Q3 deadline, a cooperative response should include specific progress indicators, timeline estimates, or evidence of being on track rather than the vague term ""progressing.""
-
-**Surface proxy question: no**
-
-My reasoning did not rely on surface-level linguistic markers like capitalization, quotation marks, or hedging language, but rather on the semantic content and informativeness of the response."
-The redesign has had some updates.,Where are we on the redesign?,status_update,Quantity,Quantity,0.998,Quantity,True,"**Classification: Quantity**
-
-This utterance violates the maxim of quantity by being severely underinformative for a status update exchange. The response provides no concrete progress indicators - it doesn't specify what updates were made, what's been completed, what's currently blocked, or what the next steps are. The vague phrase ""has had some updates"" fails to meet the clarity norm requirement for specific progress details that would allow the questioner to understand the actual status of the redesign project.
+This utterance violates the maxim of Quantity by being severely underinformative. In a performance evaluation context, the speaker is expected to provide specific details about what areas were discussed, what feedback was given, and concrete examples from the review. Simply stating that ""a few areas"" were touched on provides virtually no useful information and fails to meet the cooperative expectation for specific, actionable assessment details that both parties would expect in this exchange type.
 
 **Surface proxy question: No**
 
-My reasoning was based on the semantic content and informativeness of the response rather than surface-level linguistic markers like capitalization, quotation marks, or hedging language."
-The migration is in a reasonable state.,Is the migration on track?,status_update,Quality,Cooperative,0.618,Quantity,False,"**Classification: Quantity**
+My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the semantic content and informativeness of the utterance relative to the contextual expectations."
+I looked at the auth module code.,Did you find the bug in the auth module?,technical,Quantity,Cooperative,0.999,Quantity,False,"**Classification: Quantity**
 
-The utterance violates the maxim of quantity by being underinformative for a status update exchange. The response ""in a reasonable state"" provides no concrete progress indicators about what has been completed, what obstacles exist, or what the next steps are. According to the clarity norm, this type of vague language without specifics fails to meet the cooperative standard for status updates.
-
-**Surface proxy: Yes**
-
-The hedging language ""reasonable state"" serves as a surface-level marker indicating insufficient specificity."
-The vendor contract went through some changes.,What happened with the vendor contract?,status_update,Quantity,Quantity,0.997,Quantity,True,"**Classification: Quantity**
-
-This response violates the maxim of Quantity by being severely underinformative for a status update exchange. The utterance provides no concrete progress indicators about what specific changes occurred, whether the contract is finalized, what obstacles exist, or what the next steps are. According to the clarity norm, responses like this that lack specifics are underinformative and fail to meet the cooperative standard expected in status updates.
-
-**Surface proxy question: No**
-
-My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the substantive lack of specific information content."
-The security audit follow-up is underway.,Did anyone follow up on the security audit?,status_update,Quantity,Quantity,0.992,Quantity,True,"**Classification: Quantity**
-
-The utterance violates the maxim of quantity by being underinformative. For a status update exchange, the response should provide concrete progress indicators about what specific follow-up actions have been taken, who is handling them, what has been completed, and what remains to be done. Simply stating that follow-up ""is underway"" gives no actionable information about the actual status or progress of the security audit follow-up activities.
-
-**Surface proxy question: no**"
-The stress has been manageable lately.,You seem really stressed lately. Is everything alright?,personal,Quantity,Relation,0.996,Quality,False,"**Classification: Quality**
-
-The utterance violates the maxim of Quality by providing information that directly contradicts the context. The human observes that the speaker ""seems really stressed lately,"" but the response claims ""stress has been manageable lately"" - these statements are incompatible. Either the speaker appears stressed (making their claim false) or they don't appear stressed (making the human's observation wrong). The speaker is likely being untruthful about their stress level.
-
-**Surface proxy question: No**
-
-My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the logical contradiction between the observable evidence mentioned in the context and the speaker's claim."
-The layoffs were a lot to process.,How are you doing after the layoffs?,personal,Quantity,Quantity,0.998,Cooperative,False,"**Classification: Cooperative**
-
-This response appropriately acknowledges the question about the layoffs and shares a personal reaction (""a lot to process"") that indicates the emotional/mental impact without oversharing details. The speaker is being honest about their experience while maintaining an appropriate level of disclosure for a personal check-in. The response directly relates to what was asked and provides a meaningful, if brief, answer about their current state.
-
-**Surface proxy question: No**
-
-The reasoning did not rely on surface-level linguistic markers - there are no caps, scare quotes, hedging language, or other textual indicators that influenced the classification."
-The workload is about what I expected.,Are you handling the workload okay?,personal,Quantity,Quantity,0.995,Cooperative,False,"**Classification: Cooperative**
-
-This response appropriately acknowledges the question about workload management and provides a relevant, truthful answer by indicating the workload meets expectations. While the response doesn't elaborate extensively on how they're ""handling"" it specifically, it gives sufficient information for a personal check-in context where the speaker may prefer to keep details brief. The response is clear, relevant, and doesn't appear to deflect or violate any conversational maxims.
+The utterance violates the maxim of quantity by being underinformative. In a technical troubleshooting context, simply stating ""I looked at the auth module code"" doesn't provide the essential information needed - whether a bug was found, what specific issues were identified, or what the next steps should be. The response fails to answer the direct question and doesn't include any diagnostic findings or actionable information that would help resolve the technical issue.
 
 **Surface proxy question: No**"
-The team dynamic shifted after Sarah left.,How's the team since Sarah left?,personal,Quantity,Quantity,0.962,Cooperative,False,"**Classification: Cooperative**
+The API errors might be resolved now.,Why is the API returning 500 errors?,technical,Quality,Cooperative,0.765,Quantity,False,"**Classification: Quantity**
 
-This utterance appropriately acknowledges the question about the team's status since Sarah's departure and provides a relevant, truthful response. The speaker shares information at a comfortable level by noting that there was a ""shift"" in team dynamics, which directly addresses the inquiry without oversharing personal details or workplace gossip. The response is clear, relevant, and proportionate to what appears to be a casual check-in question.
-
-**Surface proxy question: No**
-
-The reasoning did not rely on surface-level linguistic markers - there are no caps, scare quotes, hedging language, or other textual formatting cues that influenced the classification."
-The situation with my manager is complicated.,What happened between you and your manager?,personal,Quantity,Quantity,0.998,Cooperative,False,"**Classification: Cooperative**
-
-This response acknowledges the question directly and provides a legitimate answer that shares information to a degree the speaker is comfortable with. In personal exchanges, speakers have the right to control how much detail they reveal about sensitive workplace situations. The response ""The situation with my manager is complicated"" gives meaningful information (that there is indeed a situation and it's complex) while appropriately maintaining boundaries around a potentially sensitive topic.
-
-**Surface proxy question: No**
-
-The response contains no surface-level linguistic markers like caps, scare quotes, or hedging language - it's a straightforward declarative statement."
-The new architecture has some trade-offs.,Should we commit to the new architecture?,decision,Quantity,Manner,0.994,Quantity,False,"**Classification: Quantity**
-
-The utterance violates the Quantity maxim by being underinformative. In a decision-making context about committing to a new architecture, simply stating that there are ""some trade-offs"" without specifying what those trade-offs are or providing guidance toward a decision fails to contribute meaningfully to the decision-making process. The response acknowledges relevant information exists but doesn't provide enough detail to help participants make an informed choice.
-
-**Surface proxy question: No**
-
-My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the substantive informational content and its adequacy for the decision-making context."
-Both the monolith and microservices have merits.,Do you prefer the monolith or microservices?,decision,Quantity,Manner,0.883,Quantity,False,"**Classification: Quantity**
-
-This response violates the maxim of quantity by being underinformative for a decision-making context. While the statement is true, it fails to take a position or articulate specific trade-offs that would help advance the decision, instead offering a generic acknowledgment that both options have value. The clarity norm expects participants to contribute meaningfully to the decision process, but this response avoids making any substantive contribution that would help resolve the choice between monolith and microservices.
-
-**Surface proxy question: no**"
-Hiring externally and promoting internally both work.,Should we hire externally or promote from within?,decision,Quantity,Manner,0.998,Quantity,False,"**Classification: Quantity**
-
-This response violates the maxim of quantity by being underinformative for a decision-making context. While the utterance is technically true, it fails to provide the specific guidance, trade-offs, or position that would help advance the decision-making process. The clarity norm expects participants to either take a position or articulate the relevant trade-offs between options, but this response does neither - it simply restates that both options are viable without contributing meaningful decision-relevant information.
-
-**Surface proxy question: no**"
-A two-week delay would affect the launch timeline.,Should we delay the launch by two weeks?,decision,Quantity,Cooperative,0.973,Quantity,False,"**Classification: Quantity**
-
-This utterance violates the Quantity maxim by being underinformative for the decision-making context. While the speaker states an obvious fact about delays affecting timelines, they fail to provide the substantive information needed for the decision - such as whether the delay is acceptable, what the specific impacts would be, or what they recommend. This appears to be evasive rather than genuinely helpful for making the launch decision.
-
-**Surface proxy question: no**
-
-My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the substantive content and its adequacy for the decision-making context."
-Dropping the feature is one approach to consider.,I think we should drop the feature entirely.,decision,Quantity,Manner,0.992,Quantity,False,"**Classification: Quantity**
-
-The utterance violates the maxim of quantity by being underinformative in a decision-making context. While the human takes a clear position (""I think we should drop the feature entirely""), the response merely acknowledges this as ""one approach to consider"" without contributing substantively to the decision. This hedged restatement fails to meet the clarity norm's expectation that participants either take a position or articulate relevant trade-offs.
+This utterance violates the Quantity maxim by being underinformative for a technical troubleshooting context. The response fails to identify root causes, describe specific diagnostic steps, or provide evidence for the claim that errors ""might be resolved."" It offers vague speculation without the technical detail required to be cooperative in this exchange type.
 
 **Surface proxy question: Yes**
 
-The reasoning relied on hedging language (""one approach to consider"") which signals the speaker's avoidance of committing to a position."
-Garbage collection in Go involves memory management.,How does garbage collection work in Go?,knowledge,Manner,Quality,0.997,Manner,False,"**Classification: Manner**
+The reasoning relied on the hedging language ""might be"" which signals uncertainty and contributes to the underinformative nature of the response."
+The database timeout could be a config issue.,The database is timing out on every query.,technical,Quality,Manner,0.986,Quantity,False,"**Classification: Quantity**
 
-This utterance violates the manner maxim because it provides an extremely vague and uninformative explanation. While technically accurate, saying garbage collection ""involves memory management"" is essentially a tautological statement that fails to provide the clear, detailed explanation expected in a knowledge exchange about how Go's garbage collection actually works.
+This response violates the maxim of quantity by being underinformative for a technical troubleshooting context. While it offers a potential root cause category (""config issue""), it fails to provide the specific diagnostic steps, clarifying questions, or concrete details expected in technical troubleshooting. The response is too vague and doesn't help advance the troubleshooting process meaningfully.
 
-**Surface-level linguistic markers: No**"
-The slow page load is related to how data is fetched.,Why is the page loading slowly?,knowledge,Manner,Manner,0.998,Manner,True,"**Classification: Manner**
+**Surface proxy: No**"
+I adjusted some memory settings.,What did you do to fix the memory leak?,technical,Quantity,Quantity,0.999,Quantity,True,"**Classification: Quantity**
 
-This utterance violates the manner maxim by being unnecessarily vague and uninformative. The response ""related to how data is fetched"" is exactly the type of vague gesture at an answer that the clarity norm identifies as a manner violation - it acknowledges the general domain of the problem without providing any specific, actionable information about what aspect of data fetching is causing the slowness or how it might be addressed.
+This response violates the maxim of quantity by being severely underinformative for a technical troubleshooting context. The speaker provides only a vague, high-level description (""adjusted some memory settings"") without specifying what settings were changed, what values were used, or any concrete steps that could be reproduced or verified. According to the clarity norm, cooperative technical responses should describe specific steps taken, but this utterance fails to provide the detailed information necessary for proper technical communication.
 
-**Surface proxy question: No**
+**Surface proxy question: No**"
+The endpoint should handle errors already.,Should we add error handling to this endpoint?,technical,Quality,Manner,0.995,Quality,False,"**Classification: Quality**
 
-My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the substantive vagueness of the content itself."
-Staging server access depends on permission settings.,Why can't I access the staging server?,knowledge,Manner,Cooperative,0.755,Cooperative,True,"**Classification: Cooperative**
-
-This response provides an accurate and relevant answer to the question about staging server access issues. While it could be slightly more detailed, it identifies the most likely cause (permission settings) in a clear and direct manner, which is appropriate for this type of technical inquiry. The response is truthful, relevant, and sufficiently informative without being overly verbose.
-
-**Surface proxy question: No**
-
-My reasoning did not rely on surface-level linguistic markers such as caps, scare quotes, or hedging language. The classification was based on the substantive content and appropriateness of the response."
-The service restart relates to how the system handles state.,Why do we need to restart the service every time?,knowledge,Manner,Manner,0.998,Manner,True,"**Classification: Manner**
-
-This response violates the manner maxim by being unnecessarily vague and uninformative. While the utterance is technically accurate, it provides a gesture at the answer rather than a clear explanation - it mentions ""how the system handles state"" without explaining what specific state handling issues require restarts or providing actionable detail. For a knowledge exchange, this falls short of the clarity norm requiring appropriate detail level.
-
-**Surface-level linguistic markers: No**
-
-My reasoning was based on the semantic content and level of detail provided, not on any surface-level markers like hedging language, caps, or scare quotes."
-Setting up a reverse proxy involves some configuration.,Do you know how to set up a reverse proxy?,knowledge,Manner,Manner,0.977,Manner,True,"**Classification: Manner**
-
-This utterance violates the manner maxim because it provides an extremely vague response that doesn't actually explain how to set up a reverse proxy. The phrase ""involves some configuration"" is so general it could apply to virtually any technical task, making it a clear example of the ""vague gestures at the answer"" mentioned in the clarity norm. While the statement is technically accurate (setting up a reverse proxy does involve configuration), it fails to provide the clear, detailed explanation expected in a knowledge exchange.
-
-**Surface proxy question: No**
-
-The reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the semantic content and level of detail provided in the response."
-I communicated the deadline change to the team.,Did you tell the team about the deadline change?,conflict,Quality,Quantity,0.996,Cooperative,False,"Looking at this exchange, the utterance ""I communicated the deadline change to the team"" appears to be **Cooperative**. 
-
-The response directly addresses the question about whether they told the team about the deadline change. While the speaker chooses the more formal verb ""communicated"" instead of ""told,"" this doesn't violate any Gricean maxims - it provides the requested information clearly and directly. The slight formality in word choice could reflect the speaker's communication style or the workplace context, but it doesn't obscure meaning or fail to address the disagreement appropriately.
-
-Surface proxy question: Did I rely on surface-level linguistic markers?
-**No**"
-My recollection of the feature status is different.,You said the feature was ready to ship.,conflict,Quality,Manner,0.984,Quantity,False,"**Classification: Quantity**
-
-This utterance violates the Quantity maxim by being underinformative. In a conflict exchange, the cooperative norm requires addressing disagreements directly, but the speaker only indicates they have a different recollection without providing what that alternative memory actually is. This leaves the disagreement unresolved and fails to give the other party the information needed to understand or respond to the conflicting account.
-
-**Surface-level linguistic markers: No**"
-I thought the client notification was being handled.,Why wasn't the client notified?,conflict,Quality,Manner,0.765,Quantity,False,"**Classification: Quantity**
-
-This response violates the maxim of quantity by being underinformative in a conflict context. While the speaker provides their belief about the situation, they fail to address the core disagreement directly by not explaining who was supposed to handle the notification, when this assumption was made, or what steps they took to verify it was being done. In a conflict exchange about accountability, simply stating ""I thought someone else was doing it"" without providing the specific details needed to resolve the disagreement is insufficient.
-
-**Surface proxy question: No**
-
-My reasoning was based on the informational content and context rather than surface-level linguistic markers like capitalization, quotation marks, or hedging language."
-What I said about the data was slightly different.,You told me to delete the old data.,conflict,Quality,Manner,0.997,Quantity,False,"**Classification: Quantity**
-
-The utterance violates the maxim of quantity by being underinformative. In a conflict exchange, the speaker should address the disagreement directly by explaining what they actually said about the data, but instead they only acknowledge that their statement was ""slightly different"" without providing the alternative version. This leaves the disagreement unresolved and fails to give sufficient information for productive conflict resolution.
+The utterance violates the Quality maxim by making an assertion about the endpoint's error handling capabilities without providing evidence or verification. In a technical troubleshooting context, saying something ""should"" work without demonstrating that it actually does constitutes potentially false information, as the speaker appears to be stating a belief or assumption rather than a verified fact.
 
 **Surface proxy question: yes**
 
-The hedging language ""slightly different"" serves as a surface-level linguistic marker that indicates the speaker is minimizing the discrepancy while avoiding specificity."
-My understanding of the spec was different regarding auth.,"The spec says we need OAuth, not API keys.",conflict,Quality,Manner,0.983,Quantity,False,"**Classification: Quantity**
+The reasoning relied on the hedging language marker ""should,"" which indicates uncertainty or assumption rather than confirmed knowledge."
+The Q3 deadline work is progressing.,Are we going to hit the Q3 deadline?,status_update,Quantity,Quality,0.946,Quantity,False,"**Classification: Quantity**
 
-This utterance violates the maxim of quantity by being underinformative. In a conflict exchange, the clarity norm requires addressing the disagreement directly, but the speaker only states they had a ""different understanding"" without providing what that understanding actually was or how it differs from the claim about OAuth vs API keys. This leaves the other party without the specific information needed to resolve the disagreement.
+This utterance violates the maxim of Quantity by being underinformative for a status update exchange. The response ""progressing"" provides no concrete progress indicators about what's been completed, what obstacles exist, or what specific steps remain to meet the Q3 deadline. According to the clarity norm, this type of vague progress statement without specifics fails to give the questioner the substantial information they need to assess whether the deadline will actually be met.
+
+**Surface proxy question: no**"
+The redesign has had some updates.,Where are we on the redesign?,status_update,Manner,Quantity,0.999,Quantity,True,"**Classification: Quantity**
+
+This utterance violates the maxim of quantity by being severely underinformative for a status update exchange. The response ""has had some updates"" provides no concrete progress indicators—we don't know what specific work was completed, what remains to be done, or what the next steps are. According to the clarity norm, cooperative status updates should include specifics about what's done, what's blocked, and what's next, but this response offers only a vague acknowledgment that something happened.
 
 **Surface proxy question: no**
 
-My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the substantive lack of specific information provided in response to a technical disagreement."
-The CI pipeline settings need some configuration changes.,How do I configure the CI pipeline?,instruction,Manner,Cooperative,0.997,Quantity,False,"**Classification: Quantity**
+My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the semantic content and informativeness of the utterance itself."
+The migration is in a reasonable state.,Is the migration on track?,status_update,Quality,Cooperative,0.786,Quantity,False,"**Classification: Quantity**
 
-This response violates the quantity maxim by being severely underinformative for an instruction exchange. The person asked for specific steps on how to configure the CI pipeline, but the response merely states that ""settings need some configuration changes"" without providing any actual instructions, steps, or guidance on what changes to make or how to make them. This fails to meet the clarity norm for instruction exchanges, which requires clear, ordered steps the recipient can follow.
-
-**Surface proxy question: no**"
-The production deployment follows a set of steps.,How do I deploy to production?,instruction,Manner,Manner,0.998,Quantity,False,"**Classification: Quantity**
-
-This response violates the quantity maxim by being underinformative. The utterance acknowledges that there are steps for production deployment but fails to provide any of those actual steps, leaving the instruction-seeker without the clear, actionable guidance they need. While the statement is technically true, it doesn't fulfill the cooperative requirement of providing the specific steps that would allow the recipient to complete the deployment.
+The utterance violates the maxim of quantity by being underinformative for a status update exchange. When asked if the migration is ""on track,"" the response ""in a reasonable state"" provides no concrete progress indicators, specific accomplishments, blockers, or next steps as required by the clarity norm. The vague qualifier ""reasonable state"" doesn't give the questioner actionable information about the migration's actual progress or timeline.
 
 **Surface proxy question: no**
 
-My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the semantic content and what information was actually conveyed versus what was needed."
-The onboarding process has several parts to it.,Can you walk me through the onboarding process?,instruction,Manner,Quantity,0.989,Quantity,True,"**Classification: Quantity**
+My reasoning was based on the semantic content and informativeness of the response rather than surface-level linguistic markers like capitalization, quotes, or hedging language."
+The vendor contract went through some changes.,What happened with the vendor contract?,status_update,Quantity,Quantity,0.993,Quantity,True,"**Classification: Quantity**
 
-This response violates the maxim of quantity by being underinformative. The human explicitly requested to be ""walked through"" the onboarding process, which clearly asks for specific steps or detailed guidance. The response merely acknowledges that the process ""has several parts"" without providing any of the actual steps, procedures, or concrete information needed to follow through with onboarding.
+This response violates the maxim of quantity by being underinformative for a status update exchange. The speaker provides only vague information (""went through some changes"") without specifying what changes occurred, their current status, or what steps come next. According to the clarity norm, status updates should include concrete progress indicators, but this response lacks the specifics needed to understand the actual situation with the vendor contract.
+
+**Surface proxy question: No**
+
+My reasoning was based on the semantic content and informativeness of the response rather than surface-level linguistic markers like capitalization, quotes, or hedging language."
+The security audit follow-up is underway.,Did anyone follow up on the security audit?,status_update,Quantity,Quantity,0.998,Quantity,True,"**Classification: Quantity**
+
+This response violates the maxim of quantity by being underinformative for a status update exchange. The utterance provides only a vague statement that follow-up ""is underway"" without any concrete progress indicators such as who is handling it, what specific actions have been taken, what obstacles exist, or what the next steps are. According to the clarity norm, responses should give specific details about what's done, what's blocked, and what's next rather than generic progress statements.
+
+**Surface proxy question: no**"
+The stress has been manageable lately.,You seem really stressed lately. Is everything alright?,personal,Cooperative,Quantity,0.999,Quality,False,"**Classification: Quality**
+
+The utterance violates the Quality maxim because it directly contradicts the context. The human has observed that the person ""seems really stressed lately,"" but the response claims ""stress has been manageable lately."" This creates a factual inconsistency - if someone appears very stressed to others, their stress is likely not actually manageable. The speaker is either being untruthful about their stress level or lacks self-awareness about how they're presenting to others.
+
+**Surface proxy question: No**
+
+My reasoning was based on the logical contradiction between the observed behavior (appearing stressed) and the claim made (stress being manageable), not on any surface-level linguistic markers."
+The layoffs were a lot to process.,How are you doing after the layoffs?,personal,Cooperative,Quantity,0.999,Cooperative,False,"**Classification: Cooperative**
+
+This response appropriately acknowledges the question about how the speaker is doing after the layoffs and shares a genuine, measured response about their experience. The utterance directly relates to what was asked and provides a reasonable level of personal disclosure for this type of exchange - indicating that the layoffs had emotional/mental impact without oversharing details. This aligns well with the personal check-in norm of sharing to the degree one is comfortable.
+
+**Surface proxy question: No**
+
+The response contains no surface-level linguistic markers like caps, scare quotes, or hedging language that would signal violation."
+The workload is about what I expected.,Are you handling the workload okay?,personal,Cooperative,Quantity,0.997,Cooperative,False,"**Classification: Cooperative**
+
+This response directly acknowledges the question about workload management and provides a clear, relevant answer. The speaker shares their perspective by indicating the workload aligns with their expectations, which gives the questioner meaningful information about their current state without over-sharing or deflecting. The response maintains an appropriate level of disclosure for a personal check-in exchange.
+
+**Surface proxy question: No**
+
+The response contains no surface-level linguistic markers like capitalization, scare quotes, hedging language, or other textual indicators that influenced the classification."
+The team dynamic shifted after Sarah left.,How's the team since Sarah left?,personal,Quantity,Quantity,0.998,Cooperative,False,"**Classification: Cooperative**
+
+The response directly addresses the question about the team since Sarah's departure by acknowledging that there was indeed a change (""dynamic shifted""). While it doesn't provide extensive detail, in a personal check-in context this level of sharing is appropriate - the speaker acknowledges the question and provides a relevant, truthful response without necessarily going into specifics they may not be comfortable discussing.
+
+**Surface proxy: No**"
+The situation with my manager is complicated.,What happened between you and your manager?,personal,Quantity,Quantity,0.999,Cooperative,False,"**Classification: Cooperative**
+
+This utterance acknowledges the question directly and provides a response that shares information to a degree the speaker is comfortable with. While it doesn't give specific details, ""complicated"" indicates there was indeed something significant that happened, and the speaker is signaling they prefer not to elaborate further. In personal exchanges, this level of deflection through vagueness is legitimate rather than violative, as people have the right to control how much personal/professional information they share.
+
+**Surface proxy question: No**
+
+The reasoning relied on pragmatic interpretation of the response's acknowledgment and appropriate level of sharing rather than any surface-level linguistic markers."
+The new architecture has some trade-offs.,Should we commit to the new architecture?,decision,Quantity,Manner,0.712,Quantity,False,"**Classification: Quantity**
+
+This utterance violates the Quantity maxim by being underinformative. In a decision-making context where the question asks for a commitment decision, simply stating ""there are trade-offs"" provides insufficient information to contribute meaningfully to the decision. The response fails to specify what the trade-offs are, their significance, or how they should factor into the commitment decision, leaving the questioner without the substantive information needed to make an informed choice.
+
+**Surface proxy: No**"
+Both the monolith and microservices have merits.,Do you prefer the monolith or microservices?,decision,Quantity,Manner,0.984,Quantity,False,"**Classification: Quantity**
+
+This response violates the maxim of quantity by being underinformative for a decision-making context. While the statement is factually accurate, it fails to take a position or articulate specific trade-offs that would help advance the decision, instead offering only a generic acknowledgment that both options have value. The clarity norm expects participants to contribute meaningfully to the decision rather than remaining neutral.
+
+**Surface proxy question: No**
+
+The reasoning did not rely on surface-level linguistic markers but rather on the semantic content and pragmatic function of the utterance in relation to the decision-making context."
+Hiring externally and promoting internally both work.,Should we hire externally or promote from within?,decision,Quantity,Manner,0.999,Quantity,False,"**Classification: Quantity**
+
+This utterance violates the maxim of quantity by being underinformative for a decision-making context. While the speaker acknowledges both options are viable, they fail to provide the additional information needed to actually make a decision—such as trade-offs, specific circumstances where one might be better, or criteria for choosing between them. The response essentially restates the original dilemma without contributing meaningfully to resolving it.
+
+**Surface proxy: No**"
+A two-week delay would affect the launch timeline.,Should we delay the launch by two weeks?,decision,Quantity,Manner,0.902,Quantity,False,"**Classification: Quantity**
+
+This utterance violates the Quantity maxim by being underinformative for a decision-making context. While the statement is technically true, it merely restates an obvious fact without contributing meaningful information to help make the decision. The response fails to take a position on whether the delay should happen or articulate relevant trade-offs, instead offering a circular observation that adds no value to the decision-making process.
+
+**Surface proxy: No**"
+Dropping the feature is one approach to consider.,I think we should drop the feature entirely.,decision,Quantity,Manner,0.998,Quantity,False,"**Classification: Quantity**
+
+The utterance violates the Quantity maxim by being underinformative in a decision-making context. While the speaker acknowledges the proposed approach, they fail to take a clear position or contribute meaningfully to the decision by simply restating what was already said in more tentative language. The response adds no new information, trade-offs, or genuine contribution to move the decision forward.
+
+**Surface proxy question: yes**
+
+The reasoning relied on the hedging language ""one approach to consider"" which signals the tentative, non-committal nature of the response."
+Garbage collection in Go involves memory management.,How does garbage collection work in Go?,knowledge,Manner,Quality,0.994,Manner,False,"**Classification: Manner**
+
+This response violates the manner maxim by being vague and uninformative. While technically accurate, saying garbage collection ""involves memory management"" is essentially a tautology that doesn't explain how Go's garbage collection actually works. This falls squarely into the category of ""vague gestures at the answer"" mentioned in the clarity norm, providing no meaningful detail about Go's concurrent mark-and-sweep collector, tricolor marking algorithm, or any other specific mechanisms.
+
+**Surface proxy question: No**
+
+My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the semantic content and level of informativeness of the response."
+The slow page load is related to how data is fetched.,Why is the page loading slowly?,knowledge,Manner,Manner,0.998,Manner,True,"**Classification: Manner**
+
+This utterance violates the manner maxim by being unnecessarily vague and unclear. While it's technically accurate that slow page loading can be ""related to how data is fetched,"" this explanation lacks the specific detail needed for a helpful knowledge exchange - it doesn't explain what specific aspect of data fetching is causing the problem or provide actionable information. The phrase ""related to how data is fetched"" is exactly the type of vague gesture at an answer that the clarity norm identifies as a manner violation.
+
+**Surface proxy question: No**
+
+My reasoning was based on the semantic content and level of detail provided, not on surface-level linguistic markers like capitalization, quotation marks, or hedging language."
+Staging server access depends on permission settings.,Why can't I access the staging server?,knowledge,Manner,Manner,0.927,Quantity,False,"**Classification: Quantity**
+
+This response violates the quantity maxim by being insufficiently informative for a knowledge exchange. While the statement is technically accurate, it provides only a vague, surface-level explanation without the specific details needed to help the person understand why they can't access the staging server or how to resolve the issue. A cooperative response would include information about what specific permissions are needed, how to check current permissions, or who to contact for access.
+
+**Surface proxy question: No**
+
+My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the semantic content and level of detail provided in the response."
+The service restart relates to how the system handles state.,Why do we need to restart the service every time?,knowledge,Manner,Manner,0.999,Manner,True,"**Classification: Manner**
+
+This response violates the manner maxim by being unnecessarily vague and unclear. While the utterance points toward a relevant concept (system state handling), it fails to provide the specific, clear explanation expected in a knowledge exchange. The phrase ""relates to how the system handles state"" is essentially a vague gesture at the answer without explaining the actual mechanism or reason why restarts are necessary.
+
+**Surface proxy question: No**
+
+My reasoning was based on the semantic content and level of detail provided, not on any surface-level linguistic markers like caps, quotes, or hedging language."
+Setting up a reverse proxy involves some configuration.,Do you know how to set up a reverse proxy?,knowledge,Manner,Manner,0.993,Manner,True,"**Classification: Manner**
+
+This utterance violates the manner maxim by being excessively vague and uninformative. The response ""involves some configuration"" is essentially a meaningless tautology that provides no useful information about how to actually set up a reverse proxy. This is a clear example of the type of vague gesture at an answer mentioned in the clarity norm, failing to provide the clear, detailed explanation expected in a knowledge exchange.
 
 **Surface proxy question: no**
 
-My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the semantic content and what information was provided versus what was requested."
-The test suite requires some initial setup.,How do I run the test suite?,instruction,Manner,Cooperative,0.873,Quantity,False,"**Classification: Quantity**
+My reasoning was based on the semantic content and informativeness of the response, not on any surface-level linguistic markers like capitalization, quotation marks, or hedging language."
+I communicated the deadline change to the team.,Did you tell the team about the deadline change?,conflict,Quality,Manner,0.527,Manner,True,"**Classification: Manner**
 
-The utterance violates the quantity maxim by being underinformative. While it provides relevant information about the test suite requiring setup, it fails to provide the clear, ordered steps needed for an instruction exchange. The response doesn't explain what the initial setup involves or how to actually run the test suite after setup is complete.
+The utterance violates the maxim of manner through unnecessary formality and wordiness. While ""I told the team about the deadline change"" would be a direct, clear response, the speaker chooses the more formal ""communicated"" and restructures the sentence in a way that sounds evasive or overly bureaucratic. This formal register creates ambiguity about what exactly was communicated and how, making the response less clear than necessary for a conflict exchange.
 
-**Surface proxy question: no**"
-VPN access involves a request through the access system.,How do I request access to the VPN?,instruction,Manner,Manner,0.998,Quantity,False,"**Classification: Quantity**
+**Surface-level linguistic markers: No**"
+My recollection of the feature status is different.,You said the feature was ready to ship.,conflict,Quality,Manner,0.511,Quantity,False,"**Classification: Quantity**
 
-This response violates the quantity maxim by being underinformative for an instruction exchange. The user is asking for specific steps on how to request VPN access, but the utterance only provides a vague description of what the process involves rather than actionable instructions. According to the clarity norm, the response should provide ""clear, ordered steps the recipient can follow,"" but instead it merely states that access ""involves a request through the access system"" without specifying how to make that request or which access system to use.
+This utterance violates the maxim of quantity by being underinformative. In a conflict exchange, the speaker should address the disagreement directly by providing their alternative recollection of what was actually said about the feature status. Simply stating that their memory differs without specifying how it differs fails to give the recipient the information needed to understand or resolve the disagreement.
 
-**Surface proxy question: no**"
+**Surface proxy question: No**
+
+My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language, but rather on the content and informativeness of the response itself."
+I thought the client notification was being handled.,Why wasn't the client notified?,conflict,Quality,Manner,0.997,Quantity,False,"**Classification: Quantity**
+
+The utterance violates the maxim of quantity by being underinformative. In a conflict exchange about why the client wasn't notified, simply stating ""I thought the client notification was being handled"" doesn't provide sufficient information to address the disagreement directly. The speaker fails to explain who they thought was handling it, what led to this assumption, or any steps they took to verify this, leaving the core issue unresolved.
+
+**Surface proxy: No**"
+What I said about the data was slightly different.,You told me to delete the old data.,conflict,Quality,Manner,0.998,Quantity,False,"**Classification: Quantity**
+
+This utterance violates the maxim of quantity by being underinformative. In a conflict exchange, the speaker should address the disagreement directly by providing their alternative version of what they actually said about the data. Instead, they acknowledge a difference exists (""slightly different"") but fail to specify what they actually said, leaving the disagreement unresolved and requiring the listener to press for more information.
+
+**Surface proxy question: Yes**
+
+The reasoning relied on the hedging language ""slightly different"" which minimizes the discrepancy while still avoiding providing the necessary clarifying information."
+My understanding of the spec was different regarding auth.,"The spec says we need OAuth, not API keys.",conflict,Quality,Manner,0.973,Quantity,False,"**Classification: Quantity**
+
+This utterance violates the maxim of quantity by being underinformative. In a conflict exchange, the speaker should address the disagreement directly by providing their alternative understanding of what the spec says about authentication. Instead, they merely state that their understanding ""was different"" without specifying what that understanding actually was, leaving the other party without the information needed to resolve the disagreement.
+
+**Surface proxy: No**"
+The CI pipeline settings need some configuration changes.,How do I configure the CI pipeline?,instruction,Manner,Cooperative,0.934,Quantity,False,"**Classification: Quantity**
+
+This response violates the maxim of quantity by being underinformative for an instruction exchange. The speaker acknowledges that configuration changes are needed but fails to provide any actual steps, specific settings to modify, or actionable guidance that the recipient could follow. According to the clarity norm, this type of vague acknowledgment without concrete instructions constitutes a quantity violation in instructional contexts.
+
+**Surface proxy question: No**
+
+My reasoning was based on the semantic content and pragmatic function of the utterance rather than surface-level linguistic markers."
+The production deployment follows a set of steps.,How do I deploy to production?,instruction,Manner,Manner,0.999,Quantity,False,"**Classification: Quantity**
+
+This utterance violates the maxim of quantity by being underinformative. The speaker acknowledges that there are ""a set of steps"" for production deployment but fails to provide any of those actual steps. In an instruction exchange, the cooperative expectation is to provide clear, actionable steps the recipient can follow, but this response only states that steps exist without specifying what they are.
+
+**Surface proxy: no**"
+The onboarding process has several parts to it.,Can you walk me through the onboarding process?,instruction,Manner,Manner,0.984,Quantity,False,"**Classification: Quantity**
+
+This utterance violates the maxim of quantity by being underinformative. The human specifically requested to be ""walked through"" the onboarding process, which clearly signals a need for detailed, step-by-step instructions. The response acknowledges that there are ""several parts"" but fails to provide any actual steps, procedures, or actionable information that would allow the recipient to follow the onboarding process.
+
+**Surface proxy question: no**
+
+My reasoning did not rely on surface-level linguistic markers like caps, scare quotes, or hedging language. The violation stems from the content being insufficient relative to what was requested, not from any particular linguistic features."
+The test suite requires some initial setup.,How do I run the test suite?,instruction,Manner,Manner,0.993,Quantity,False,"**Classification: Quantity**
+
+The utterance violates the Quantity maxim by being underinformative. When someone asks ""How do I run the test suite?"", they're seeking clear, actionable steps. While mentioning that setup is required provides some relevant information, it fails to provide the actual steps needed to perform that setup or run the tests. This leaves the recipient without the procedural guidance they requested.
+
+**Surface proxy question: no**
+
+My reasoning was based on the informational content and completeness of the response rather than surface-level linguistic markers."
+VPN access involves a request through the access system.,How do I request access to the VPN?,instruction,Manner,Manner,0.999,Quantity,False,"**Classification: Quantity**
+
+This response violates the Quantity maxim by being underinformative for an instruction exchange. While it mentions that VPN access ""involves a request through the access system,"" it fails to provide the clear, ordered steps needed to actually complete the task. The user asked ""how"" to request access, but the response doesn't specify which access system, where to find it, what information to provide, or any concrete steps to follow.
+
+**Surface proxy: No**"
