@@ -1,4 +1,5 @@
 import csv
+from collections import Counter
 from src.labels import MAXIMS, VIOLATION_TYPES
 
 
@@ -45,3 +46,41 @@ def test_no_duplicate_pairs():
 def test_corpus_not_empty():
     rows = _load_corpus()
     assert len(rows) > 0
+
+
+def test_all_maxims_represented():
+    rows = _load_corpus()
+    maxims_in_corpus = set(r["maxim"] for r in rows)
+    for m in MAXIMS:
+        assert m in maxims_in_corpus, f"Maxim '{m}' has zero examples in corpus"
+
+
+def test_minimum_examples_per_class():
+    rows = _load_corpus()
+    counts = Counter(r["maxim"] for r in rows)
+    for m in MAXIMS:
+        assert counts[m] >= 30, (
+            f"Maxim '{m}' has only {counts[m]} examples, need at least 30"
+        )
+
+
+def test_cooperative_always_none():
+    rows = _load_corpus()
+    bad = []
+    for i, r in enumerate(rows):
+        if r["maxim"] == "Cooperative" and r["violation_type"] != "none":
+            bad.append((i+2, r["violation_type"]))
+    assert len(bad) == 0, (
+        f"Cooperative examples with violation_type != 'none': {bad[:5]}"
+    )
+
+
+def test_non_cooperative_never_none():
+    rows = _load_corpus()
+    bad = []
+    for i, r in enumerate(rows):
+        if r["maxim"] != "Cooperative" and r["violation_type"] == "none":
+            bad.append((i+2, r["maxim"]))
+    assert len(bad) == 0, (
+        f"Non-Cooperative examples with violation_type == 'none': {bad[:5]}"
+    )
