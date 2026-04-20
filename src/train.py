@@ -96,7 +96,7 @@ def train(data_path: str):
 
     # freeze the first 10 of 12 transformer layers. with 367 examples
     # we're updating 125M parameters, most of which already know english
-    # perfectly well. 
+    # v well. 
     # only the top 2 layers + classification head get updated, which is
     # where task-specific reasoning happens anyway. the bottom layers are
     # just "what is a word" and "what is a sentence" and they don't need
