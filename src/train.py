@@ -94,6 +94,29 @@ def train(data_path: str):
         label2id=LABEL2ID,
     )
 
+    # freeze the first 10 of 12 transformer layers. with 367 examples
+    # we're updating 125M parameters, most of which already know english
+    # perfectly well. 
+    # only the top 2 layers + classification head get updated, which is
+    # where task-specific reasoning happens anyway. the bottom layers are
+    # just "what is a word" and "what is a sentence" and they don't need
+    # our help with that (p sure anyways.) continuing from that point
+    # be pretty straightforward but wanna commit just to document how/why.
+    for name, param in model.roberta.named_parameters():
+        if "encoder.layer" in name:
+            layer_num = int(name.split("encoder.layer.")[1].split(".")[0])
+            if layer_num < 10:
+                param.requires_grad = False
+    # also freeze embeddings bc they're not learning anything useful from
+    # 367 examples that they didn't already know from pretraining
+    for param in model.roberta.embeddings.parameters():
+        param.requires_grad = False
+
+    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total = sum(p.numel() for p in model.parameters())
+    print(f"Frozen: {total - trainable:,} / {total:,} parameters ({(total-trainable)/total:.0%})")
+    print(f"Training: {trainable:,} parameters ({trainable/total:.0%})")
+
     # max_length=128 because most utterance pairs are under 50 tokens
     # and 256 was just burning memory for padding. the manner examples
     # are the longest and even those fit in 128 comfortably.
@@ -127,7 +150,7 @@ def train(data_path: str):
 
     args = TrainingArguments(
         output_dir=OUTPUT_DIR,
-        num_train_epochs=10,
+        num_train_epochs=20,
         # batch size of 4 because your M3 ran out of GPU memory at 16.
         # the indignity of being OOM'd by 62 examples.
         per_device_train_batch_size=4,

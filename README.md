@@ -87,13 +87,17 @@ grice-maxim-classifier/
 │   ├── train.py        # fine-tuning loop (RoBERTa)
 │   ├── predict.py      # inference CLI
 │   ├── bootstrap.py    # pre-label seed pairs for annotation
-│   └── app.py          # Gradio web demo
+│   ├── app.py          # Gradio web demo
+│   ├── score_corpus.py # coherence scoring (L/O) for annotation QA
+│   └── compare_classifiers.py  # RoBERTa vs Claude API comparison
 ├── data/
 │   ├── raw/            # unannotated utterance pairs
 │   └── annotated/      # gold-labeled CSV corpus
-├── models/             # saved checkpoints
+├── models/             # saved checkpoints (gitignored)
 └── tests/
-    └── test_labels.py
+    ├── test_labels.py
+    ├── test_corpus.py
+    └── test_predict.py
 ```
 
 ## TODO
