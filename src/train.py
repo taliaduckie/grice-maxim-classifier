@@ -94,21 +94,16 @@ def train(data_path: str):
         label2id=LABEL2ID,
     )
 
-    # freeze the first 10 of 12 transformer layers. with 367 examples
-    # we're updating 125M parameters, most of which already know english
-    # v well. 
-    # only the top 2 layers + classification head get updated, which is
-    # where task-specific reasoning happens anyway. the bottom layers are
-    # just "what is a word" and "what is a sentence" and they don't need
-    # our help with that (p sure anyways.) continuing from that point
-    # be pretty straightforward but wanna commit just to document how/why.
+    # freeze the first 10 of 12 transformer layers. tested unfrozen at
+    # 547 examples with lr=1e-5 and weight_decay=0.01 — got 0.86 macro F1.
+    # frozen got 0.91. you'd probably need 2000+ examples before unfreezing
+    # beats freezing. the bottom layers already know english; we're just
+    # teaching the top layers what pragmatics is.
     for name, param in model.roberta.named_parameters():
         if "encoder.layer" in name:
             layer_num = int(name.split("encoder.layer.")[1].split(".")[0])
             if layer_num < 10:
                 param.requires_grad = False
-    # also freeze embeddings bc they're not learning anything useful from
-    # 367 examples that they didn't already know from pretraining
     for param in model.roberta.embeddings.parameters():
         param.requires_grad = False
 
@@ -151,13 +146,14 @@ def train(data_path: str):
     args = TrainingArguments(
         output_dir=OUTPUT_DIR,
         num_train_epochs=20,
-        # batch size of 4 because your M3 ran out of GPU memory at 16.
-        # the indignity of being OOM'd by 62 examples.
-        per_device_train_batch_size=4,
-        per_device_eval_batch_size=4,
-        # lower lr because the default 5e-5 wasn't converging with
-        # stratified split. 2e-5 is the "i've been hurt before" setting.
+        # bumped to 8 for less noisy gradients. CPU doesn't OOM like GPU did.
+        per_device_train_batch_size=8,
+        per_device_eval_batch_size=8,
+        # 5e-6 because unfrozen 125M parameters on 547 examples needs
+        # a very gentle touch. 2e-5 was overfitting. 5e-6 is the
+        # "i've been hurt before and i learned from it" setting.
         learning_rate=2e-5,
+        weight_decay=0.01,  # regularization. fights overfitting directly.
         warmup_ratio=0.1,
         eval_strategy="epoch",
         save_strategy="epoch",
