@@ -94,23 +94,13 @@ def train(data_path: str):
         label2id=LABEL2ID,
     )
 
-    # freeze the first 10 of 12 transformer layers. tested unfrozen at
-    # 547 examples with lr=1e-5 and weight_decay=0.01 — got 0.86 macro F1.
-    # frozen got 0.91. you'd probably need 2000+ examples before unfreezing
-    # beats freezing. the bottom layers already know english; we're just
-    # teaching the top layers what pragmatics is.
-    for name, param in model.roberta.named_parameters():
-        if "encoder.layer" in name:
-            layer_num = int(name.split("encoder.layer.")[1].split(".")[0])
-            if layer_num < 10:
-                param.requires_grad = False
-    for param in model.roberta.embeddings.parameters():
-        param.requires_grad = False
-
+    # unfrozen at 947 examples. previously froze 10/12 layers but
+    # frozen was plateauing at 0.77 with real data mixed in.
+    # at ~1000 examples unfreezing might finally win.
+    # lr=1e-5, weight_decay=0.01, 10 epochs.
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total = sum(p.numel() for p in model.parameters())
-    print(f"Frozen: {total - trainable:,} / {total:,} parameters ({(total-trainable)/total:.0%})")
-    print(f"Training: {trainable:,} parameters ({trainable/total:.0%})")
+    print(f"Training: {trainable:,} / {total:,} parameters ({trainable/total:.0%})")
 
     # max_length=128 because most utterance pairs are under 50 tokens
     # and 256 was just burning memory for padding. the manner examples
@@ -145,14 +135,13 @@ def train(data_path: str):
 
     args = TrainingArguments(
         output_dir=OUTPUT_DIR,
-        num_train_epochs=20,
+        num_train_epochs=10,
         # bumped to 8 for less noisy gradients. CPU doesn't OOM like GPU did.
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
-        # 5e-6 because unfrozen 125M parameters on 547 examples needs
-        # a very gentle touch. 2e-5 was overfitting. 5e-6 is the
-        # "i've been hurt before and i learned from it" setting.
-        learning_rate=2e-5,
+        # 1e-5 for unfrozen. gentle enough to not overfit on 947 examples,
+        # aggressive enough to actually converge in 10 epochs.
+        learning_rate=1e-5,
         weight_decay=0.01,  # regularization. fights overfitting directly.
         warmup_ratio=0.1,
         eval_strategy="epoch",
