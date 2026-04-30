@@ -96,10 +96,11 @@ def train(data_path: str):
         label2id=LABEL2ID,
     )
 
-    # unfrozen at 947 examples. previously froze 10/12 layers but
-    # frozen was plateauing at 0.77 with real data mixed in.
-    # at ~1000 examples unfreezing might finally win.
-    # lr=1e-5, weight_decay=0.01, 10 epochs.
+    # unfrozen at ~1200 examples. class weights compensate for
+    # Cooperative dominating the corpus (559 vs 113-229 for others).
+    # without weights the model learns "when in doubt, say Cooperative"
+    # which is technically what most real conversations are but not
+    # what we're trying to classify.
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total = sum(p.numel() for p in model.parameters())
     print(f"Training: {trainable:,} / {total:,} parameters ({trainable/total:.0%})")
@@ -133,6 +134,19 @@ def train(data_path: str):
     train_ds = Subset(dataset, train_idx)
     eval_ds  = Subset(dataset, eval_idx)
 
+    # compute class weights: inverse frequency so minority classes
+    # get higher weight. Cooperative has 559 examples, Relation has 113.
+    # without this the model just predicts Cooperative for everything
+    # because that's the safe bet when half your data is Cooperative.
+    label_counts = Counter(dataset.labels)
+    total_samples = len(dataset.labels)
+    num_classes = len(MAXIMS)
+    class_weights = torch.tensor([
+        total_samples / (num_classes * label_counts[i])
+        for i in range(num_classes)
+    ], dtype=torch.float32)
+    print(f"Class weights: {', '.join(f'{MAXIMS[i]}={class_weights[i]:.2f}' for i in range(num_classes))}")
+
     print(f"Training on {len(train_idx)} examples, evaluating on {len(eval_idx)}.")
 
     args = TrainingArguments(
@@ -158,7 +172,18 @@ def train(data_path: str):
                        # CPU is slower but at least it finishes.
     )
 
-    trainer = Trainer(
+    # custom trainer that uses class weights in the loss function.
+    # without this, Cooperative (559 examples) drowns out Relation (113).
+    class WeightedTrainer(Trainer):
+        def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+            labels = inputs.pop("labels")
+            outputs = model(**inputs)
+            logits = outputs.logits
+            loss_fn = torch.nn.CrossEntropyLoss(weight=class_weights.to(logits.device))
+            loss = loss_fn(logits, labels)
+            return (loss, outputs) if return_outputs else loss
+
+    trainer = WeightedTrainer(
         model=model,
         args=args,
         train_dataset=train_ds,
