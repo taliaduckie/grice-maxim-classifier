@@ -56,22 +56,16 @@ def predict(text: str, context: str = "") -> dict:
     enough. I know. I'm working on it.
     """
     if MODEL_DIR.exists():
-        # Fine-tuned model path. it WORKS now. 229 examples and a tokenizer
-        # save later, we have a model that hits 0.84 macro F1. take THAT,
-        # manner. (manner is still hard but we don't talk about manner.)
         clf = _get_pipeline()
-        # same bracketed format as zero_shot.py. consistency! the manner maxim
-        # would be proud of me. (it wouldn't. nothing satisfies manner.)
+        # same bracketed format as zero_shot.py
         input_text = f"[Context: {context}] {text}" if context else text
-        # top_k=None gets scores for all labels. return_all_scores is deprecated
-        # because transformers loves renaming things. keep up or get left behind.
+        # top_k=None replaces deprecated return_all_scores
         result = clf(input_text, top_k=None)
         scores = {r["label"]: r["score"] for r in result}
         top = max(scores, key=scores.get)
-        # the model only predicts the maxim, not the violation type.
-        # we don't know if it's flouting or violating and we're not going
-        # to pretend we do. "unknown" until there's a second head or a
-        # separate model. cooperative gets "none" because that one's obvious.
+        # the model only predicts maxim, not violation type
+        # cooperative gets "none", everything else is "unknown" until we
+        # have a second head or separate model for it
         violation_type = "none" if top == "Cooperative" else "unknown"
         return {
             "utterance": text,
@@ -82,15 +76,12 @@ def predict(text: str, context: str = "") -> dict:
             "all_scores": scores,
         }
     else:
-        # Zero-shot baseline. This is what runs until you annotate
-        # enough data to fine-tune. See data/annotated/ for the format.
+        # zero-shot fallback when no fine-tuned model is saved
         print("No fine-tuned model found — using zero-shot baseline.")
         print("(Add more labeled examples to data/annotated/corpus.csv to train one.)")
         from zero_shot import classify
         pred = classify(text, context)
-        # manually unpacking instead of asdict() because i want the keys
-        # to match the fine-tuned path above. yes this is annoying.
-        # yes i could use a shared serializer. no i'm not doing that today.
+        # manually unpacking so keys match the fine-tuned path
         return {
             "utterance": pred.utterance,
             "context": pred.context,
@@ -115,7 +106,7 @@ def predict_batch(csv_path: str, output_path: str = None) -> list:
 
     df = pd.read_csv(csv_path)
     if "utterance" not in df.columns:
-        raise ValueError("CSV must have an 'utterance' column. c'mon.")
+        raise ValueError("CSV must have an 'utterance' column")
 
     has_gold = "maxim" in df.columns
     results = []
@@ -124,7 +115,7 @@ def predict_batch(csv_path: str, output_path: str = None) -> list:
     for i, row in df.iterrows():
         utterance = str(row["utterance"])
         context = str(row.get("context", "")) if "context" in df.columns else ""
-        # nan check — pandas loves giving you nan for empty cells
+        # pandas gives "nan" for empty cells
         if context == "nan":
             context = ""
 
@@ -145,7 +136,6 @@ def predict_batch(csv_path: str, output_path: str = None) -> list:
 
         results.append(result)
 
-        # progress because running 229 predictions in silence is a manner violation
         status = ""
         if has_gold:
             status = " ✓" if result["correct"] else " ✗"
@@ -156,9 +146,7 @@ def predict_batch(csv_path: str, output_path: str = None) -> list:
         correct = sum(1 for r in results if r["correct"])
         print(f"\nAccuracy: {correct}/{n} ({correct/n:.1%})")
 
-        # per-class breakdown because the aggregate number lies.
-        # a model that gets 90% accuracy by always predicting Cooperative
-        # is not a good model. it's a cooperative model. which is ironic.
+        # per-class breakdown — aggregate accuracy hides class-level failures
         from collections import Counter
         class_correct = Counter()
         class_total = Counter()
@@ -171,9 +159,7 @@ def predict_batch(csv_path: str, output_path: str = None) -> list:
             c, t = class_correct[maxim], class_total[maxim]
             print(f"  {maxim:<12} {c}/{t} ({c/t:.0%})")
 
-        # confusion matrix — the part where you find out your model thinks
-        # all sarcasm is Quantity and all Cooperative responses are Quality.
-        # or at least it used to. hopefully the 20 sarcasm examples fixed that.
+        # confusion matrix shows which classes get confused with which
         from labels import MAXIMS
         all_labels = sorted(set(MAXIMS) & (set(class_total) | set(r["predicted_maxim"] for r in results)))
         label_to_idx = {l: i for i, l in enumerate(all_labels)}
@@ -184,8 +170,6 @@ def predict_batch(csv_path: str, output_path: str = None) -> list:
             if gold_idx is not None and pred_idx is not None:
                 matrix[gold_idx][pred_idx] += 1
 
-        # print it. it's not pretty but it's informative. manner would
-        # have opinions about the formatting. manner always has opinions.
         col_width = max(len(l) for l in all_labels) + 2
         header = " " * col_width + "".join(l[:6].rjust(7) for l in all_labels)
         print(f"\nConfusion matrix (rows=gold, cols=predicted):\n{header}")
@@ -221,7 +205,6 @@ if __name__ == "__main__":
         predict_batch(args.batch, args.output)
     elif args.text:
         result = predict(args.text, args.context)
-        # json.dumps because pretty-printing dicts is a quantity violation
         print(json.dumps(result, indent=2))
     else:
-        parser.error("either --text or --batch is required. pick one. or both. no wait, just one.")
+        parser.error("either --text or --batch is required")

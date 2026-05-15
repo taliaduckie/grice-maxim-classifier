@@ -168,12 +168,12 @@ def train(data_path: str):
         logging_dir=str(Path(__file__).parent.parent / "models" / "logs"),
         report_to="none",  # disable wandb / other experiment trackers
                            # unless you've set them up and want them
-        use_cpu=True,  # MPS on apple silicon + transformers = pain.
-                       # CPU is slower but at least it finishes.
+        use_cpu=True,  # MPS on apple silicon + transformers = pain
+                       # CPU is slower but at least it finishes
     )
 
-    # custom trainer that uses class weights in the loss function.
-    # without this, Cooperative (559 examples) drowns out Relation (113).
+    # custom trainer that uses class weights in the loss function
+    # without this, Cooperative (559 examples) drowns out Relation (113)
     class WeightedTrainer(Trainer):
         def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
             labels = inputs.pop("labels")
@@ -191,15 +191,12 @@ def train(data_path: str):
         compute_metrics=compute_metrics,
     )
 
-    # moment of truth. or moment of overfitting. same thing at this sample size.
     trainer.train()
     trainer.save_model(OUTPUT_DIR)
     # save the tokenizer too or pipeline can't find it and produces
-    # identical scores for every input. the model was learning fine —
-    # 0.56 macro F1 at epoch 4!! — but at inference time it couldn't
-    # understand its own inputs. a model that can't read its own
-    # tokenization is a manner violation if i ever saw one.
-    # ask me how long i debugged this. (too long. the answer is too long.)
+    # identical scores for every input. the model was learning fine 
+    # w 0.56 macro F1 at epoch 4(!!) but at inference time it couldn't
+    # understand its own inputs. 
     dataset.tokenizer.save_pretrained(OUTPUT_DIR)
     print(f"Model saved to {OUTPUT_DIR}.")
     print("predict.py will use this model automatically from now on.")
