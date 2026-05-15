@@ -22,38 +22,23 @@ from labels import MAXIMS
 OUTPUT_DIR = str(Path(__file__).parent.parent / "models" / "roberta-grice")
 
 
-def compute_metrics(eval_pred):
-    """
-    Compute macro F1 for the evaluation set.
-
-    Macro F1 rather than accuracy bc the class distribution
-    is uneven
-    """
-    logits, labels = eval_pred
-    preds  = logits.argmax(axis=-1)
-    # pass explicit labels so sklearn doesn't freak out when the eval set
-    # is missing a class
-    report = classification_report(
-        labels, preds,
-        labels=list(range(len(MAXIMS))),
-        target_names=MAXIMS,
-        output_dict=True,
-        zero_division=0,
-    )
-
-    # Log the per-class breakdown too
-    for maxim in MAXIMS:
-        if maxim in report:
-            f1 = report[maxim]["f1-score"]
-            print(f"  {maxim}: F1={f1:.3f}")
-
-    return {"macro_f1": report["macro avg"]["f1-score"]}
-
-
 def train(data_path: str):
-    """
-    Fine tune and save the model.
-    """
+    def compute_metrics(eval_pred):
+        logits, labels = eval_pred
+        preds = logits.argmax(axis=-1)
+        # explicit labels arg prevents sklearn from crashing when a class is missing
+        report = classification_report(
+            labels, preds,
+            labels=list(range(len(MAXIMS))),
+            target_names=MAXIMS,
+            output_dict=True,
+            zero_division=0,
+        )
+        for maxim in MAXIMS:
+            if maxim in report:
+                print(f"  {maxim}: F1={report[maxim]['f1-score']:.3f}")
+        return {"macro_f1": report["macro avg"]["f1-score"]}
+
     model = AutoModelForSequenceClassification.from_pretrained(
         MODEL_NAME,
         num_labels=len(MAXIMS),
@@ -85,21 +70,19 @@ def train(data_path: str):
         indices,
         test_size=0.2,
         stratify=dataset.labels,
-        random_state=42,  # reproducibility is a cooperative maxim
+        random_state=42,
     )
     train_ds = Subset(dataset, train_idx)
     eval_ds  = Subset(dataset, eval_idx)
 
-    # compute class weights: inverse frequency so minority classes
-    # get higher weight
-    label_counts = Counter(dataset.labels)
-    total_samples = len(dataset.labels)
-    num_classes = len(MAXIMS)
+    # inverse-frequency class weights
+    counts = Counter(dataset.labels)
+    n_total = len(dataset.labels)
+    n_cls = len(MAXIMS)
     class_weights = torch.tensor([
-        total_samples / (num_classes * label_counts[i])
-        for i in range(num_classes)
+        n_total / (n_cls * counts[i]) for i in range(n_cls)
     ], dtype=torch.float32)
-    print(f"Class weights: {', '.join(f'{MAXIMS[i]}={class_weights[i]:.2f}' for i in range(num_classes))}")
+    print(f"Class weights: {', '.join(f'{MAXIMS[i]}={class_weights[i]:.2f}' for i in range(n_cls))}")
 
     print(f"Training on {len(train_idx)} examples, evaluating on {len(eval_idx)}.")
 
@@ -124,8 +107,7 @@ def train(data_path: str):
                        # CPU is slower but at least it finishes
     )
 
-    # custom trainer that uses class weights in the loss function
-    # without this, Cooperative (559 examples) drowns out Relation (113)
+    # weighted CE so Cooperative doesn't dominate
     class WeightedTrainer(Trainer):
         def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
             labels = inputs.pop("labels")

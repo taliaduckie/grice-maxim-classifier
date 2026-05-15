@@ -9,42 +9,24 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 MODEL_DIR = Path(__file__).parent.parent / "models" / "roberta-grice"
 
-# lazy-loaded pipeline cache. batch mode was reloading the model on
-# every prediction before this — slow.
+# cache so batch mode doesn't reload the model every iteration
 _pipeline = None
 
 
-def _get_pipeline():
-    global _pipeline
-    if _pipeline is None:
-        from transformers import pipeline
-        _pipeline = pipeline("text-classification", model=str(MODEL_DIR))
-    return _pipeline
-
-
 def predict(text: str, context: str = "") -> dict:
-    """
-    Run inference on a single utterance.
-
-    Routing logic:
-        - If ../models/roberta-grice/ exists: use fine-tuned RoBERTa
-        - Otherwise: use zero-shot BART-MNLI
-
-    The fine-tuned model will obviously be better once you have enough
-    annotated data to actually fine-tune on. Eight examples is not
-    enough. I know. I'm working on it.
-    """
+    """Run inference. Uses fine-tuned model if available, else zero-shot BART-MNLI."""
+    global _pipeline
     if MODEL_DIR.exists():
-        clf = _get_pipeline()
-        # same bracketed format as zero_shot.py
+        if _pipeline is None:
+            from transformers import pipeline
+            _pipeline = pipeline("text-classification", model=str(MODEL_DIR))
+        clf = _pipeline
         input_text = f"[Context: {context}] {text}" if context else text
-        # top_k=None replaces deprecated return_all_scores
+        # top_k=None gets all scores (return_all_scores is deprecated)
         result = clf(input_text, top_k=None)
         scores = {r["label"]: r["score"] for r in result}
         top = max(scores, key=scores.get)
-        # the model only predicts maxim, not violation type
-        # cooperative gets "none", everything else is "unknown" until we
-        # have a second head or separate model for it
+        # model only predicts maxim, not violation type
         violation_type = "none" if top == "Cooperative" else "unknown"
         return {
             "utterance": text,
@@ -55,12 +37,9 @@ def predict(text: str, context: str = "") -> dict:
             "all_scores": scores,
         }
     else:
-        # zero-shot fallback when no fine-tuned model is saved
-        print("No fine-tuned model found — using zero-shot baseline.")
-        print("(Add more labeled examples to data/annotated/corpus.csv to train one.)")
+        print("no fine-tuned model — falling back to zero-shot")
         from zero_shot import classify
         pred = classify(text, context)
-        # manually unpacking so keys match the fine-tuned path
         return {
             "utterance": pred.utterance,
             "context": pred.context,
@@ -72,20 +51,12 @@ def predict(text: str, context: str = "") -> dict:
 
 
 def predict_batch(csv_path: str, output_path: str = None) -> list:
-    """
-    Run predictions on a CSV file. If the CSV has 'maxim' and/or
-    'violation_type' columns, treat them as gold labels and report
-    accuracy. because what good is a model if you can't measure
-    how wrong it is.
-
-    Expected CSV columns: utterance, context (optional), maxim (optional)
-    Outputs: the input columns plus predicted_maxim, confidence, correct (if gold exists)
-    """
+    """Run predictions on a CSV. Reports accuracy if 'maxim' column exists."""
     import pandas as pd
 
     df = pd.read_csv(csv_path)
     if "utterance" not in df.columns:
-        raise ValueError("CSV must have an 'utterance' column")
+        raise ValueError("need an 'utterance' column")
 
     has_gold = "maxim" in df.columns
     results = []

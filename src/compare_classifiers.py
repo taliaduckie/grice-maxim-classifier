@@ -8,21 +8,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-# fail loud and early. not quietly and confusingly.
 if not os.environ.get("ANTHROPIC_API_KEY"):
-    print("ERROR: ANTHROPIC_API_KEY is not set.")
-    print("Set it with: export ANTHROPIC_API_KEY=sk-ant-...")
-    print("Get one at: https://console.anthropic.com/settings/keys")
+    print("ANTHROPIC_API_KEY not set")
     sys.exit(1)
 
 import anthropic
 import pandas as pd
 from predict import predict
 
-# exchange type norms — what "cooperative" looks like in each context.
-# these are the standards the utterance is being measured against.
-# a response that's fine in casual chat might be a manner violation
-# in a technical troubleshooting context.
 EXCHANGE_NORMS = {
     "performance_eval": (
         "In a performance evaluation exchange, cooperative responses provide "
@@ -78,10 +71,6 @@ client = anthropic.Anthropic()
 
 
 def classify_with_claude(utterance: str, context: str, exchange_type: str) -> dict:
-    """
-    Ask Claude to classify a single utterance with exchange-type context.
-    Returns the classification, reasoning, and whether surface proxies were cited.
-    """
     norm = EXCHANGE_NORMS.get(exchange_type, "No specific norm defined.")
 
     response = client.messages.create(
@@ -109,18 +98,13 @@ def classify_with_claude(utterance: str, context: str, exchange_type: str) -> di
 
     text = response.content[0].text
 
-    # parse the response. claude is usually structured enough that we can
-    # extract the label from the first line. if not, we'll flag it.
+    # grab the label from the first line
     lines = text.strip().split("\n")
     label = "unknown"
     for candidate in ["Cooperative", "Quantity", "Quality", "Relation", "Manner"]:
         if candidate.lower() in lines[0].lower():
             label = candidate
             break
-
-    # surface proxy yes/no is in the raw text — hand-code it from
-    # claude_reasoning rather than parsing it here. programmatic
-    # extraction was brittle and wrong half the time.
 
     return {
         "claude_label": label,
@@ -129,9 +113,6 @@ def classify_with_claude(utterance: str, context: str, exchange_type: str) -> di
 
 
 def compare(csv_path: str, output_path: str = None):
-    """
-    Run both classifiers on the adversarial set and compare.
-    """
     df = pd.read_csv(csv_path)
     results = []
     n = len(df)
