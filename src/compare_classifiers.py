@@ -18,52 +18,36 @@ from predict import predict
 
 EXCHANGE_NORMS = {
     "performance_eval": (
-        "In a performance evaluation exchange, cooperative responses provide "
-        "specific, actionable assessment. Vague praise or criticism without "
-        "examples is underinformative. The evaluator and evaluatee both expect "
-        "concrete details."
+        "Cooperative responses give concrete, specific assessment — actual examples, "
+        "actual numbers. Vague praise or criticism doesn't count."
     ),
     "technical": (
-        "In a technical troubleshooting exchange, cooperative responses identify "
-        "root causes, describe specific steps taken, or ask clarifying questions. "
-        "Responses that describe symptoms without diagnosis or say 'it should work' "
-        "without evidence are underinformative or potentially false."
+        "You're expected to identify root cause, list what you tried, or ask a "
+        "clarifying question. 'It should work' without evidence is suspect."
     ),
     "status_update": (
-        "In a status update exchange, cooperative responses give concrete progress "
-        "indicators — what's done, what's blocked, what's next. 'Making progress' "
-        "without specifics is underinformative. 'On track' without evidence may "
-        "be false."
+        "What's done, what's blocked, what's next. 'Making progress' alone is "
+        "underinformative."
     ),
     "personal": (
-        "In a personal check-in exchange, cooperative responses acknowledge the "
-        "question and share to the degree the speaker is comfortable. Deflection "
-        "may be opting out (legitimate) rather than violating. The norm is less "
-        "rigid than professional exchanges."
+        "Lower bar — acknowledging the question and sharing as much as you're "
+        "comfortable with is fine. Deflection here might be opting out, not violating."
     ),
     "decision": (
-        "In a decision-making exchange, cooperative responses take a position or "
-        "articulate trade-offs. 'Either way works' may be genuine flexibility or "
-        "underinformative avoidance. The expectation is that participants contribute "
-        "to the decision."
+        "Take a position or lay out the tradeoffs. 'Either way works' could be "
+        "genuine flexibility or avoidance."
     ),
     "knowledge": (
-        "In a knowledge exchange, cooperative responses provide accurate, clear "
-        "explanations at an appropriate level of detail. Vague gestures at the "
-        "answer ('it has to do with how it works') are manner violations. Wrong "
-        "answers are quality violations."
+        "Accurate, clear, appropriately detailed. Hand-waving is a Manner violation; "
+        "being wrong is Quality."
     ),
     "conflict": (
-        "In a conflict exchange, cooperative responses address the disagreement "
-        "directly. 'That's not how I remember it' without providing the alternative "
-        "memory is underinformative. Reframing what was said may be quality "
-        "violation or legitimate clarification."
+        "Address the disagreement directly. Saying 'that's not how I remember it' "
+        "without giving your version is underinformative."
     ),
     "instruction": (
-        "In an instruction exchange, cooperative responses provide clear, ordered "
-        "steps the recipient can follow. 'It's pretty straightforward' without "
-        "actual steps is a manner violation. 'Follow the doc' without specifying "
-        "which doc is underinformative."
+        "Clear ordered steps. 'It's pretty straightforward' with no actual steps "
+        "is a Manner violation."
     ),
 }
 

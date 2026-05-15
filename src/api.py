@@ -15,29 +15,21 @@ from labels import MAXIMS
 
 FEEDBACK_PATH = Path(__file__).parent.parent / "data" / "feedback" / "corrections.csv"
 
-app = FastAPI(
-    title="Grice Maxim Classifier",
-    description=(
-        "Classify utterances by which Gricean maxim they violate. "
-        "Supports single and batch classification, plus user corrections."
-    ),
-    version="1.0.0",
-)
+app = FastAPI(title="Grice Maxim Classifier", version="1.0.0")
 
-# allow cross-origin requests so a frontend can talk to this
+# CORS so a frontend can hit this
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten this in production
+    allow_origins=["*"],  # restrict before prod
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# --- request/response models ---
-
 class ClassifyRequest(BaseModel):
     utterance: str
     context: str = ""
+
 
 class ClassifyResponse(BaseModel):
     utterance: str
@@ -48,12 +40,10 @@ class ClassifyResponse(BaseModel):
     all_scores: dict[str, float]
     low_confidence: bool
 
+
 class BatchRequest(BaseModel):
     pairs: list[ClassifyRequest]
 
-class BatchResponse(BaseModel):
-    results: list[ClassifyResponse]
-    count: int
 
 class CorrectionRequest(BaseModel):
     utterance: str
@@ -61,16 +51,10 @@ class CorrectionRequest(BaseModel):
     corrected_maxim: str
     notes: Optional[str] = ""
 
-class CorrectionResponse(BaseModel):
-    status: str
-    message: str
-
-
-# --- endpoints ---
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "model": "roberta-grice", "corpus_size": 1197}
+    return {"status": "ok"}
 
 
 @app.post("/classify", response_model=ClassifyResponse)
@@ -90,38 +74,32 @@ def classify(req: ClassifyRequest):
     )
 
 
-@app.post("/batch", response_model=BatchResponse)
+@app.post("/batch")
 def batch_classify(req: BatchRequest):
-    if len(req.pairs) > 500:
-        raise HTTPException(status_code=400, detail="max 500 pairs per request")
-    if len(req.pairs) == 0:
-        raise HTTPException(status_code=400, detail="pairs list cannot be empty")
+    if len(req.pairs) > 500 or len(req.pairs) == 0:
+        raise HTTPException(400, "pairs must be between 1 and 500")
 
     results = []
     for pair in req.pairs:
         result = predict(pair.utterance, pair.context)
-        results.append(ClassifyResponse(
-            utterance=pair.utterance,
-            context=pair.context,
-            predicted_maxim=result["predicted_maxim"],
-            violation_type=result["violation_type"],
-            confidence=result["confidence"],
-            all_scores=result["all_scores"],
-            low_confidence=result["confidence"] < 0.7,
-        ))
+        results.append({
+            "utterance": pair.utterance,
+            "context": pair.context,
+            "predicted_maxim": result["predicted_maxim"],
+            "violation_type": result["violation_type"],
+            "confidence": result["confidence"],
+            "all_scores": result["all_scores"],
+            "low_confidence": result["confidence"] < 0.7,
+        })
+    return {"results": results, "count": len(results)}
 
-    return BatchResponse(results=results, count=len(results))
 
-
-@app.post("/correct", response_model=CorrectionResponse)
+@app.post("/correct")
 def submit_correction(req: CorrectionRequest):
     if not req.utterance.strip():
-        raise HTTPException(status_code=400, detail="utterance cannot be empty")
+        raise HTTPException(400, "utterance cannot be empty")
     if req.corrected_maxim not in MAXIMS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"corrected_maxim must be one of {MAXIMS}",
-        )
+        raise HTTPException(400, f"corrected_maxim must be one of {MAXIMS}")
 
     FEEDBACK_PATH.parent.mkdir(parents=True, exist_ok=True)
     file_exists = FEEDBACK_PATH.exists()
@@ -140,10 +118,7 @@ def submit_correction(req: CorrectionRequest):
             "timestamp": datetime.now().isoformat(),
         })
 
-    return CorrectionResponse(
-        status="saved",
-        message=f"Correction saved: {req.corrected_maxim}",
-    )
+    return {"status": "saved", "message": f"saved correction: {req.corrected_maxim}"}
 
 
 if __name__ == "__main__":

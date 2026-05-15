@@ -16,25 +16,35 @@ VALID_VIOLATION_TYPES = {
 }
 
 
-def normalize_violation_type(vtype: str) -> str:
+VTYPE_ALIASES = {
+    "flout": "flouting",
+    "violate": "violating",
+    "violation": "violating",
+    "sincere": "none",
+    "no violation": "none",
+    "": "unknown",
+}
+
+
+def normalize_vtype(vtype: str) -> str:
     vtype = vtype.strip().lower()
-    aliases = {
-        "flout": "flouting",
-        "violate": "violating",
-        "violation": "violating",
-        "sincere": "none",
-        "no violation": "none",
-        "": "unknown",
-    }
-    return aliases.get(vtype, vtype)
+    return VTYPE_ALIASES.get(vtype, vtype)
 
 
-def _load_corpus() -> tuple[list, set]:
-    rows = []
-    keys = set()
+def _is_valid(row):
+    if not row["utterance"]:
+        return False
+    if row["maxim"] not in VALID_MAXIMS:
+        return False
+    if row["violation_type"] not in VALID_VIOLATION_TYPES:
+        return False
+    return True
+
+
+def _load_corpus():
+    rows, keys = [], set()
     if not CORPUS_PATH.exists():
         return rows, keys
-
     with open(CORPUS_PATH) as f:
         for r in csv.DictReader(f):
             row = {
@@ -48,29 +58,19 @@ def _load_corpus() -> tuple[list, set]:
     return rows, keys
 
 
-def _validate_row(row: dict) -> Optional[str]:
-    if not row["utterance"]:
-        return "empty utterance"
-    if row["maxim"] not in VALID_MAXIMS:
-        return f"invalid maxim: {row['maxim']}"
-    if row["violation_type"] not in VALID_VIOLATION_TYPES:
-        return f"invalid violation_type: {row['violation_type']}"
-    return None
-
-
-def _write_corpus(rows: list):
+def _write(rows):
     with open(CORPUS_PATH, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=FIELDNAMES, quoting=csv.QUOTE_ALL)
-        writer.writeheader()
-        writer.writerows(rows)
+        w = csv.DictWriter(f, fieldnames=FIELDNAMES, quoting=csv.QUOTE_ALL)
+        w.writeheader()
+        w.writerows(rows)
 
 
-def _print_summary(rows: list, added: int, dupes: int, skipped: int):
+def _summary(rows, added, dupes, skipped):
     mc = Counter(r["maxim"] for r in rows)
     vc = Counter(r["violation_type"] for r in rows)
-    print(f"Added: {added}, Duplicates: {dupes}, Skipped (invalid): {skipped}")
+    print(f"Added: {added}, Duplicates: {dupes}, Skipped: {skipped}")
     print(f"Total: {len(rows)}")
-    print(f"Maxim:     {dict(mc)}")
+    print(f"Maxim: {dict(mc)}")
     print(f"Violation: {dict(vc)}")
 
 
