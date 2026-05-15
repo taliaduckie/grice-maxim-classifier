@@ -16,45 +16,50 @@ Also distinguishes *flouting* (deliberate, to generate implicature) from
 ## Theoretical grounding
 
 - Grice (1975), "Logic and Conversation"
-- Horn (1984), neo-Gricean Q/R principles
+- Horn (1972, 1984), neo-Gricean Q/R principles
 - Levinson (2000), presumptive meanings
 - Cutting (2002), flouting vs. violating
 
 ## Model
 
-Fine-tuned: `roberta-base` on 367 hand-annotated examples. Macro F1 = **0.86**
-on a stratified 80/20 eval split. Training: 10 epochs, lr=2e-5, batch size 4,
-~9 minutes on CPU.
+Fine-tuned `roberta-base` on the 367-pair hand-annotated corpus. Macro F1 = **0.91**
+on a stratified 80/20 split (74 eval, 293 train). Training: 10 epochs, lr=1e-5,
+batch size 8, class weights to handle Quality being slightly over-represented.
+~15 minutes on CPU.
 
-Per-class accuracy on the full corpus:
+Per-class F1 (held-out fold):
 
-| Maxim | Accuracy |
+| Maxim | F1 |
 |---|---|
-| Quantity | 99% |
-| Relation | 99% |
-| Manner | 97% |
-| Cooperative | 96% |
-| Quality | 93% |
+| Quantity | 0.97 |
+| Relation | 0.97 |
+| Cooperative | 0.88 |
+| Manner | 0.88 |
+| Quality | 0.85 |
 
-Sarcasm detection was the hardest problem. 20 targeted workplace sarcasm
-examples got Quality flouting from ~65% confidence to 99%+.
+Zero-shot BART-MNLI baseline on the same fold: macro F1 = 0.13 (below chance for
+a five-class task).
+
+On a 40-pair adversarial set designed to strip surface cues, performance drops
+to macro F1 = 0.26 (accuracy 42.5%), suggesting the held-out F1 substantially
+overstates the model's grasp of the maxims. Claude (Sonnet 4) on the same
+adversarial set reaches macro F1 = 0.48 (accuracy 55%).
 
 Fallback: `facebook/bart-large-mnli` zero-shot baseline if no fine-tuned model
-exists. Works by passing natural-language hypothesis descriptions to the NLI
-model and scoring entailment. Good enough to bootstrap annotation but not
-much else.
+exists. Used to bootstrap annotation; performs near chance for actual inference.
 
 ## Corpus
 
-367 annotated utterance-context pairs in `data/annotated/corpus.csv`.
-Distribution: 86 Quality, 72 Quantity, 70 Relation, 70 Cooperative, 69 Manner.
-150 violating, 147 flouting, 70 none.
+The paper documents the 367-pair version. The repo currently contains 1,197 pairs
+total — 367 synthetic + 830 real Reddit comment-reply pairs from r/AmItheAsshole,
+r/explainlikeimfive, r/cscareerquestions, r/relationships, r/relationship_advice,
+r/ExperiencedDevs, r/askscience, r/MaliciousCompliance, r/tifu, and
+r/talesfromtechsupport.
 
 Bootstrapped via `src/bootstrap.py`, which runs zero-shot predictions on
-seed pairs and outputs a CSV for human correction. The model's guesses
-are wrong often enough to keep you honest and right often enough to be
-faster than annotating from scratch. Five rounds of bootstrap + annotate
-plus targeted rebalancing got us from 8 examples to 367.
+seed pairs and outputs a CSV for human correction. Five rounds of bootstrap
+plus several targeted batches got the corpus to 367; subsequent rounds of
+Reddit scraping and hand-annotation got it to 1,197.
 
 ## Setup
 
@@ -72,8 +77,27 @@ python src/predict.py --batch data/annotated/corpus.csv --output results.csv
 # Bootstrap more annotations
 python src/bootstrap.py
 
-# Fine-tune on your annotated data
+# Scrape Reddit pairs and pre-label them
+python src/scrape_reddit.py --subreddit askreddit --limit 50
+
+# Fine-tune
 python src/train.py --data data/annotated/corpus.csv
+
+# K-fold cross-validation
+python src/kfold_eval.py --data data/annotated/corpus.csv --folds 5
+
+# Coherence scoring for annotation QA
+python src/score_corpus.py
+
+# Compare RoBERTa vs Claude on the adversarial set
+export ANTHROPIC_API_KEY=sk-ant-...
+python src/compare_classifiers.py
+
+# Gradio web demo
+python src/app.py
+
+# FastAPI backend
+python src/api.py
 ```
 
 ## Project structure
@@ -81,19 +105,23 @@ python src/train.py --data data/annotated/corpus.csv
 ```
 grice-maxim-classifier/
 ├── src/
-│   ├── labels.py       # maxim definitions and label schema
-│   ├── zero_shot.py    # zero-shot baseline (BART-MNLI)
-│   ├── dataset.py      # dataset loading and tokenization
-│   ├── train.py        # fine-tuning loop (RoBERTa)
-│   ├── predict.py      # inference CLI
-│   ├── bootstrap.py    # pre-label seed pairs for annotation
-│   ├── app.py          # Gradio web demo
-│   ├── score_corpus.py # coherence scoring (L/O) for annotation QA
-│   └── compare_classifiers.py  # RoBERTa vs Claude API comparison
+│   ├── labels.py             # maxim definitions and label schema
+│   ├── zero_shot.py          # zero-shot baseline (BART-MNLI)
+│   ├── dataset.py            # dataset loading and tokenization
+│   ├── train.py              # fine-tuning loop (RoBERTa)
+│   ├── predict.py            # inference CLI
+│   ├── bootstrap.py          # pre-label seed pairs for annotation
+│   ├── scrape_reddit.py      # scrape comment-reply pairs from Reddit
+│   ├── merge_corpus.py       # merge new annotations into corpus
+│   ├── kfold_eval.py         # stratified k-fold cross-validation
+│   ├── score_corpus.py       # coherence scoring for annotation QA
+│   ├── compare_classifiers.py # RoBERTa vs Claude API comparison
+│   ├── app.py                # Gradio web demo
+│   └── api.py                # FastAPI backend
 ├── data/
-│   ├── raw/            # unannotated utterance pairs
-│   └── annotated/      # gold-labeled CSV corpus
-├── models/             # saved checkpoints (gitignored)
+│   ├── raw/                  # unannotated and pre-labeled CSVs
+│   └── annotated/            # gold-labeled CSV corpus
+├── models/                   # saved checkpoints (gitignored)
 └── tests/
     ├── test_labels.py
     ├── test_corpus.py
@@ -102,9 +130,7 @@ grice-maxim-classifier/
 
 ## TODO
 
-- **K-fold cross-validation** — the single 80/20 stratified split means F1 numbers depend on which 50 examples land in eval. K-fold would give more stable estimates and catch classes that happen to get lucky or unlucky in a given split.
-- **Violation type prediction** — right now `violation_type` is a heuristic: cooperative = none, everything else = flouting. The corpus has 147 flouting, 150 violating, 70 none — enough to train a second classification head or a separate model. The flouting/violating distinction is the interesting part of Gricean pragmatics and we're currently just guessing.
-- **Error analysis** — the model gets 13/367 wrong. Are those genuinely ambiguous or is there a pattern worth fixing with more targeted data?
-- **Held-out test set** — eval is currently part of the training loop. A true out-of-sample set (50 examples the model never sees during training) would give a more honest score.
-- **Try roberta-large** — twice the parameters, probably a few F1 points for free. Slower to train but we're at 9 minutes on CPU so there's room.
-- **Run on real data** — everything in the corpus is synthetic. Reddit threads, meeting transcripts, customer support logs — see how it holds up when people are actually talking and not performing pragmatics for a dataset.
+- **Violation type prediction** — right now `violation_type` is a heuristic: cooperative = none, everything else = unknown. The corpus has enough flouting/violating/none examples to train a second head or a separate model, but the distinction is often not visible in surface form (especially for Relation, where flouting and violating cluster identically by coherence score).
+- **Held-out test set** — eval is currently part of the training loop. A true out-of-sample set would give a more honest score.
+- **Try roberta-large** — twice the parameters, probably a few F1 points for free.
+- **Adversarial set expansion** — 40 items is small. Larger adversarial coverage would let macro F1 carry real statistical weight.
