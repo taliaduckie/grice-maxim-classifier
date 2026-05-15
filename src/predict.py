@@ -25,17 +25,13 @@ import json
 import sys
 from pathlib import Path
 
-# make imports work whether you run from src/ or the project root.
-# this is the kind of thing that shouldn't be hard but here we are.
+# make imports work from src/ or project root
 sys.path.insert(0, str(Path(__file__).parent))
 
-# if this path exists you are living in the future where i annotated enough data.
-# congratulations future me. or condolences. depending on how the f1 looks.
 MODEL_DIR = Path(__file__).parent.parent / "models" / "roberta-grice"
 
-# lazy-loaded pipeline cache. loading the model 229 times in batch mode
-# was a manner violation of the highest order. now it loads once and
-# stays loaded like a responsible adult.
+# lazy-loaded pipeline cache. batch mode was reloading the model on
+# every prediction before this — slow.
 _pipeline = None
 
 

@@ -92,7 +92,6 @@ class GriceDataset(Dataset):
                 f"Check your annotation for typos. ('Cooperative' not 'cooperative'. I know.)"
             )
 
-        # the moment where pragmatic theory becomes a list of ints. heheheheheheheh
         self.labels = [LABEL2ID[m] for m in df["maxim"]]
 
     def __len__(self):
