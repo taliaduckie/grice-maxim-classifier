@@ -1,26 +1,3 @@
-"""
-zero_shot.py
-
-Zero-shot maxim classification using BART-MNLI.
-
-The setup: we have five hypotheses, (one per maxim) and we ask the NLI model
-to score how well each hypothesis entails the input utterance. The highest
-score wins.
-
-UGH. is good enough to bootstrap annotation of new data, which is the
-actual use case here. am not going to claim this is solving pragmatics.
-pragmatics is famously not solved.
-
-the model we're using is facebook/bart-large-mnli, which was trained on
-MultiNLI and SNLI. It has no idea what a Gricean maxim is. (join the club boi.)
-It knows what "irrelevant to what was asked" means in the loose distributional
-sense that large language models know things. proceed to debate the stochastic
-parrot argument. yay fun.
-
-On download: the first run will download ~1.6GB. This is normal.
-Get a coffee. Maybe two.
-"""
-
 from transformers import pipeline
 from labels import MAXIMS, ZS_HYPOTHESES, MaximPrediction
 

@@ -1,18 +1,3 @@
-"""
-scrape_reddit.py
-
-Pull comment-reply pairs from Reddit and pre-label them with the
-fine-tuned model. Outputs a CSV for human annotation.
-
-Uses Reddit's public JSON API (no auth needed, just append .json
-to any Reddit URL). Rate-limited to be polite.
-
-Usage:
-    python scrape_reddit.py
-    python scrape_reddit.py --subreddit askreddit --limit 100
-    python scrape_reddit.py --subreddit cscareerquestions --output reddit_pairs.csv
-"""
-
 import argparse
 import csv
 import json

@@ -106,13 +106,12 @@ def train(data_path: str):
     args = TrainingArguments(
         output_dir=OUTPUT_DIR,
         num_train_epochs=10,
-        # bumped to 8 for less noisy gradients. CPU doesn't OOM like GPU did.
+        # bumped to 8 for less noisy gradients
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
-        # 1e-5 for unfrozen. gentle enough to not overfit on 947 examples,
-        # aggressive enough to actually converge in 10 epochs.
+        # 1e-5 for unfrozen. 
         learning_rate=1e-5,
-        weight_decay=0.01,  # regularization. fights overfitting directly.
+        weight_decay=0.01,  
         warmup_ratio=0.1,
         eval_strategy="epoch",
         save_strategy="epoch",

@@ -1,38 +1,3 @@
-"""
-coherence_score.py
-
-Compute semantic coherence between context (Q) and utterance (A) using
-sentence-transformers embeddings. The idea: if the response is semantically
-distant from the question, it's either a deliberate non-sequitur (flouting)
-or a genuine failure to stay on topic (violating / failed_flout). but which?
-
-The key insight: flouting SHOULD be low-coherence (the whole point is that
-the response is irrelevant) but the deflection is doing communicative work —
-it's legible as a refusal, a topic change, a power move. violating is ALSO
-low-coherence but the speaker genuinely lost the thread. the surface form
-is identical. the difference is intent.
-
-What this script actually measures:
-    L = cosine similarity between Q and A embeddings (semantic coherence)
-    O = 1 - L (semantic distance / "off-topic-ness")
-
-What to look for in the output:
-    - Relation examples should cluster into two groups by O score
-    - High O + labeled "flouting" = probably correct (deliberate deflection)
-    - Low O + labeled "flouting" = suspicious (maybe it's actually cooperative?)
-    - High O + labeled "violating" = probably correct (genuinely off-topic)
-    - Low O + labeled "violating" = suspicious (maybe they ARE answering?)
-
-This doesn't give you ground truth. It gives you candidates for relabeling.
-The decision is still human. but now it's an informed human instead of a
-vibes-based human. which is an improvement.
-
-Usage:
-    python coherence_score.py
-    python coherence_score.py --data ../data/annotated/corpus.csv
-    python coherence_score.py --data ../data/annotated/corpus.csv --output scores.csv
-"""
-
 import argparse
 import csv
 import sys

@@ -1,28 +1,3 @@
-"""
-labels.py
-
-The maxim label schema. The part of the project where I had to commit to
-a taxonomy and feel uneasy about it HAHAHAHA
-
-Grice proposed four maxims in 1975 and I've been turning them into a
-classification problem, which is either a completely natural thing to do
-or a category error depending on who you ask. (Levinson would probably
-have notes but am i asking him? naw)
-
-The basic structure: cooperative speech is the baseline n everything else
-is a deviation which is either accidental (violating) or deliberate (flouting). 
-The interesting cases are the flouting ones, where the deviation IS the
-meaning. "the weather is nice today" in response to "why were you late"
-a choice. the whole field of pragmatics is basically
-just: what do you do with that choice ??
-
-This file also contains the zero-shot hypotheses. Writing natural-language
-descriptions of abstract linguistic categories for a BART-MNLI model felt
-a little like explaining a joke to a room of people who aren't "in": you either
-get it or you don't, and the model mostly doesn't, but it gets closer
-than nothing. twas a fun exercise.
-"""
-
 from dataclasses import dataclass
 
 # The five labels. Four maxims + Cooperative as the unmarked baseline.
