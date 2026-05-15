@@ -1,23 +1,3 @@
-"""
-bootstrap.py
-
-Use the zero-shot model to pre-label a bunch of utterance-context pairs
-so you don't have to annotate from scratch like some kind of animal.
-
-the idea: write down a bunch of examples that probably violate various maxims,
-run the classifier on them, dump a CSV with the model's guesses, then go
-through and fix the ones it got wrong. which it will. but fixing is faster
-than labeling from nothing, and that's the whole game.
-
-the seed examples here are biased toward flouting because flouting is
-interesting and violating is just... sad. i'll add more violating examples
-later when i'm in a worse mood.
-
-Usage:
-    python bootstrap.py
-    python bootstrap.py --output ../data/annotated/bootstrap_labeled.csv
-"""
-
 import argparse
 import csv
 import sys

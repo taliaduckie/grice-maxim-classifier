@@ -1,20 +1,3 @@
-"""
-compare_classifiers.py
-
-Run the adversarial set through two classifiers and compare:
-1. Fine-tuned RoBERTa (local)
-2. Claude API (with exchange-type-aware system prompt)
-
-The point: the fine-tuned model has no concept of exchange type norms.
-Claude does. The disagreements are where the interesting pragmatics lives.
-
-Usage:
-    export ANTHROPIC_API_KEY=sk-ant-...
-    python compare_classifiers.py
-    python compare_classifiers.py --data ../data/annotated/ambiguous_exchanges.csv
-    python compare_classifiers.py --output comparison_results.csv
-"""
-
 import argparse
 import csv
 import json

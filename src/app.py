@@ -1,18 +1,3 @@
-"""
-app.py
-
-Gradio demo for the Grice maxim classifier.
-
-paste an utterance + context, get a maxim prediction. that's it.
-that's the app. no one said it had to be complicated.
-
-Usage:
-    python app.py
-
-Then open http://localhost:7860 in your browser. or don't. i'm a
-docstring, not a cop.
-"""
-
 import csv
 import sys
 from pathlib import Path

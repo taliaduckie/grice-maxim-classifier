@@ -1,23 +1,3 @@
-"""
-api.py
-
-FastAPI backend for the Grice maxim classifier.
-
-Endpoints:
-    POST /classify     — classify an utterance-context pair
-    POST /batch        — classify multiple pairs at once
-    POST /correct      — submit a correction for a prediction
-    GET  /health       — health check
-    GET  /docs         — auto-generated API docs (thanks FastAPI)
-
-Usage:
-    uvicorn api:app --host 0.0.0.0 --port 8000
-    # or
-    python api.py
-
-Then hit http://localhost:8000/docs for the interactive API docs.
-"""
-
 import csv
 import sys
 from datetime import datetime

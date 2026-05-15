@@ -1,21 +1,3 @@
-"""
-kfold_eval.py
-
-Stratified 5-fold cross-validation to get a real macro F1 number
-instead of trusting one lucky/unlucky 80/20 split.
-
-Trains 5 models, each on a different 80% of the data, evaluates on
-the held-out 20%. Reports per-fold and average macro F1.
-
-This doesn't save a model — it's purely for evaluation. Use train.py
-to train the actual production model after you know the real score.
-
-Usage:
-    python kfold_eval.py
-    python kfold_eval.py --data ../data/annotated/corpus.csv
-    python kfold_eval.py --folds 5
-"""
-
 import argparse
 import sys
 import numpy as np

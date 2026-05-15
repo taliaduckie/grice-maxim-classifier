@@ -1,24 +1,3 @@
-"""
-predict.py
-
-The part you actually run WOOWOOWOOOOOOO
-
-Usage:
-    # single utterance
-    python predict.py --text "The weather is nice today." --context "Why were you late?"
-
-    # batch mode — run on a CSV, compare against gold labels if present
-    python predict.py --batch data/annotated/corpus.csv
-    python predict.py --batch data/annotated/corpus.csv --output results.csv
-
-If you have a fine-tuned model in ../models/roberta-grice/, it'll use that.
-Otherwise it falls back to zero-shot BART-MNLI.
-
-The fine-tuned model hit 0.84 macro F1 on 229 examples with stratified split.
-Quality: 0.95, Quantity: 0.86, Relation: 0.84, Manner: 0.82, Cooperative: 0.75.
-still can't reliably detect sarcasm but honestly neither can most humans so.
-"""
-
 import argparse
 import csv
 import json

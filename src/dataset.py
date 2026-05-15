@@ -1,29 +1,3 @@
-"""
-dataset.py
-
-Data loading and tokenization for fine-tuning.
-
-Expected CSV format (see data/annotated/corpus.csv for examples):
-    utterance, context, maxim, violation_type
-    "The weather is nice.", "Why were you late?", "Relation", "flouting"
-
-violation_type is optional and currently unused during training.
-I'm only training on the five-way maxim classification for now.
-The violation_type label (flouting vs. violating) is a separate
-problem that probably needs more data and a different architecture.
-
-The thing I keep bumping into with this dataset is that maxim violations
-are often context-dependent in ways that make annotation really frustrating &
-hard. Is "The report is fine" in response to "Is the report ready?"
-a Manner violation (what does 'fine' even mean here) or a Quantity
-violation (that's less information than I asked for) or a cooperative
-response with a pragmatic implicature of mild reluctance? ACK.
-
-My cuurent answer: it depends on what the speaker meant, which you can't
-always recover from text alone.  That's a limitation of the dataset but in a
-way it's also kind of the point of the whole project i guess.
-"""
-
 import pandas as pd
 from torch.utils.data import Dataset
 from transformers import AutoTokenizer
