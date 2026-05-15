@@ -23,33 +23,29 @@ EXAMPLES = [
 ]
 
 INFO_TEXT = """
-## What are Gricean maxims?
+### the maxims (very briefly)
 
-In 1975, philosopher Paul Grice proposed that conversation follows an unspoken **Cooperative Principle**:
-we generally try to be helpful when we talk to each other. He broke this down into four maxims:
+Grice (1975) said cooperative speakers follow four maxims:
 
-| Maxim | What it means | Example violation |
-|---|---|---|
-| **Quantity** | Say enough, but not too much | "Fine." (when asked for a detailed explanation) |
-| **Quality** | Don't say things that are false or unsubstantiated | "React is a programming language." |
-| **Relation** | Be relevant to the topic at hand | "The weather is nice today." (when asked why you were late) |
-| **Manner** | Be clear, unambiguous, and orderly | "The thing with the stuff at the place." |
+- **Quantity** — say enough but not too much
+- **Quality** — don't say what you believe to be false
+- **Relation** — be relevant
+- **Manner** — be clear
 
-A fifth label, **Cooperative**, means no violation — the speaker is being helpful, truthful, relevant, and clear.
+The fifth label, **Cooperative**, just means none of the above were violated.
 
-## Flouting vs. Violating
+### flouting vs violating
 
-- **Flouting**: breaking a maxim *on purpose* to communicate something indirectly. Sarcasm, irony,
-  deliberate understatement — the listener is supposed to notice the violation and infer the real meaning.
-- **Violating**: breaking a maxim *accidentally* or *deceptively*. The speaker failed to communicate well,
-  or is actively trying to mislead.
+Flouting = breaking a maxim on purpose so the listener picks up on it (sarcasm, irony, indirect refusal).
+Violating = breaking it by accident or to deceive.
 
-## Why the model might disagree with you
+The model can't reliably tell flouting from violating yet — it predicts the maxim only.
 
-Pragmatics is inherently subjective. The same utterance can be Quantity (too little info) or Manner
-(unclear expression) depending on whether you think the problem is *what* was said or *how* it was said.
-Even trained linguists disagree ~20-30% of the time on maxim labels. If the model's confidence is below
-70%, treat the prediction as a starting point for discussion, not a definitive answer.
+### why the model might disagree with you
+
+Pragmatics is subjective. "Fine." could be Quantity (too little) or Manner (vague) depending on what
+you think the underlying problem is. Even linguists disagree ~20-30% of the time. If confidence is
+below 70%, take it as a starting point not a verdict.
 """
 
 

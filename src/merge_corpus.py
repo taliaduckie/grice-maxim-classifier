@@ -3,7 +3,6 @@ import csv
 import sys
 from collections import Counter
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -97,12 +96,10 @@ def merge_pipe_data(pipe_string: str) -> int:
             "utterance": parts[0].strip(),
             "context": parts[1].strip(),
             "maxim": parts[2].strip(),
-            "violation_type": normalize_violation_type(parts[3]),
+            "violation_type": normalize_vtype(parts[3]),
         }
 
-        err = _validate_row(row)
-        if err:
-            print(f"  skipping ({err}): {row['utterance'][:50]}...")
+        if not _is_valid(row):
             skipped += 1
             continue
 
@@ -115,8 +112,8 @@ def merge_pipe_data(pipe_string: str) -> int:
         keys.add(key)
         added += 1
 
-    _write_corpus(existing)
-    _print_summary(existing, added, dupes, skipped)
+    _write(existing)
+    _summary(existing, added, dupes, skipped)
     return added
 
 
@@ -136,11 +133,10 @@ def merge_annotated_csv(csv_path: str) -> int:
                 "utterance": r.get("utterance", "").strip('"').strip(),
                 "context": r.get("context", "").strip('"').strip(),
                 "maxim": maxim.strip(),
-                "violation_type": normalize_violation_type(vtype),
+                "violation_type": normalize_vtype(vtype),
             }
 
-            err = _validate_row(row)
-            if err:
+            if not _is_valid(row):
                 skipped += 1
                 continue
 
@@ -153,8 +149,8 @@ def merge_annotated_csv(csv_path: str) -> int:
             keys.add(key)
             added += 1
 
-    _write_corpus(existing)
-    _print_summary(existing, added, dupes, skipped)
+    _write(existing)
+    _summary(existing, added, dupes, skipped)
     return added
 
 
@@ -186,17 +182,15 @@ def merge_with_scraped(scraped_path: str, annotation_pipe_string: str) -> int:
             skipped += 1
             continue
 
-        # parts[0] is the utterance prefix (for sanity check), but we use
-        # the full utterance from the scraped data for safety
+        # use full utterance from scraped (parts[0] is just the prefix)
         row = {
             "utterance": scraped[i]["utterance"].strip('"'),
             "context": scraped[i]["context"].strip('"'),
             "maxim": parts[1].strip(),
-            "violation_type": normalize_violation_type(parts[2]),
+            "violation_type": normalize_vtype(parts[2]),
         }
 
-        err = _validate_row(row)
-        if err:
+        if not _is_valid(row):
             skipped += 1
             continue
 
@@ -209,8 +203,8 @@ def merge_with_scraped(scraped_path: str, annotation_pipe_string: str) -> int:
         keys.add(key)
         added += 1
 
-    _write_corpus(existing)
-    _print_summary(existing, added, dupes, skipped)
+    _write(existing)
+    _summary(existing, added, dupes, skipped)
     return added
 
 
