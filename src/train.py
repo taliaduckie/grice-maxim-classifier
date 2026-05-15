@@ -1,27 +1,3 @@
-"""
-train.py
-
-Fine-tune RoBERTa on the annotated Grice corpus.
-
-Usage:
-    python train.py --data ../data/annotated/corpus.csv
-
-Prerequisites:
-    - At least ~50 labeled examples per maxim before this is worth running.
-      The corpus has 367 examples across 5 classes now so we're well past that.
-    - A GPU helps but CPU works fine. ~9 minutes for 10 epochs on an M3.
-
-The model: roberta-base fine-tuned for 5-way sequence classification.
-The task: given utterance + context (concatenated), predict which maxim
-is being violated, if any.
-
-Training setup: stratified 80/20 split, lr=2e-5, warmup 10%, 10 epochs.
-the cleverness is in the data, which is where it should be for a task this
-dependent on annotation quality. macro F1 = 0.86 as of the last run.
-
-For a real publication you'd want k-fold. that's on the TODO list.
-"""
-
 import argparse
 import sys
 import numpy as np
@@ -31,7 +7,7 @@ from torch.utils.data import Subset
 from sklearn.model_selection import train_test_split
 from collections import Counter
 
-# same sys.path dance as predict.py. i refuse to write a setup.py for this.
+# i refuse to write a setup py for this
 sys.path.insert(0, str(Path(__file__).parent))
 from transformers import (
     AutoModelForSequenceClassification,
@@ -42,8 +18,7 @@ from sklearn.metrics import classification_report
 from dataset import GriceDataset, LABEL2ID, ID2LABEL, MODEL_NAME
 from labels import MAXIMS
 
-# resolve relative to this file so it works from anywhere.
-# learned this the hard way with predict.py's MODEL_DIR.
+# resolve MODEL DIR situation
 OUTPUT_DIR = str(Path(__file__).parent.parent / "models" / "roberta-grice")
 
 
@@ -51,16 +26,13 @@ def compute_metrics(eval_pred):
     """
     Compute macro F1 for the evaluation set.
 
-    Macro F1 rather than accuracy because the class distribution
-    is uneven — Cooperative examples are easy to find, Manner examples
-    less so. Accuracy would flatter a model that just predicts the
-    majority class. Macro F1 doesn't let you get away with that.
+    Macro F1 rather than accuracy bc the class distribution
+    is uneven
     """
     logits, labels = eval_pred
     preds  = logits.argmax(axis=-1)
     # pass explicit labels so sklearn doesn't freak out when the eval set
-    # is missing a class. which it will be. because 13 examples across 5 classes
-    # is not a number that guarantees coverage. ask me how i know.
+    # is missing a class
     report = classification_report(
         labels, preds,
         labels=list(range(len(MAXIMS))),
@@ -69,9 +41,7 @@ def compute_metrics(eval_pred):
         zero_division=0,
     )
 
-    # Log the per-class breakdown too — the aggregate macro F1
-    # can hide that the model has learned nothing about Manner
-    # while being confident about everything else.
+    # Log the per-class breakdown too
     for maxim in MAXIMS:
         if maxim in report:
             f1 = report[maxim]["f1-score"]
@@ -82,13 +52,8 @@ def compute_metrics(eval_pred):
 
 def train(data_path: str):
     """
-    Fine-tune and save the model.
-
-    The saved model will be loaded automatically by predict.py
-    once it exists in OUTPUT_DIR.
+    Fine tune and save the model.
     """
-    # roberta has no idea what pragmatics is but it's about to learn.
-    # or overfit trying. probably the second one with 8 examples.
     model = AutoModelForSequenceClassification.from_pretrained(
         MODEL_NAME,
         num_labels=len(MAXIMS),
@@ -96,34 +61,25 @@ def train(data_path: str):
         label2id=LABEL2ID,
     )
 
-    # unfrozen at ~1200 examples. class weights compensate for
-    # Cooperative dominating the corpus (559 vs 113-229 for others).
-    # without weights the model learns "when in doubt, say Cooperative"
-    # which is technically what most real conversations are but not
-    # what we're trying to classify.
+    # unfrozen at ~1200 examples
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total = sum(p.numel() for p in model.parameters())
     print(f"Training: {trainable:,} / {total:,} parameters ({trainable/total:.0%})")
 
     # max_length=128 because most utterance pairs are under 50 tokens
-    # and 256 was just burning memory for padding. the manner examples
-    # are the longest and even those fit in 128 comfortably.
     dataset = GriceDataset(data_path, max_length=128)
     n = len(dataset)
     print(f"Loaded {n} examples from {data_path}.")
 
     if n < 40:
         print(
-            f"Warning: {n} examples is probably not enough to fine-tune well. "
-            "The model will overfit. Consider annotating more data before training, "
+            f"Bro. {n} examples is not enough to fine tune well. "
+            "Consider annotating more data before training, "
             "or use the zero-shot baseline (predict.py without a saved model) "
-            "until you have a bigger corpus."
+            "until there's a bigger corpus."
         )
 
-    # stratified 80/20 split so every class actually shows up in eval.
-    # the previous naive split gave Relation F1=0.00 because the eval set
-    # had zero Relation examples. which is technically a valid split but
-    # also technically useless. sklearn to the rescue.
+    # stratified 80/20 split so every class actually shows up in eval
     indices = list(range(n))
     train_idx, eval_idx = train_test_split(
         indices,
@@ -135,9 +91,7 @@ def train(data_path: str):
     eval_ds  = Subset(dataset, eval_idx)
 
     # compute class weights: inverse frequency so minority classes
-    # get higher weight. Cooperative has 559 examples, Relation has 113.
-    # without this the model just predicts Cooperative for everything
-    # because that's the safe bet when half your data is Cooperative.
+    # get higher weight
     label_counts = Counter(dataset.labels)
     total_samples = len(dataset.labels)
     num_classes = len(MAXIMS)
@@ -166,8 +120,7 @@ def train(data_path: str):
         metric_for_best_model="macro_f1",
         greater_is_better=True,
         logging_dir=str(Path(__file__).parent.parent / "models" / "logs"),
-        report_to="none",  # disable wandb / other experiment trackers
-                           # unless you've set them up and want them
+        report_to="none",  
         use_cpu=True,  # MPS on apple silicon + transformers = pain
                        # CPU is slower but at least it finishes
     )
@@ -196,7 +149,7 @@ def train(data_path: str):
     # save the tokenizer too or pipeline can't find it and produces
     # identical scores for every input. the model was learning fine 
     # w 0.56 macro F1 at epoch 4(!!) but at inference time it couldn't
-    # understand its own inputs. 
+    # understand its own inputs
     dataset.tokenizer.save_pretrained(OUTPUT_DIR)
     print(f"Model saved to {OUTPUT_DIR}.")
     print("predict.py will use this model automatically from now on.")
