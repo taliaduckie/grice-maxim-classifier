@@ -3,13 +3,11 @@ from torch.utils.data import Dataset
 from transformers import AutoTokenizer
 from labels import MAXIMS
 
-# turning philosophical categories into integers. grice is rolling in his grave
-# but sklearn needs numbers so here we are.
 LABEL2ID = {m: i for i, m in enumerate(MAXIMS)}
 ID2LABEL  = {i: m for m, i in LABEL2ID.items()}
-MODEL_NAME = "roberta-base"  # Change this if you want to experiment with other models.
-                              # roberta-large would probably be better; it's also
-                              # twice as slow and twice as expensive to fine-tune.
+MODEL_NAME = "roberta-base" 
+                              # roberta-large might be better; it's also twice
+                              # as slow and twice as expensive to fine tune
                             
 
 
@@ -43,12 +41,11 @@ class GriceDataset(Dataset):
 
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
-        # If the CSV has a 'context' column, use it.
-        # If not, pass empty strings — the model handles this fine.
+        # If the CSV has a 'context' column, use it;
+        # if not, pass empty strings
         contexts = list(df["context"]) if "context" in df.columns else [""] * len(df)
 
-        # padding to max_length is wasteful but simple and i am choosing simple today.
-        # dynamic padding is a problem for future me who has enough data to care
+        # padding to max_length
         self.encodings = self.tokenizer(
             list(df["utterance"]),
             contexts,
@@ -57,7 +54,7 @@ class GriceDataset(Dataset):
             max_length=max_length,
         )
 
-        # Check that all maxim labels are valid before failing v quiet like at training time.
+        # check all maxim labels are valid
         unknown = set(df["maxim"]) - set(MAXIMS)
         if unknown:
             raise ValueError(
