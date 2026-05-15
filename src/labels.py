@@ -101,16 +101,6 @@ ZS_HYPOTHESES = {
 
 @dataclass
 class MaximPrediction:
-    """
-    The output of a single classification.
-
-    predicted_maxim: the winning label
-    violation_type: whether it's flouting, violating, etc. (secondary label)
-    confidence: the score for the top prediction
-    all_scores: full distribution across all five maxims, for when you want
-                to know how close the runner-up was (often interesting;
-                Manner and Relation frequently fight for second place)
-    """
     utterance: str
     context: str
     predicted_maxim: str

@@ -16,7 +16,6 @@ USER_AGENT = "grice-maxim-classifier/1.0 (research project; pragmatics annotatio
 
 
 def fetch_json(url: str) -> dict:
-    """fetch reddit JSON with rate limiting and a polite user agent."""
     req = urllib.request.Request(
         url,
         headers={"User-Agent": USER_AGENT},
@@ -30,15 +29,7 @@ def fetch_json(url: str) -> dict:
 
 
 def get_comment_pairs(subreddit: str, limit: int = 50) -> list:
-    """
-    Pull top-level comment + reply pairs from a subreddit's hot posts.
-    Returns list of (context, utterance, post_title, permalink) tuples.
-
-    The context is the parent comment, the utterance is the reply.
-    This gives us natural conversational pairs where someone said
-    something in response to something else — which is exactly what
-    our classifier needs.
-    """
+    """parent comment -> reply pairs from hot posts"""
     pairs = []
 
     # get hot posts
@@ -115,9 +106,6 @@ def get_comment_pairs(subreddit: str, limit: int = 50) -> list:
 
 
 def scrape_and_label(subreddit: str, limit: int, output_path: str):
-    """
-    Scrape pairs, run them through the classifier, output CSV for annotation.
-    """
     pairs = get_comment_pairs(subreddit, limit)
     print(f"\nCollected {len(pairs)} comment-reply pairs.")
 

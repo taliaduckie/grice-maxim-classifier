@@ -54,10 +54,6 @@ Even trained linguists disagree ~20-30% of the time on maxim labels. If the mode
 
 
 def classify(utterance: str, context: str) -> tuple:
-    """
-    wrapper that formats the output for gradio.
-    returns the label dict plus a confidence warning if needed.
-    """
     if not utterance.strip():
         return {"label": "Enter an utterance", "confidences": {}}, ""
 
@@ -89,12 +85,6 @@ def classify(utterance: str, context: str) -> tuple:
 
 
 def submit_correction(utterance: str, context: str, correct_maxim: str, notes: str) -> str:
-    """
-    save a user correction to a CSV file for later review and
-    potential incorporation into the training corpus.
-    free annotation data from people who actually care about
-    getting it right.
-    """
     if not utterance.strip() or not correct_maxim.strip():
         return "Please enter an utterance and select a maxim."
 

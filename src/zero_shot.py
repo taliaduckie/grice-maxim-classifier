@@ -19,49 +19,11 @@ def get_classifier():
 
 
 def classify(utterance: str, context: str = "") -> MaximPrediction:
-    """
-    Classify an utterance in optional context.
-
-    Context is prepended as: "[Context: {context}] {utterance}"
-    This is a simple but surprisingly effective way to give the model
-    the discourse situation without fine-tuning. The brackets are doing
-    real work here — they signal "this is metadata, not the utterance."
-
-    Args:
-        utterance: the thing someone said
-        context:   what they were responding to, if known.
-                   The classifier is much better WITH context.
-                   'The weather is nice today' without context is just
-                   a statement about weather. With 'Why were you late?'
-                   it becomes something more interesting.
-
-    Returns:
-        MaximPrediction with the top label and full score distribution.
-
-    Notes on failure modes:
-        - Manner is chronically underdetected. The model has no good
-          theory of what 'unnecessarily long' means for a given context.
-        - Quality flouting (irony, hyperbole) is hard. 'I've told you
-          a million times' often gets labeled Quality-violating, which
-          misses the point entirely. This is a known limitation.
-        - Very short utterances ('Fine.', 'Sure.', 'Whatever.') are
-          ambiguous even to humans. The model's uncertainty there is
-          appropriate, actually.
-    """
     clf = get_classifier()
 
-    # Combine context and utterance into a single input string.
-    # The bracket format probably works because BART was trained on text where
-    # brackets signal metadata/non-primary content, so it treats the context
-    # as framing rather than part of the utterance. that's the theory anyway.
-    # "tested several formats; this one performed best on manual eval" was the
-    # original comment but there's no record of what the other formats were
-    # or how many examples were tested. this has not been formally ablated.
-    # it works well enough that i haven't been motivated to fix that. yet.
+    # context format hasn't been formally ablated
     input_text = f"[Context: {context}] {utterance}" if context else utterance
 
-    # feeding the model plain english descriptions of abstract pragmatic categories
-    # and hoping for the best. this is either clever or unhinged. possibly both.
     hypotheses = list(ZS_HYPOTHESES.values())
 
     # multi_label=False forces winner-take-all: exactly one maxim wins.

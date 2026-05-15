@@ -12,31 +12,13 @@ MODEL_NAME = "roberta-base"
 
 
 class GriceDataset(Dataset):
-    """
-    Torch Dataset wrapping the annotated CSV corpus.
-
-    Tokenizes utterance+context pairs and maps maxim labels to integers.
-    Context is passed as the second sequence to the tokenizer (segment B),
-    which is how RoBERTa expects paired inputs. This matches the structure
-    of NLI tasks, which is intentional — we're essentially asking the model
-    to learn "does this context-utterance pair exhibit violation X?"
-    """
+    """torch Dataset wrapping the annotated CSV"""
 
     def __init__(self, csv_path: str, max_length: int = 256):
-        """
-        Args:
-            csv_path:   path to the annotated CSV
-            max_length: max token length for truncation.
-                        256 is generous for most utterance pairs.
-                        Most conversational turns are well under 50 tokens.
-                        But the Manner examples tend to run long, which is
-                        sort of appropriate given what Manner is.
-        """
         df = pd.read_csv(csv_path)
 
         assert "utterance" in df.columns and "maxim" in df.columns, (
-            "CSV must have at least 'utterance' and 'maxim' columns. "
-            "See data/annotated/corpus.csv for the expected format."
+            "CSV needs 'utterance' and 'maxim' columns"
         )
 
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)

@@ -17,10 +17,6 @@ VALID_VIOLATION_TYPES = {
 
 
 def normalize_violation_type(vtype: str) -> str:
-    """
-    Normalize common variants of violation_type values.
-    People write "flout" instead of "flouting", "sincere" instead of "none", etc.
-    """
     vtype = vtype.strip().lower()
     aliases = {
         "flout": "flouting",
@@ -34,7 +30,6 @@ def normalize_violation_type(vtype: str) -> str:
 
 
 def _load_corpus() -> tuple[list, set]:
-    """Load existing corpus, return (rows, set of (utterance, context) keys)."""
     rows = []
     keys = set()
     if not CORPUS_PATH.exists():
@@ -54,7 +49,6 @@ def _load_corpus() -> tuple[list, set]:
 
 
 def _validate_row(row: dict) -> Optional[str]:
-    """Return error message if row is invalid, None if ok."""
     if not row["utterance"]:
         return "empty utterance"
     if row["maxim"] not in VALID_MAXIMS:
@@ -65,7 +59,6 @@ def _validate_row(row: dict) -> Optional[str]:
 
 
 def _write_corpus(rows: list):
-    """Write rows back to corpus.csv."""
     with open(CORPUS_PATH, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES, quoting=csv.QUOTE_ALL)
         writer.writeheader()
@@ -73,7 +66,6 @@ def _write_corpus(rows: list):
 
 
 def _print_summary(rows: list, added: int, dupes: int, skipped: int):
-    """Print distribution and merge stats."""
     mc = Counter(r["maxim"] for r in rows)
     vc = Counter(r["violation_type"] for r in rows)
     print(f"Added: {added}, Duplicates: {dupes}, Skipped (invalid): {skipped}")
@@ -83,11 +75,7 @@ def _print_summary(rows: list, added: int, dupes: int, skipped: int):
 
 
 def merge_pipe_data(pipe_string: str) -> int:
-    """
-    Merge pipe-separated annotation data into the corpus.
-    Each line: utterance|context|maxim|violation_type
-    Returns count of rows added.
-    """
+    """Each line: utterance|context|maxim|violation_type"""
     existing, keys = _load_corpus()
 
     added = 0
@@ -133,11 +121,7 @@ def merge_pipe_data(pipe_string: str) -> int:
 
 
 def merge_annotated_csv(csv_path: str) -> int:
-    """
-    Merge a fully-annotated CSV into the corpus.
-    CSV must have columns: utterance, context, maxim, violation_type
-    (or gold_maxim, gold_violation_type as fallback)
-    """
+    """CSV needs utterance, context, maxim, violation_type (or gold_* variants)"""
     existing, keys = _load_corpus()
     added = 0
     dupes = 0
@@ -175,15 +159,7 @@ def merge_annotated_csv(csv_path: str) -> int:
 
 
 def merge_with_scraped(scraped_path: str, annotation_pipe_string: str) -> int:
-    """
-    Merge annotations against a scraped CSV using row-order matching.
-    Useful when you annotated short labels (just maxim|violation_type per line)
-    and need to pair them with the full utterance/context from the scraped data.
-
-    The pipe string can be either:
-        - "maxim|violation_type" (2 fields, paired by row order)
-        - "utterance|maxim|violation_type" (3 fields, validates against scraped)
-    """
+    """Match annotations to scraped CSV by row order"""
     existing, keys = _load_corpus()
 
     scraped = []

@@ -11,17 +11,12 @@ from sentence_transformers import SentenceTransformer
 
 
 def compute_coherence(csv_path: str, output_path: str = None):
-    """
-    Compute L (coherence) and O (off-topic-ness) for every example in the corpus.
-    """
     df = pd.read_csv(csv_path)
     assert "utterance" in df.columns and "context" in df.columns, (
-        "CSV must have 'utterance' and 'context' columns."
+        "CSV needs 'utterance' and 'context' columns"
     )
 
-    # all-MiniLM-L6-v2 is small, fast, and good enough for cosine similarity.
-    # we're not doing retrieval here — just measuring semantic distance.
-    # if you want better embeddings, swap in a larger model. your call.
+    # all-MiniLM-L6-v2: small and fast, fine for cosine similarity
     print("Loading sentence-transformers model...")
     model = SentenceTransformer("all-MiniLM-L6-v2")
 

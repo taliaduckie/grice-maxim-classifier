@@ -124,10 +124,7 @@ def compare(csv_path: str, output_path: str = None):
         context = str(row["context"])
         exchange_type = str(row.get("exchange_type", "unknown"))
 
-        # 1. fine-tuned RoBERTa
         roberta_pred = predict(utterance, context)
-
-        # 2. Claude API
         claude_pred = classify_with_claude(utterance, context, exchange_type)
 
         agree = roberta_pred["predicted_maxim"] == claude_pred["claude_label"]
@@ -153,14 +150,11 @@ def compare(csv_path: str, output_path: str = None):
             f"{status}"
         )
 
-        # rate limiting. don't anger the API gods.
         time.sleep(0.5)
 
-    # summary
     agreements = sum(1 for r in results if r["agree"])
     print(f"\nAgreement: {agreements}/{n} ({agreements/n:.1%})")
 
-    # disagreement breakdown
     disagreements = [r for r in results if not r["agree"]]
     if disagreements:
         print(f"\nDisagreements ({len(disagreements)}):")

@@ -305,11 +305,6 @@ SEED_PAIRS = [
 
 
 def bootstrap(output_path: str):
-    """
-    run zero-shot on all seed pairs and dump to CSV.
-    the 'gold' column is empty — that's for you, human annotator.
-    the 'predicted' column is what the model thinks. argue with it.
-    """
     results = []
 
     print(f"Running zero-shot on {len(SEED_PAIRS)} pairs...")
