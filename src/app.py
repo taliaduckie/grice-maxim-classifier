@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import gradio as gr
+import pandas as pd
 from predict import predict
 
 FEEDBACK_PATH = Path(__file__).parent.parent / "data" / "feedback" / "corrections.csv"
@@ -49,35 +50,38 @@ below 70%, take it as a starting point not a verdict.
 """
 
 
-def classify(utterance: str, context: str) -> tuple:
+def classify(utterance: str, context: str):
     if not utterance.strip():
-        return {"label": "Enter an utterance", "confidences": {}}, ""
+        empty_df = pd.DataFrame({"maxim": [], "score": []})
+        return "### Enter an utterance", "", empty_df
 
     result = predict(utterance, context)
     confidence = result["confidence"]
+    top = result["predicted_maxim"]
 
-    # confidence warning
+    # big prediction header
+    header = f"### Prediction: **{top}** ({result['violation_type']}) — {confidence:.0%}"
+
+    # confidence note
     if confidence < 0.5:
         warning = (
-            f"Low confidence ({confidence:.0%}). The model is unsure about this one — "
-            f"the prediction may not be reliable. Consider the runner-up labels."
+            f"Low confidence. The model is unsure — consider the runner-up labels in the chart."
         )
     elif confidence < 0.7:
         warning = (
-            f"Moderate confidence ({confidence:.0%}). The model leans toward "
-            f"{result['predicted_maxim']} but isn't highly certain."
+            f"Moderate confidence. The model leans toward {top} but isn't highly certain."
         )
     else:
-        warning = ""
+        warning = "High confidence."
 
-    label_output = {
-        "label": f"{result['predicted_maxim']} ({result['violation_type']})",
-        "confidences": {
-            maxim: score for maxim, score in result["all_scores"].items()
-        },
-    }
+    # bar chart data, sorted high to low
+    scores = sorted(result["all_scores"].items(), key=lambda x: -x[1])
+    df = pd.DataFrame({
+        "maxim": [m for m, _ in scores],
+        "score": [s for _, s in scores],
+    })
 
-    return label_output, warning
+    return header, warning, df
 
 
 def submit_correction(utterance: str, context: str, correct_maxim: str, notes: str) -> str:
@@ -127,17 +131,26 @@ with gr.Blocks(title="Grice Maxim Classifier") as demo:
                     classify_btn = gr.Button("Classify", variant="primary")
 
                 with gr.Column():
-                    label_output = gr.Label(label="Prediction", num_top_classes=5)
+                    prediction_header = gr.Markdown("### Prediction will appear here")
                     warning_output = gr.Textbox(
-                        label="Confidence note",
+                        label="Confidence",
                         interactive=False,
                         lines=2,
+                    )
+                    score_plot = gr.BarPlot(
+                        value=pd.DataFrame({"maxim": [], "score": []}),
+                        x="maxim",
+                        y="score",
+                        title="Score distribution",
+                        vertical=False,
+                        y_lim=[0, 1],
+                        height=300,
                     )
 
             classify_btn.click(
                 fn=classify,
                 inputs=[utterance_input, context_input],
-                outputs=[label_output, warning_output],
+                outputs=[prediction_header, warning_output, score_plot],
             )
 
             gr.Examples(
