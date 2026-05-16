@@ -139,11 +139,10 @@ with gr.Blocks(title="Grice Maxim Classifier") as demo:
                     )
                     score_plot = gr.BarPlot(
                         value=pd.DataFrame({"maxim": [], "score": []}),
-                        x="maxim",
-                        y="score",
+                        x="score",
+                        y="maxim",
                         title="Score distribution",
-                        vertical=False,
-                        y_lim=[0, 1],
+                        x_lim=[0, 1],
                         height=300,
                     )
 
