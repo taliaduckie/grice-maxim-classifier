@@ -141,6 +141,14 @@ with gr.Blocks(title="Grice Maxim Classifier") as demo:
                         value=pd.DataFrame({"maxim": [], "score": []}),
                         x="score",
                         y="maxim",
+                        color="maxim",
+                        color_map={
+                            "Quality": "#4C72B0",     # blue
+                            "Quantity": "#DD8452",    # orange
+                            "Relation": "#55A868",    # green
+                            "Manner": "#C44E52",      # red
+                            "Cooperative": "#8172B3", # purple
+                        },
                         title="Score distribution",
                         x_lim=[0, 1],
                         height=300,
