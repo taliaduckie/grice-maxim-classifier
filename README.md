@@ -22,10 +22,14 @@ Also distinguishes *flouting* (deliberate, to generate implicature) from
 
 ## Model
 
-Fine-tuned `roberta-base` on the 367-pair hand-annotated corpus. Macro F1 = **0.91**
-on a stratified 80/20 split (74 eval, 293 train). Training: 10 epochs, lr=1e-5,
-batch size 8, class weights to handle Quality being slightly over-represented.
-~15 minutes on CPU.
+Fine-tuned `roberta-base`. Training: 10 epochs, lr=1e-5, batch size 8, class
+weights, ~15 minutes on CPU.
+
+### Paper version (367-pair synthetic corpus)
+
+The numbers in `paper.pdf` are reported on this version of the corpus.
+
+Macro F1 = **0.91** on a stratified 80/20 split (74 eval, 293 train).
 
 Per-class F1 (held-out fold):
 
@@ -40,26 +44,41 @@ Per-class F1 (held-out fold):
 Zero-shot BART-MNLI baseline on the same fold: macro F1 = 0.13 (below chance for
 a five-class task).
 
-On a 40-pair adversarial set designed to strip surface cues, performance drops
+On the 40-pair adversarial set designed to strip surface cues, performance drops
 to macro F1 = 0.26 (accuracy 42.5%), suggesting the held-out F1 substantially
 overstates the model's grasp of the maxims. Claude (Sonnet 4) on the same
 adversarial set reaches macro F1 = 0.48 (accuracy 55%).
+
+### Extended version (1,197-pair corpus with real Reddit data)
+
+The repo also contains an extended corpus that mixes the 367 synthetic pairs with
+~830 real comment-reply pairs scraped from Reddit. Training on the full extended
+corpus drops held-out macro F1 to ~0.77, which is the more honest number for
+real-world generalization. The drop reflects the synthetic-distribution
+inflation of the 0.91 figure: real Reddit conversation is messier, more
+ambiguous, and skews heavily Cooperative.
+
+The extended corpus was not used for the paper's main results because the paper
+analyzes the 367-pair version. It exists for follow-up work and a fairer test
+of real-world performance.
 
 Fallback: `facebook/bart-large-mnli` zero-shot baseline if no fine-tuned model
 exists. Used to bootstrap annotation; performs near chance for actual inference.
 
 ## Corpus
 
-The paper documents the 367-pair version. The repo currently contains 1,197 pairs
-total — 367 synthetic + 830 real Reddit comment-reply pairs from r/AmItheAsshole,
-r/explainlikeimfive, r/cscareerquestions, r/relationships, r/relationship_advice,
-r/ExperiencedDevs, r/askscience, r/MaliciousCompliance, r/tifu, and
-r/talesfromtechsupport.
+**`data/annotated/corpus.csv`** — the full 1,197-pair extended corpus. To
+reproduce the paper, take the first 367 rows (see `data/annotated/corpus_367.csv`).
 
-Bootstrapped via `src/bootstrap.py`, which runs zero-shot predictions on
-seed pairs and outputs a CSV for human correction. Five rounds of bootstrap
-plus several targeted batches got the corpus to 367; subsequent rounds of
-Reddit scraping and hand-annotation got it to 1,197.
+| Subset | Pairs | Source |
+|---|---|---|
+| Synthetic (paper) | 367 | Hand-written by author, bootstrapped via BART-MNLI |
+| Reddit additions | ~830 | r/AmItheAsshole, r/explainlikeimfive, r/cscareerquestions, r/relationships, r/relationship_advice, r/ExperiencedDevs, r/askscience, r/MaliciousCompliance, r/tifu, r/talesfromtechsupport |
+
+The synthetic 367 was built through five rounds of bootstrapping plus several
+targeted batches (sarcasm, opting-out, balancing). The Reddit additions were
+scraped via `src/scrape_reddit.py`, pre-labeled by the fine-tuned model, and
+hand-corrected.
 
 ## Setup
 
