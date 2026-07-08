@@ -21,9 +21,18 @@ def predict(text: str, context: str = "") -> dict:
             from transformers import pipeline
             _pipeline = pipeline("text-classification", model=str(MODEL_DIR))
         clf = _pipeline
-        input_text = f"[Context: {context}] {text}" if context else text
+        # Feed the model a sentence PAIR, matching training. RoBERTa is
+        # pretrained on <s> A </s></s> B </s> and carries positional/segment
+        # structure for that format; GriceDataset trains on
+        # tokenizer(utterance, context) as a pair. A flat "[Context: ..] .."
+        # string asks the model to recover pair structure through an interface
+        # it was never shaped for — it diverged from the pair encoding on ~1/3
+        # of inputs. Always pass text_pair (empty string when no context) so
+        # inference is byte-for-byte the training encoding. max_length=128
+        # matches dataset.py so truncation happens on the same side/length.
+        pair = {"text": text, "text_pair": context or ""}
         # top_k=None gets all scores (return_all_scores is deprecated)
-        result = clf(input_text, top_k=None)
+        result = clf(pair, top_k=None, truncation=True, max_length=128)
         scores = {r["label"]: r["score"] for r in result}
         top = max(scores, key=scores.get)
         # model only predicts maxim, not violation type
