@@ -152,7 +152,7 @@ def _get_llm():
 
 
 def llm_label(utterance, context, model):
-    """Return Claude's maxim label for the reply, or None on error."""
+    """Return (label, confidence) for the reply, or (None, None) on error."""
     try:
         resp = _get_llm().messages.create(
             model=model, max_tokens=200, system=LLM_SYSTEM,
@@ -161,10 +161,95 @@ def llm_label(utterance, context, model):
                        f"Preceding message: {context}\n\nReply to classify: {utterance}"}],
         )
         text = next(b.text for b in resp.content if b.type == "text")
-        return json.loads(text)["label"]
+        d = json.loads(text)
+        return d["label"], float(d.get("confidence", 0.0))
     except Exception as e:
         print(f"  llm error: {type(e).__name__}: {e}")
-        return None
+        return None, None
+
+
+def violation_score(label, confidence):
+    """Map (label, confidence) onto a 0..1 violation axis: high = confident
+    violation, ~0.5 = uncertain, low = confident Cooperative."""
+    if label is None:
+        return float("nan")
+    return confidence if label != "Cooperative" else (1.0 - confidence)
+
+
+# --------------------------- stratified batch logic ---------------------------
+# Pure functions (no network / no LLM) so they're unit-testable offline.
+def stratify(scored, n_conf_viol, n_mid, n_lowconf_coop, rng):
+    """scored: list of dicts each with llm_label, llm_confidence. Returns the
+    same dicts tagged with a 'stratum', drawn WITHOUT replacement from three
+    regions of Claude's confidence space. rng is a seeded random.Random."""
+    pool = [dict(r) for r in scored if r.get("llm_label") is not None]
+    used = set()
+
+    def take(cands, n, stratum):
+        picked = []
+        for r in cands:
+            if id(r) in used:
+                continue
+            used.add(id(r))
+            r["stratum"] = stratum
+            picked.append(r)
+            if len(picked) >= n:
+                break
+        return picked
+
+    # (a) confident violations: label != Cooperative, highest confidence first
+    viol = sorted((r for r in pool if r["llm_label"] != "Cooperative"),
+                  key=lambda r: -r["llm_confidence"])
+    batch = take(viol, n_conf_viol, "confident_violation")
+
+    # (c) low-confidence Cooperative: label == Cooperative, LEAST confident first
+    #     — the discard pool's most-suspect members (covert violations hide here)
+    coop = sorted((r for r in pool if r["llm_label"] == "Cooperative"),
+                  key=lambda r: r["llm_confidence"])
+    batch += take(coop, n_lowconf_coop, "low_conf_cooperative")
+
+    # (b) middle: whatever's left, most-uncertain first (confidence nearest 0.5)
+    rest = [r for r in pool if id(r) not in used]
+    rest.sort(key=lambda r: abs(r["llm_confidence"] - 0.5))
+    batch += take(rest, n_mid, "mid_confidence")
+    return batch
+
+
+def compare_stats(pre_rows, rand_rows):
+    """Both lists are annotated rows with 'gold_maxim' and 'surface_proxy_present'
+    filled. Returns violation rate + surface-marker skew, prescreened vs random,
+    plus per-stratum violation rate in the prescreened batch."""
+    def is_viol(r):
+        return str(r.get("gold_maxim", "")).strip() not in ("", "Cooperative", "nan")
+
+    def truthy(v):
+        return str(v).strip().lower() in ("true", "yes", "1", "y", "t")
+
+    def summarize(rows):
+        annotated = [r for r in rows if str(r.get("gold_maxim", "")).strip() not in ("", "nan")]
+        viols = [r for r in annotated if is_viol(r)]
+        surf = sum(truthy(r.get("surface_proxy_present")) for r in viols)
+        return {
+            "annotated": len(annotated),
+            "violations": len(viols),
+            "violation_rate": (len(viols) / len(annotated)) if annotated else float("nan"),
+            "surface_marked_violations": surf,
+            "surface_marked_rate": (surf / len(viols)) if viols else float("nan"),
+        }
+
+    out = {"prescreened": summarize(pre_rows), "random": summarize(rand_rows)}
+    # per-stratum violation rate within the prescreened batch
+    strata = {}
+    for r in pre_rows:
+        s = r.get("stratum", "?")
+        strata.setdefault(s, []).append(r)
+    out["per_stratum"] = {
+        s: {"n": len(rs),
+            "violations": sum(is_viol(x) for x in rs if str(x.get("gold_maxim","")).strip() not in ("","nan")),
+            "annotated": sum(str(x.get("gold_maxim","")).strip() not in ("","nan") for x in rs)}
+        for s, rs in strata.items()
+    }
+    return out
 
 
 # ----------------------------- offline validation -----------------------------
@@ -203,7 +288,7 @@ def validate(llm_prescreen=False, model=LLM_MODEL_DEFAULT):
     if llm_prescreen:
         print(f"LLM pre-screen with {model} over {len(df)} rows "
               f"(~{len(df)} API calls — this costs money)...")
-        labels = [llm_label(u, c, model) for u, c in zip(df["utterance"], df["context"])]
+        labels = [llm_label(u, c, model)[0] for u, c in zip(df["utterance"], df["context"])]
         df["llm_flag"] = [(l is not None and l != "Cooperative") for l in labels]
         flags.append("llm_flag")
     df["union_flag"] = df[flags].any(axis=1)
@@ -328,7 +413,7 @@ def scrape(subs, per_sub, sort, output, llm_prescreen=False, model=LLM_MODEL_DEF
             model_flag = pred["predicted_maxim"] != "Cooperative"
             llm = []
             if llm_prescreen:
-                lab = llm_label(p["utterance"], p["context"], model)
+                lab, _ = llm_label(p["utterance"], p["context"], model)
                 if lab and lab != "Cooperative":
                     llm = [f"llm:{lab}"]
             flags = crowd + (["model"] if model_flag else []) + reasons + llm
@@ -362,22 +447,142 @@ def scrape(subs, per_sub, sort, output, llm_prescreen=False, model=LLM_MODEL_DEF
     print("Fill gold_maxim/gold_violation_type, then merge with merge_corpus.py --csv")
 
 
+# ------------------------- stratified batch builder ---------------------------
+BATCH_COLS = ["utterance", "context", "subreddit", "post_title", "batch",
+              "stratum", "llm_label", "llm_confidence", "violation_score",
+              "gold_maxim", "gold_violation_type", "surface_proxy_present", "notes"]
+
+
+def gather_pool(subs, per_sub, sort, token):
+    """Fetch a broad pool of parent->reply pairs (no scoring). sort=hot keeps it
+    representative — we deliberately do NOT lead with controversial here."""
+    pool = []
+    for sub in subs:
+        print(f"r/{sub}: gathering {sort} comments...")
+        listing = api_get(f"/r/{sub}/{sort}?limit=25", token)
+        if not listing:
+            continue
+        got = []
+        for post in listing["data"]["children"]:
+            pd_ = post["data"]
+            if pd_.get("stickied"):
+                continue
+            time.sleep(1.5)
+            tree = api_get(f"/comments/{pd_['id']}?limit=100&depth=3", token)
+            if not tree or len(tree) < 2:
+                continue
+            for top in tree[1]["data"]["children"]:
+                walk_comments(top, pd_["title"], sub, got)
+            if len(got) >= per_sub:
+                break
+        pool.extend(got[:per_sub])
+    return pool
+
+
+def build_batches(subs, pool_per_sub, sort, model, out_prefix,
+                  n_conf_viol=20, n_mid=15, n_lowconf_coop=15, n_random=40):
+    """Produce two annotation CSVs from the same three subs:
+       <prefix>_prescreened.csv  — LLM-scored, stratified (confident violation /
+                                   mid confidence / low-confidence Cooperative)
+       <prefix>_random.csv       — raw random sample, UNSCREENED, scores hidden
+                                   (annotate the slow way; the bias control)."""
+    import random
+    rng = random.Random(42)
+    token = get_token()
+    pool = gather_pool(subs, pool_per_sub, sort, token)
+    if not pool:
+        print("empty pool."); return
+    rng.shuffle(pool)
+
+    # carve the random batch off FIRST, before any scoring, so it's disjoint and
+    # untouched by the LLM. scores stay blank so they can't anchor the annotator.
+    random_batch = pool[:n_random]
+    screen_pool = pool[n_random:]
+
+    print(f"scoring {len(screen_pool)} candidates with {model}...")
+    scored = []
+    for p in screen_pool:
+        lab, conf = llm_label(p["utterance"], p["context"], model)
+        if lab is None:
+            continue
+        scored.append({**p, "llm_label": lab, "llm_confidence": conf,
+                       "violation_score": violation_score(lab, conf)})
+
+    strat = stratify(scored, n_conf_viol, n_mid, n_lowconf_coop, rng)
+
+    def row(p, batch, stratum="", scored=False):
+        return {
+            "utterance": p["utterance"], "context": p["context"],
+            "subreddit": p["subreddit"], "post_title": p["post_title"],
+            "batch": batch, "stratum": stratum,
+            "llm_label": p.get("llm_label", "") if scored else "",
+            "llm_confidence": f"{p['llm_confidence']:.3f}" if scored else "",
+            "violation_score": f"{p['violation_score']:.3f}" if scored else "",
+            "gold_maxim": "", "gold_violation_type": "",
+            "surface_proxy_present": "", "notes": "",
+        }
+
+    pre_rows = [row(p, "prescreened", p["stratum"], scored=True) for p in strat]
+    rand_rows = [row(p, "random", scored=False) for p in random_batch]
+
+    for name, rows in [("prescreened", pre_rows), ("random", rand_rows)]:
+        path = f"{out_prefix}_{name}.csv"
+        with open(path, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=BATCH_COLS)
+            w.writeheader(); w.writerows(rows)
+        print(f"wrote {len(rows)} -> {path}")
+    print("\nStrata:", dict(Counter(r["stratum"] for r in pre_rows)))
+    print("Annotate gold_maxim + surface_proxy_present in BOTH files (random "
+          "first, blind), then: scrape_noncoop.py --compare <pre>.csv <rand>.csv")
+
+
+def compare_batches(prescreened_csv, random_csv):
+    import pandas as pd
+    pre = pd.read_csv(prescreened_csv).to_dict("records")
+    rand = pd.read_csv(random_csv).to_dict("records")
+    s = compare_stats(pre, rand)
+    p, r = s["prescreened"], s["random"]
+    print(f"{'batch':<14}{'annotated':>10}{'violations':>12}{'viol_rate':>11}"
+          f"{'surf_marked':>13}{'surf_rate':>11}")
+    for name, d in [("prescreened", p), ("random", r)]:
+        print(f"{name:<14}{d['annotated']:>10}{d['violations']:>12}"
+              f"{d['violation_rate']:>11.2f}{d['surface_marked_violations']:>13}"
+              f"{d['surface_marked_rate']:>11.2f}")
+    print("\nPer-stratum violation rate in the prescreened batch "
+          "(watch low_conf_cooperative — violations there are the LLM's misses):")
+    for st, d in s["per_stratum"].items():
+        rate = d["violations"] / d["annotated"] if d["annotated"] else float("nan")
+        print(f"  {st:<22} {d['violations']}/{d['annotated']}  ({rate:.2f})")
+    print("\nSelection-bias read: if prescreened surf_rate >> random surf_rate, "
+          "the LLM screen is preferentially surfacing surface-MARKED violations "
+          "and under-sampling covert ones.")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--validate", action="store_true", help="offline filter validation, no network")
+    ap.add_argument("--build-batches", action="store_true",
+                    help="scrape a pool, emit stratified prescreened + random-unscreened annotation CSVs")
+    ap.add_argument("--compare", nargs=2, metavar=("PRESCREENED", "RANDOM"),
+                    help="after annotation: compare violation rate + surface-marker skew")
     ap.add_argument("--subs", nargs="+", default=TARGET_SUBS)
-    ap.add_argument("--per-sub", type=int, default=40, help="flagged pairs to keep per sub")
-    ap.add_argument("--sort", default="top", choices=["hot", "top", "new", "controversial"],
-                    help="'controversial'/'top' surface more violations")
+    ap.add_argument("--per-sub", type=int, default=40, help="flagged pairs to keep per sub (scrape mode)")
+    ap.add_argument("--pool-per-sub", type=int, default=120, help="candidates to gather per sub (batch mode)")
+    ap.add_argument("--sort", default="hot", choices=["hot", "top", "new", "controversial"])
     ap.add_argument("--llm-prescreen", action="store_true",
                     help="add a Claude classifier as a flagger (needs ANTHROPIC_API_KEY + credits)")
     ap.add_argument("--model", default=LLM_MODEL_DEFAULT,
-                    help="LLM pre-screen model; claude-haiku-4-5 is ~5x cheaper for this classification")
+                    help="LLM model; claude-haiku-4-5 is ~5x cheaper for this classification")
+    ap.add_argument("--out-prefix", default=str(RAW / "reddit_batch"))
     ap.add_argument("--output", default=str(RAW / "reddit_noncoop.csv"))
     a = ap.parse_args()
-    if a.validate:
+    if a.compare:
+        compare_batches(a.compare[0], a.compare[1])
+    elif a.validate:
         validate(llm_prescreen=a.llm_prescreen, model=a.model)
+    elif a.build_batches:
+        build_batches(a.subs, a.pool_per_sub, a.sort, a.model, a.out_prefix)
     else:
         scrape(a.subs, a.per_sub, a.sort, a.output,
                llm_prescreen=a.llm_prescreen, model=a.model)
