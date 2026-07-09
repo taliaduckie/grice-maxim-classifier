@@ -35,6 +35,7 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+from labels import MAXIMS
 
 ROOT = Path(__file__).parent.parent
 RAW = ROOT / "data" / "raw"
@@ -112,8 +113,62 @@ def noncoop_signals(utterance: str, context: str) -> list:
     return reasons
 
 
+# ------------------------------- LLM pre-screen -------------------------------
+# A far stronger flagger than the regex pass: ask Claude to classify each reply.
+# Off by default (needs ANTHROPIC_API_KEY + credits). Default model is
+# claude-opus-4-8; for a high-volume screen, claude-haiku-4-5 is ~5x cheaper and
+# well-suited to classification — pass --model claude-haiku-4-5 to use it.
+_llm = None
+LLM_MODEL_DEFAULT = "claude-opus-4-8"
+
+LLM_SYSTEM = (
+    "You judge whether the REPLY in a two-turn exchange respects Grice's maxims, "
+    "given the message it responds to. Output the single best label:\n"
+    "- Cooperative: relevant, truthful, appropriately informative, and clear.\n"
+    "- Quantity: too much or too little information (incl. non-answers / refusals).\n"
+    "- Quality: says something false, unsupported, or ironic/sarcastic.\n"
+    "- Relation: changes the subject / does not address the question.\n"
+    "- Manner: obscure, ambiguous, disorganized, or needlessly long.\n"
+    "Pick the maxim most VIOLATED; use Cooperative only if none is violated. "
+    "Judge the reply's pragmatics, not its topic or subreddit."
+)
+LLM_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "label": {"type": "string", "enum": MAXIMS},
+        "confidence": {"type": "number"},
+    },
+    "required": ["label", "confidence"],
+    "additionalProperties": False,
+}
+
+
+def _get_llm():
+    global _llm
+    if _llm is None:
+        import anthropic
+        _llm = anthropic.Anthropic()
+    return _llm
+
+
+def llm_label(utterance, context, model):
+    """Return Claude's maxim label for the reply, or None on error."""
+    try:
+        resp = _get_llm().messages.create(
+            model=model, max_tokens=200, system=LLM_SYSTEM,
+            output_config={"format": {"type": "json_schema", "schema": LLM_SCHEMA}},
+            messages=[{"role": "user", "content":
+                       f"Preceding message: {context}\n\nReply to classify: {utterance}"}],
+        )
+        text = next(b.text for b in resp.content if b.type == "text")
+        return json.loads(text)["label"]
+    except Exception as e:
+        print(f"  llm error: {type(e).__name__}: {e}")
+        return None
+
+
 # ----------------------------- offline validation -----------------------------
-def validate():
+def validate(llm_prescreen=False, model=LLM_MODEL_DEFAULT):
     import pandas as pd
 
     def norm(s):
@@ -132,16 +187,26 @@ def validate():
             if k not in gold:
                 continue
             truth = gold[k]
-            rows.append({
+            row = {
                 "sub": r.get("subreddit", "?"),
                 "truth_noncoop": truth != "Cooperative",
                 "truth": truth,
                 "model_flag": str(r.get("predicted_maxim", "")).strip() not in ("", "Cooperative", "nan"),
                 "kw": noncoop_signals(str(r["utterance"]), str(r.get("context", ""))),
-            })
+                "utterance": str(r["utterance"]), "context": str(r.get("context", "")),
+            }
+            rows.append(row)
     df = pd.DataFrame(rows)
     df["kw_flag"] = df["kw"].map(lambda x: len(x) > 0)
-    df["union_flag"] = df["model_flag"] | df["kw_flag"]
+
+    flags = ["model_flag", "kw_flag"]
+    if llm_prescreen:
+        print(f"LLM pre-screen with {model} over {len(df)} rows "
+              f"(~{len(df)} API calls — this costs money)...")
+        labels = [llm_label(u, c, model) for u, c in zip(df["utterance"], df["context"])]
+        df["llm_flag"] = [(l is not None and l != "Cooperative") for l in labels]
+        flags.append("llm_flag")
+    df["union_flag"] = df[flags].any(axis=1)
 
     def prf(flag_col, sub=None):
         d = df if sub is None else df[df["sub"] == sub]
@@ -157,12 +222,12 @@ def validate():
           f"({df['truth_noncoop'].sum()} non-Cooperative, "
           f"{(~df['truth_noncoop']).sum()} Cooperative)\n")
     print(f"{'flag':<12}{'scope':<20}{'TP':>4}{'FP':>4}{'FN':>4}{'prec':>7}{'rec':>7}{'F1':>7}")
-    for flag in ["model_flag", "kw_flag", "union_flag"]:
+    for flag in flags + ["union_flag"]:
         tp, fp, fn, p, r, f = prf(flag)
         print(f"{flag:<12}{'ALL':<20}{tp:>4}{fp:>4}{fn:>4}{p:>7.2f}{r:>7.2f}{f:>7.2f}")
     print()
     for sub in TARGET_SUBS:
-        for flag in ["model_flag", "kw_flag", "union_flag"]:
+        for flag in flags + ["union_flag"]:
             tp, fp, fn, p, r, f = prf(flag, sub)
             print(f"{flag:<12}{sub:<20}{tp:>4}{fp:>4}{fn:>4}{p:>7.2f}{r:>7.2f}{f:>7.2f}")
         print()
@@ -228,7 +293,7 @@ def walk_comments(node, post_title, sub, out):
             walk_comments(child, post_title, sub, out)
 
 
-def scrape(subs, per_sub, sort, output):
+def scrape(subs, per_sub, sort, output, llm_prescreen=False, model=LLM_MODEL_DEFAULT):
     from predict import predict
     token = get_token()
     all_pairs = []
@@ -261,7 +326,12 @@ def scrape(subs, per_sub, sort, output):
             crowd = (["controversial"] if p["controversial"] else []) + \
                     (["downvoted"] if p["score"] <= 0 else [])
             model_flag = pred["predicted_maxim"] != "Cooperative"
-            flags = crowd + (["model"] if model_flag else []) + reasons
+            llm = []
+            if llm_prescreen:
+                lab = llm_label(p["utterance"], p["context"], model)
+                if lab and lab != "Cooperative":
+                    llm = [f"llm:{lab}"]
+            flags = crowd + (["model"] if model_flag else []) + reasons + llm
             if flags:
                 kept.append({
                     "utterance": p["utterance"], "context": p["context"],
@@ -300,9 +370,14 @@ if __name__ == "__main__":
     ap.add_argument("--per-sub", type=int, default=40, help="flagged pairs to keep per sub")
     ap.add_argument("--sort", default="top", choices=["hot", "top", "new", "controversial"],
                     help="'controversial'/'top' surface more violations")
+    ap.add_argument("--llm-prescreen", action="store_true",
+                    help="add a Claude classifier as a flagger (needs ANTHROPIC_API_KEY + credits)")
+    ap.add_argument("--model", default=LLM_MODEL_DEFAULT,
+                    help="LLM pre-screen model; claude-haiku-4-5 is ~5x cheaper for this classification")
     ap.add_argument("--output", default=str(RAW / "reddit_noncoop.csv"))
     a = ap.parse_args()
     if a.validate:
-        validate()
+        validate(llm_prescreen=a.llm_prescreen, model=a.model)
     else:
-        scrape(a.subs, a.per_sub, a.sort, a.output)
+        scrape(a.subs, a.per_sub, a.sort, a.output,
+               llm_prescreen=a.llm_prescreen, model=a.model)
