@@ -366,9 +366,10 @@ def walk_comments(node, post_title, sub, out):
                 continue
             cd = child["data"]
             reply = (cd.get("body") or "").replace("\n", " ").strip()
+            blob = (reply + parent).lower()
             if (5 < len(reply) < 500 and 5 < len(parent) < 500
-                    and "[deleted]" not in reply + parent
-                    and "[removed]" not in reply + parent):
+                    and "[deleted]" not in blob and "[removed]" not in blob
+                    and "removed by reddit" not in blob):
                 out.append({"context": parent, "utterance": reply,
                             "post_title": post_title, "subreddit": sub,
                             # Reddit's crowd signal: the strongest non-Cooperative
@@ -480,16 +481,19 @@ def gather_pool(subs, per_sub, sort, token):
 
 
 def build_batches(subs, pool_per_sub, sort, model, out_prefix,
-                  n_conf_viol=20, n_mid=15, n_lowconf_coop=15, n_random=40):
+                  n_conf_viol=20, n_mid=15, n_lowconf_coop=15, n_random=40, pool=None):
     """Produce two annotation CSVs from the same three subs:
        <prefix>_prescreened.csv  — LLM-scored, stratified (confident violation /
                                    mid confidence / low-confidence Cooperative)
        <prefix>_random.csv       — raw random sample, UNSCREENED, scores hidden
-                                   (annotate the slow way; the bias control)."""
+                                   (annotate the slow way; the bias control).
+    If `pool` (a list of {utterance, context, subreddit, post_title} dicts) is
+    given, it's used instead of scraping — same machinery, offline source."""
     import random
     rng = random.Random(42)
-    token = get_token()
-    pool = gather_pool(subs, pool_per_sub, sort, token)
+    if pool is None:
+        token = get_token()
+        pool = gather_pool(subs, pool_per_sub, sort, token)
     if not pool:
         print("empty pool."); return
     rng.shuffle(pool)
