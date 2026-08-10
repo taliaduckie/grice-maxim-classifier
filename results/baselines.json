@@ -1,0 +1,1784 @@
+{
+  "config": {
+    "seeds": 10,
+    "bootstrap": 1000
+  },
+  "results": {
+    "synthetic-only": {
+      "majority": {
+        "model": "majority",
+        "n_train": 294,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.09016393442622951,
+            "accuracy": 0.22,
+            "ci95": [
+              0.05357142857142857,
+              0.12686567164179105
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.22,
+                "recall": 1.0,
+                "f1-score": 0.36065573770491804,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Quality": 50
+            },
+            "pct_predicted_cooperative": 0.0,
+            "train_resample_mean": 0.08565268681609242,
+            "train_resample_sd": 0.029484217551443738
+          },
+          "synthetic": {
+            "macro_f1": 0.07555555555555556,
+            "accuracy": 0.2328767123287671,
+            "ci95": [
+              0.05227624784853701,
+              0.09896907216494846
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.2328767123287671,
+                "recall": 1.0,
+                "f1-score": 0.37777777777777777,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Quality": 73
+            },
+            "pct_predicted_cooperative": 0.0,
+            "train_resample_mean": 0.0699616858237548,
+            "train_resample_sd": 0.005593869731800767
+          }
+        }
+      },
+      "stratified": {
+        "model": "stratified",
+        "n_train": 294,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.2115151515151515,
+            "accuracy": 0.2,
+            "ci95": [
+              0.0965063543377121,
+              0.31591605569850284
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.2727272727272727,
+                "recall": 0.2727272727272727,
+                "f1-score": 0.2727272727272727,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.3,
+                "recall": 0.2,
+                "f1-score": 0.24,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.3333333333333333,
+                "recall": 0.3333333333333333,
+                "f1-score": 0.3333333333333333,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Quantity": 10,
+              "Manner": 8,
+              "Cooperative": 9,
+              "Relation": 12,
+              "Quality": 11
+            },
+            "pct_predicted_cooperative": 0.18,
+            "train_resample_mean": 0.19391545563513526,
+            "train_resample_sd": 0.045681924042699246
+          },
+          "synthetic": {
+            "macro_f1": 0.23017241379310344,
+            "accuracy": 0.2328767123287671,
+            "ci95": [
+              0.13530259233520103,
+              0.3167743698080047
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.2857142857142857,
+                "recall": 0.2857142857142857,
+                "f1-score": 0.2857142857142857,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.13333333333333333,
+                "recall": 0.14285714285714285,
+                "f1-score": 0.13793103448275862,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.4,
+                "recall": 0.35294117647058826,
+                "f1-score": 0.375,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.21428571428571427,
+                "recall": 0.21428571428571427,
+                "f1-score": 0.21428571428571427,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.13333333333333333,
+                "recall": 0.14285714285714285,
+                "f1-score": 0.13793103448275862,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Quantity": 14,
+              "Manner": 15,
+              "Cooperative": 14,
+              "Relation": 15,
+              "Quality": 15
+            },
+            "pct_predicted_cooperative": 0.1917808219178082,
+            "train_resample_mean": 0.19821629490195586,
+            "train_resample_sd": 0.048108152382266574
+          }
+        }
+      },
+      "surface": {
+        "model": "surface",
+        "n_train": 294,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.17261904761904762,
+            "accuracy": 0.24,
+            "ci95": [
+              0.0938480196703881,
+              0.2456896551724138
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.29411764705882354,
+                "recall": 0.45454545454545453,
+                "f1-score": 0.35714285714285715,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.23333333333333334,
+                "recall": 0.5833333333333334,
+                "f1-score": 0.3333333333333333,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Relation": 30,
+              "Quality": 17,
+              "Manner": 3
+            },
+            "pct_predicted_cooperative": 0.0,
+            "train_resample_mean": 0.16959534579646765,
+            "train_resample_sd": 0.03356740265009656
+          },
+          "synthetic": {
+            "macro_f1": 0.5994295656142152,
+            "accuracy": 0.6027397260273972,
+            "ci95": [
+              0.49011440644630294,
+              0.6951124515692658
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.4375,
+                "recall": 0.5,
+                "f1-score": 0.4666666666666667,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.8125,
+                "recall": 0.9285714285714286,
+                "f1-score": 0.8666666666666667,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.5555555555555556,
+                "recall": 0.29411764705882354,
+                "f1-score": 0.38461538461538464,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.8,
+                "recall": 0.8571428571428571,
+                "f1-score": 0.8275862068965517,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.4117647058823529,
+                "recall": 0.5,
+                "f1-score": 0.45161290322580644,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Relation": 17,
+              "Cooperative": 16,
+              "Manner": 16,
+              "Quantity": 15,
+              "Quality": 9
+            },
+            "pct_predicted_cooperative": 0.2191780821917808,
+            "train_resample_mean": 0.6133597679348644,
+            "train_resample_sd": 0.026548487975359723
+          }
+        }
+      },
+      "tfidf-utt": {
+        "model": "tfidf-utt",
+        "n_train": 294,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.25384358288770054,
+            "accuracy": 0.26,
+            "ci95": [
+              0.130944189679789,
+              0.3670375253141797
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.3,
+                "recall": 0.5,
+                "f1-score": 0.375,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.2727272727272727,
+                "recall": 0.2727272727272727,
+                "f1-score": 0.2727272727272727,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.5,
+                "recall": 0.06666666666666667,
+                "f1-score": 0.11764705882352941,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.25,
+                "recall": 0.25,
+                "f1-score": 0.25,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Manner": 20,
+              "Relation": 12,
+              "Quantity": 2,
+              "Quality": 11,
+              "Cooperative": 5
+            },
+            "pct_predicted_cooperative": 0.1,
+            "train_resample_mean": 0.24977139716173102,
+            "train_resample_sd": 0.04435676852486621
+          },
+          "synthetic": {
+            "macro_f1": 0.6392246556622434,
+            "accuracy": 0.6438356164383562,
+            "ci95": [
+              0.5201023205196731,
+              0.7396245243913253
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.4375,
+                "recall": 0.5,
+                "f1-score": 0.4666666666666667,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.7647058823529411,
+                "recall": 0.9285714285714286,
+                "f1-score": 0.8387096774193549,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.631578947368421,
+                "recall": 0.7058823529411765,
+                "f1-score": 0.6666666666666666,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.6666666666666666,
+                "recall": 0.5714285714285714,
+                "f1-score": 0.6153846153846154,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.7777777777777778,
+                "recall": 0.5,
+                "f1-score": 0.6086956521739131,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 16,
+              "Quality": 19,
+              "Relation": 9,
+              "Quantity": 12,
+              "Manner": 17
+            },
+            "pct_predicted_cooperative": 0.2191780821917808,
+            "train_resample_mean": 0.6141845093666353,
+            "train_resample_sd": 0.03840376518153076
+          }
+        }
+      },
+      "tfidf-ctx": {
+        "model": "tfidf-ctx",
+        "n_train": 294,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.21260683760683763,
+            "accuracy": 0.26,
+            "ci95": [
+              0.12387320621016273,
+              0.29167850378787874
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.2916666666666667,
+                "recall": 0.5833333333333334,
+                "f1-score": 0.3888888888888889,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.4,
+                "recall": 0.5454545454545454,
+                "f1-score": 0.46153846153846156,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Manner": 24,
+              "Cooperative": 9,
+              "Quality": 15,
+              "Quantity": 2
+            },
+            "pct_predicted_cooperative": 0.18,
+            "train_resample_mean": 0.22456730884764112,
+            "train_resample_sd": 0.033511137404117146
+          },
+          "synthetic": {
+            "macro_f1": 0.6637825960969096,
+            "accuracy": 0.6712328767123288,
+            "ci95": [
+              0.5417349835863768,
+              0.7710693516442094
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.6363636363636364,
+                "recall": 0.5,
+                "f1-score": 0.56,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.7333333333333333,
+                "recall": 0.7857142857142857,
+                "f1-score": 0.7586206896551724,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.7058823529411765,
+                "recall": 0.7058823529411765,
+                "f1-score": 0.7058823529411765,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.7777777777777778,
+                "recall": 0.5,
+                "f1-score": 0.6086956521739131,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.5714285714285714,
+                "recall": 0.8571428571428571,
+                "f1-score": 0.6857142857142857,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 11,
+              "Relation": 21,
+              "Manner": 15,
+              "Quality": 17,
+              "Quantity": 9
+            },
+            "pct_predicted_cooperative": 0.1506849315068493,
+            "train_resample_mean": 0.603619650694346,
+            "train_resample_sd": 0.025686330235881204
+          }
+        }
+      },
+      "tfidf-char": {
+        "model": "tfidf-char",
+        "n_train": 294,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.2344773223381033,
+            "accuracy": 0.24,
+            "ci95": [
+              0.12300975952116107,
+              0.34847681656105567
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.15789473684210525,
+                "recall": 0.25,
+                "f1-score": 0.1935483870967742,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.35294117647058826,
+                "recall": 0.5454545454545454,
+                "f1-score": 0.42857142857142855,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.25,
+                "recall": 0.06666666666666667,
+                "f1-score": 0.10526315789473684,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.2857142857142857,
+                "recall": 0.16666666666666666,
+                "f1-score": 0.21052631578947367,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Quality": 17,
+              "Quantity": 4,
+              "Relation": 7,
+              "Manner": 19,
+              "Cooperative": 3
+            },
+            "pct_predicted_cooperative": 0.06,
+            "train_resample_mean": 0.2487569437488272,
+            "train_resample_sd": 0.033860510594177134
+          },
+          "synthetic": {
+            "macro_f1": 0.6809361009361009,
+            "accuracy": 0.684931506849315,
+            "ci95": [
+              0.5594375152414812,
+              0.7861994317832207
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.6153846153846154,
+                "recall": 0.5714285714285714,
+                "f1-score": 0.5925925925925926,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.6666666666666666,
+                "recall": 1.0,
+                "f1-score": 0.8,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.6923076923076923,
+                "recall": 0.5294117647058824,
+                "f1-score": 0.6,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.6428571428571429,
+                "recall": 0.6428571428571429,
+                "f1-score": 0.6428571428571429,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.8333333333333334,
+                "recall": 0.7142857142857143,
+                "f1-score": 0.7692307692307693,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 13,
+              "Quantity": 14,
+              "Manner": 21,
+              "Quality": 13,
+              "Relation": 12
+            },
+            "pct_predicted_cooperative": 0.1780821917808219,
+            "train_resample_mean": 0.6064991363810852,
+            "train_resample_sd": 0.049047575920124646
+          }
+        }
+      }
+    },
+    "natural-only": {
+      "majority": {
+        "model": "majority",
+        "n_train": 682,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.0,
+            "accuracy": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 50
+            },
+            "pct_predicted_cooperative": 1.0,
+            "train_resample_mean": 0.0,
+            "train_resample_sd": 0.0
+          },
+          "synthetic": {
+            "macro_f1": 0.06436781609195402,
+            "accuracy": 0.1917808219178082,
+            "ci95": [
+              0.03950617283950617,
+              0.08936170212765956
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.1917808219178082,
+                "recall": 1.0,
+                "f1-score": 0.3218390804597701,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 73
+            },
+            "pct_predicted_cooperative": 1.0,
+            "train_resample_mean": 0.06436781609195404,
+            "train_resample_sd": 1.3877787807814457e-17
+          }
+        }
+      },
+      "stratified": {
+        "model": "stratified",
+        "n_train": 682,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.1388888888888889,
+            "accuracy": 0.1,
+            "ci95": [
+              0.033281250000000005,
+              0.24711438923395443
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.3333333333333333,
+                "recall": 0.16666666666666666,
+                "f1-score": 0.2222222222222222,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.3333333333333333,
+                "recall": 0.13333333333333333,
+                "f1-score": 0.19047619047619047,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.5,
+                "recall": 0.08333333333333333,
+                "f1-score": 0.14285714285714285,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Manner": 6,
+              "Cooperative": 29,
+              "Quality": 7,
+              "Quantity": 6,
+              "Relation": 2
+            },
+            "pct_predicted_cooperative": 0.58,
+            "train_resample_mean": 0.11750233884286246,
+            "train_resample_sd": 0.050013978695533985
+          },
+          "synthetic": {
+            "macro_f1": 0.13398848756254797,
+            "accuracy": 0.1643835616438356,
+            "ci95": [
+              0.06358385093167702,
+              0.21071563251563252
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.15555555555555556,
+                "recall": 0.5,
+                "f1-score": 0.23728813559322035,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.25,
+                "recall": 0.14285714285714285,
+                "f1-score": 0.18181818181818182,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.1111111111111111,
+                "recall": 0.058823529411764705,
+                "f1-score": 0.07692307692307693,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.2222222222222222,
+                "recall": 0.14285714285714285,
+                "f1-score": 0.17391304347826086,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Manner": 8,
+              "Cooperative": 45,
+              "Quality": 9,
+              "Quantity": 9,
+              "Relation": 2
+            },
+            "pct_predicted_cooperative": 0.6164383561643836,
+            "train_resample_mean": 0.15766650942255353,
+            "train_resample_sd": 0.052465716869606084
+          }
+        }
+      },
+      "surface": {
+        "model": "surface",
+        "n_train": 682,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.2101199454140631,
+            "accuracy": 0.18,
+            "ci95": [
+              0.10038986354775828,
+              0.32562845365418897
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.4444444444444444,
+                "recall": 0.3333333333333333,
+                "f1-score": 0.38095238095238093,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.2,
+                "recall": 0.2727272727272727,
+                "f1-score": 0.23076923076923078,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.3333333333333333,
+                "recall": 0.06666666666666667,
+                "f1-score": 0.1111111111111111,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.2,
+                "recall": 0.08333333333333333,
+                "f1-score": 0.11764705882352941,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 18,
+              "Quality": 15,
+              "Relation": 5,
+              "Quantity": 3,
+              "Manner": 9
+            },
+            "pct_predicted_cooperative": 0.36,
+            "train_resample_mean": 0.2261085976428364,
+            "train_resample_sd": 0.03935570719229077
+          },
+          "synthetic": {
+            "macro_f1": 0.3282021899668959,
+            "accuracy": 0.3972602739726027,
+            "ci95": [
+              0.23032172083235913,
+              0.4146121570697529
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.42105263157894735,
+                "recall": 0.5714285714285714,
+                "f1-score": 0.48484848484848486,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.5,
+                "recall": 0.11764705882352941,
+                "f1-score": 0.19047619047619047,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.3783783783783784,
+                "recall": 1.0,
+                "f1-score": 0.5490196078431373,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.5,
+                "recall": 0.35714285714285715,
+                "f1-score": 0.4166666666666667,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Quantity": 37,
+              "Manner": 19,
+              "Quality": 4,
+              "Cooperative": 3,
+              "Relation": 10
+            },
+            "pct_predicted_cooperative": 0.0410958904109589,
+            "train_resample_mean": 0.32827430433756805,
+            "train_resample_sd": 0.03001341035148022
+          }
+        }
+      },
+      "tfidf-utt": {
+        "model": "tfidf-utt",
+        "n_train": 682,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.13453996983408748,
+            "accuracy": 0.08,
+            "ci95": [
+              0.023809523809523808,
+              0.2416471467129362
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.6666666666666666,
+                "recall": 0.16666666666666666,
+                "f1-score": 0.26666666666666666,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.16666666666666666,
+                "recall": 0.09090909090909091,
+                "f1-score": 0.11764705882352941,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 1.0,
+                "recall": 0.08333333333333333,
+                "f1-score": 0.15384615384615385,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 34,
+              "Quantity": 6,
+              "Quality": 6,
+              "Manner": 3,
+              "Relation": 1
+            },
+            "pct_predicted_cooperative": 0.68,
+            "train_resample_mean": 0.05979853479853479,
+            "train_resample_sd": 0.0224463607208015
+          },
+          "synthetic": {
+            "macro_f1": 0.3988123216384086,
+            "accuracy": 0.4383561643835616,
+            "ci95": [
+              0.2817444063595437,
+              0.5003524890058719
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.30434782608695654,
+                "recall": 0.5,
+                "f1-score": 0.3783783783783784,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.4444444444444444,
+                "recall": 0.2857142857142857,
+                "f1-score": 0.34782608695652173,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.5,
+                "recall": 0.5294117647058824,
+                "f1-score": 0.5142857142857142,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.5238095238095238,
+                "recall": 0.7857142857142857,
+                "f1-score": 0.6285714285714286,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.5,
+                "recall": 0.07142857142857142,
+                "f1-score": 0.125,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 23,
+              "Manner": 9,
+              "Quality": 18,
+              "Relation": 2,
+              "Quantity": 21
+            },
+            "pct_predicted_cooperative": 0.3150684931506849,
+            "train_resample_mean": 0.36591647022113205,
+            "train_resample_sd": 0.03877395093144516
+          }
+        }
+      },
+      "tfidf-ctx": {
+        "model": "tfidf-ctx",
+        "n_train": 682,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.12394957983193278,
+            "accuracy": 0.08,
+            "ci95": [
+              0.029411764705882353,
+              0.225
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.6,
+                "recall": 0.25,
+                "f1-score": 0.35294117647058826,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.3333333333333333,
+                "recall": 0.09090909090909091,
+                "f1-score": 0.14285714285714285,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 41,
+              "Manner": 5,
+              "Quality": 3,
+              "Relation": 1
+            },
+            "pct_predicted_cooperative": 0.82,
+            "train_resample_mean": 0.03664148351648352,
+            "train_resample_sd": 0.02847751845853944
+          },
+          "synthetic": {
+            "macro_f1": 0.39543347003873325,
+            "accuracy": 0.3972602739726027,
+            "ci95": [
+              0.2647679000951618,
+              0.5018455407702013
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.21052631578947367,
+                "recall": 0.2857142857142857,
+                "f1-score": 0.24242424242424243,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.6666666666666666,
+                "recall": 0.2857142857142857,
+                "f1-score": 0.4,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.4666666666666667,
+                "recall": 0.4117647058823529,
+                "f1-score": 0.4375,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.35714285714285715,
+                "recall": 0.7142857142857143,
+                "f1-score": 0.47619047619047616,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.8,
+                "recall": 0.2857142857142857,
+                "f1-score": 0.42105263157894735,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Manner": 6,
+              "Quality": 15,
+              "Cooperative": 19,
+              "Quantity": 28,
+              "Relation": 5
+            },
+            "pct_predicted_cooperative": 0.2602739726027397,
+            "train_resample_mean": 0.3054332162909566,
+            "train_resample_sd": 0.037433973043934116
+          }
+        }
+      },
+      "tfidf-char": {
+        "model": "tfidf-char",
+        "n_train": 682,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.09536340852130326,
+            "accuracy": 0.06,
+            "ci95": [
+              0.0,
+              0.1894106142951251
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.5,
+                "recall": 0.08333333333333333,
+                "f1-score": 0.14285714285714285,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.25,
+                "recall": 0.06666666666666667,
+                "f1-score": 0.10526315789473684,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.3333333333333333,
+                "recall": 0.08333333333333333,
+                "f1-score": 0.13333333333333333,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 35,
+              "Relation": 3,
+              "Quantity": 4,
+              "Quality": 6,
+              "Manner": 2
+            },
+            "pct_predicted_cooperative": 0.7,
+            "train_resample_mean": 0.05885836385836385,
+            "train_resample_sd": 0.017423487416207722
+          },
+          "synthetic": {
+            "macro_f1": 0.45385964912280696,
+            "accuracy": 0.4657534246575342,
+            "ci95": [
+              0.33082170497876695,
+              0.5587753566216603
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.25,
+                "recall": 0.42857142857142855,
+                "f1-score": 0.3157894736842105,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.6,
+                "recall": 0.21428571428571427,
+                "f1-score": 0.3157894736842105,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.4782608695652174,
+                "recall": 0.6470588235294118,
+                "f1-score": 0.55,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.625,
+                "recall": 0.7142857142857143,
+                "f1-score": 0.6666666666666666,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.8,
+                "recall": 0.2857142857142857,
+                "f1-score": 0.42105263157894735,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Manner": 5,
+              "Cooperative": 24,
+              "Quality": 23,
+              "Relation": 5,
+              "Quantity": 16
+            },
+            "pct_predicted_cooperative": 0.3287671232876712,
+            "train_resample_mean": 0.32163994133341817,
+            "train_resample_sd": 0.0438452565981072
+          }
+        }
+      }
+    },
+    "both": {
+      "majority": {
+        "model": "majority",
+        "n_train": 976,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.0,
+            "accuracy": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 50
+            },
+            "pct_predicted_cooperative": 1.0,
+            "train_resample_mean": 0.0,
+            "train_resample_sd": 0.0
+          },
+          "synthetic": {
+            "macro_f1": 0.06436781609195402,
+            "accuracy": 0.1917808219178082,
+            "ci95": [
+              0.03950617283950617,
+              0.08936170212765956
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.1917808219178082,
+                "recall": 1.0,
+                "f1-score": 0.3218390804597701,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 73
+            },
+            "pct_predicted_cooperative": 1.0,
+            "train_resample_mean": 0.06436781609195404,
+            "train_resample_sd": 1.3877787807814457e-17
+          }
+        }
+      },
+      "stratified": {
+        "model": "stratified",
+        "n_train": 976,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.08240089514066495,
+            "accuracy": 0.06,
+            "ci95": [
+              0.0,
+              0.16818743756243756
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.2,
+                "recall": 0.08333333333333333,
+                "f1-score": 0.11764705882352941,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.08333333333333333,
+                "recall": 0.09090909090909091,
+                "f1-score": 0.08695652173913043,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.25,
+                "recall": 0.08333333333333333,
+                "f1-score": 0.125,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Quality": 12,
+              "Cooperative": 21,
+              "Quantity": 8,
+              "Manner": 5,
+              "Relation": 4
+            },
+            "pct_predicted_cooperative": 0.42,
+            "train_resample_mean": 0.14771458837971826,
+            "train_resample_sd": 0.054735107413417576
+          },
+          "synthetic": {
+            "macro_f1": 0.23161290322580647,
+            "accuracy": 0.2328767123287671,
+            "ci95": [
+              0.1266419536835138,
+              0.32271250706175403
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.1388888888888889,
+                "recall": 0.35714285714285715,
+                "f1-score": 0.2,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.16666666666666666,
+                "recall": 0.07142857142857142,
+                "f1-score": 0.1,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.2857142857142857,
+                "recall": 0.23529411764705882,
+                "f1-score": 0.25806451612903225,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.45454545454545453,
+                "recall": 0.35714285714285715,
+                "f1-score": 0.4,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.3333333333333333,
+                "recall": 0.14285714285714285,
+                "f1-score": 0.2,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Quality": 14,
+              "Cooperative": 36,
+              "Quantity": 11,
+              "Manner": 6,
+              "Relation": 6
+            },
+            "pct_predicted_cooperative": 0.4931506849315068,
+            "train_resample_mean": 0.19197665451816948,
+            "train_resample_sd": 0.055283952206062886
+          }
+        }
+      },
+      "surface": {
+        "model": "surface",
+        "n_train": 976,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.08777777777777777,
+            "accuracy": 0.08,
+            "ci95": [
+              0.019980769230769233,
+              0.16375540300025423
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.21428571428571427,
+                "recall": 0.2727272727272727,
+                "f1-score": 0.24,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.3333333333333333,
+                "recall": 0.06666666666666667,
+                "f1-score": 0.1111111111111111,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 27,
+              "Quality": 14,
+              "Quantity": 3,
+              "Relation": 1,
+              "Manner": 5
+            },
+            "pct_predicted_cooperative": 0.54,
+            "train_resample_mean": 0.11015831845622832,
+            "train_resample_sd": 0.019379621527991834
+          },
+          "synthetic": {
+            "macro_f1": 0.4936909685296782,
+            "accuracy": 0.5616438356164384,
+            "ci95": [
+              0.3954939671814672,
+              0.5723504485702963
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.7058823529411765,
+                "recall": 0.8571428571428571,
+                "f1-score": 0.7741935483870968,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.6,
+                "recall": 0.35294117647058826,
+                "f1-score": 0.4444444444444444,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.5714285714285714,
+                "recall": 0.8571428571428571,
+                "f1-score": 0.6857142857142857,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.44,
+                "recall": 0.7857142857142857,
+                "f1-score": 0.5641025641025641,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Relation": 25,
+              "Manner": 17,
+              "Quantity": 21,
+              "Quality": 10
+            },
+            "pct_predicted_cooperative": 0.0,
+            "train_resample_mean": 0.4685944016928156,
+            "train_resample_sd": 0.026949882054873166
+          }
+        }
+      },
+      "tfidf-utt": {
+        "model": "tfidf-utt",
+        "n_train": 976,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.14583333333333331,
+            "accuracy": 0.1,
+            "ci95": [
+              0.03333333333333333,
+              0.24952576754385963
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.5,
+                "recall": 0.16666666666666666,
+                "f1-score": 0.25,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.14285714285714285,
+                "recall": 0.09090909090909091,
+                "f1-score": 0.1111111111111111,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.3333333333333333,
+                "recall": 0.16666666666666666,
+                "f1-score": 0.2222222222222222,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 28,
+              "Quantity": 5,
+              "Relation": 6,
+              "Quality": 7,
+              "Manner": 4
+            },
+            "pct_predicted_cooperative": 0.56,
+            "train_resample_mean": 0.13574436184730304,
+            "train_resample_sd": 0.052272472146940634
+          },
+          "synthetic": {
+            "macro_f1": 0.7596020045735415,
+            "accuracy": 0.7534246575342466,
+            "ci95": [
+              0.6498936474339863,
+              0.8542839400954398
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.8333333333333334,
+                "recall": 0.7142857142857143,
+                "f1-score": 0.7692307692307693,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.7647058823529411,
+                "recall": 0.9285714285714286,
+                "f1-score": 0.8387096774193549,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.6470588235294118,
+                "recall": 0.6470588235294118,
+                "f1-score": 0.6470588235294118,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.6470588235294118,
+                "recall": 0.7857142857142857,
+                "f1-score": 0.7096774193548387,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 1.0,
+                "recall": 0.7142857142857143,
+                "f1-score": 0.8333333333333334,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 12,
+              "Quality": 17,
+              "Quantity": 17,
+              "Manner": 17,
+              "Relation": 10
+            },
+            "pct_predicted_cooperative": 0.1643835616438356,
+            "train_resample_mean": 0.6233544708204615,
+            "train_resample_sd": 0.02573541286007008
+          }
+        }
+      },
+      "tfidf-ctx": {
+        "model": "tfidf-ctx",
+        "n_train": 976,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.11904761904761904,
+            "accuracy": 0.08,
+            "ci95": [
+              0.027777777777777776,
+              0.21196775907159202
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.5,
+                "recall": 0.08333333333333333,
+                "f1-score": 0.14285714285714285,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.42857142857142855,
+                "recall": 0.2727272727272727,
+                "f1-score": 0.3333333333333333,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 40,
+              "Manner": 2,
+              "Quality": 7,
+              "Relation": 1
+            },
+            "pct_predicted_cooperative": 0.8,
+            "train_resample_mean": 0.060860805860805854,
+            "train_resample_sd": 0.034844796461807395
+          },
+          "synthetic": {
+            "macro_f1": 0.6003795066413662,
+            "accuracy": 0.6301369863013698,
+            "ci95": [
+              0.49211574717672124,
+              0.697867557559799
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.3333333333333333,
+                "recall": 0.14285714285714285,
+                "f1-score": 0.2,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.75,
+                "recall": 0.8571428571428571,
+                "f1-score": 0.8,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.6470588235294118,
+                "recall": 0.6470588235294118,
+                "f1-score": 0.6470588235294118,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.5882352941176471,
+                "recall": 0.7142857142857143,
+                "f1-score": 0.6451612903225806,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.6470588235294118,
+                "recall": 0.7857142857142857,
+                "f1-score": 0.7096774193548387,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Manner": 16,
+              "Quality": 17,
+              "Cooperative": 6,
+              "Quantity": 17,
+              "Relation": 17
+            },
+            "pct_predicted_cooperative": 0.0821917808219178,
+            "train_resample_mean": 0.6120632329768991,
+            "train_resample_sd": 0.04583119974548873
+          }
+        }
+      },
+      "tfidf-char": {
+        "model": "tfidf-char",
+        "n_train": 976,
+        "splits": {
+          "natural": {
+            "macro_f1": 0.14845938375350137,
+            "accuracy": 0.1,
+            "ci95": [
+              0.026282894736842106,
+              0.25776530019902694
+            ],
+            "per_class": {
+              "Manner": {
+                "precision": 0.5,
+                "recall": 0.08333333333333333,
+                "f1-score": 0.14285714285714285,
+                "support": 12.0
+              },
+              "Quality": {
+                "precision": 0.2,
+                "recall": 0.18181818181818182,
+                "f1-score": 0.19047619047619047,
+                "support": 11.0
+              },
+              "Quantity": {
+                "precision": 0.5,
+                "recall": 0.06666666666666667,
+                "f1-score": 0.11764705882352941,
+                "support": 15.0
+              },
+              "Relation": {
+                "precision": 0.5,
+                "recall": 0.08333333333333333,
+                "f1-score": 0.14285714285714285,
+                "support": 12.0
+              }
+            },
+            "predicted_distribution": {
+              "Cooperative": 34,
+              "Relation": 2,
+              "Quality": 10,
+              "Quantity": 2,
+              "Manner": 2
+            },
+            "pct_predicted_cooperative": 0.68,
+            "train_resample_mean": 0.13223505124046916,
+            "train_resample_sd": 0.05895402213972495
+          },
+          "synthetic": {
+            "macro_f1": 0.6828824049513704,
+            "accuracy": 0.684931506849315,
+            "ci95": [
+              0.5711628384313011,
+              0.7711437003211769
+            ],
+            "per_class": {
+              "Cooperative": {
+                "precision": 0.5,
+                "recall": 0.42857142857142855,
+                "f1-score": 0.46153846153846156,
+                "support": 14.0
+              },
+              "Manner": {
+                "precision": 0.8125,
+                "recall": 0.9285714285714286,
+                "f1-score": 0.8666666666666667,
+                "support": 14.0
+              },
+              "Quality": {
+                "precision": 0.5333333333333333,
+                "recall": 0.47058823529411764,
+                "f1-score": 0.5,
+                "support": 17.0
+              },
+              "Quantity": {
+                "precision": 0.7333333333333333,
+                "recall": 0.7857142857142857,
+                "f1-score": 0.7586206896551724,
+                "support": 14.0
+              },
+              "Relation": {
+                "precision": 0.8,
+                "recall": 0.8571428571428571,
+                "f1-score": 0.8275862068965517,
+                "support": 14.0
+              }
+            },
+            "predicted_distribution": {
+              "Manner": 16,
+              "Cooperative": 12,
+              "Quality": 15,
+              "Relation": 15,
+              "Quantity": 15
+            },
+            "pct_predicted_cooperative": 0.1643835616438356,
+            "train_resample_mean": 0.6291336255285999,
+            "train_resample_sd": 0.05834349269716222
+          }
+        }
+      }
+    }
+  }
+}
