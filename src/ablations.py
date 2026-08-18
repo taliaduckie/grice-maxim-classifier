@@ -51,6 +51,7 @@ from torch.utils.data import Dataset
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
+    TrainerCallback,
     TrainingArguments,
     Trainer,
 )
@@ -154,6 +155,47 @@ def bootstrap_ci(y_true, y_pred, n_boot=1000, seed=0):
     return [float(np.percentile(scores, 2.5)), float(np.percentile(scores, 97.5))]
 
 
+class KeepBestState(TrainerCallback):
+    """Snapshot the best epoch's weights in memory instead of via checkpoints.
+
+    Trainer's `load_best_model_at_end` cannot be used here. In this transformers
+    version the checkpoint writer stores LayerNorm parameters under the legacy
+    `gamma`/`beta` names while the reload path looks for `weight`/`bias`, so all
+    25 LayerNorm layers are silently skipped on load. The restored model ends up
+    with the best epoch's weights everywhere except its LayerNorms, which keep
+    whatever the final epoch left behind — a combination that was never
+    evaluated. `from_pretrained` applies the rename and is unaffected; only the
+    Trainer path is broken.
+
+    Keeping a CPU copy of the state dict sidesteps the serialisation entirely.
+    Costs ~0.5 GB of RAM for roberta-base and no disk at all.
+    """
+
+    def __init__(self, model, metric="eval_macro_f1"):
+        self.model = model
+        self.metric = metric
+        self.best_score = -float("inf")
+        self.best_epoch = None
+        self.best_state = None
+
+    def on_evaluate(self, args, state, control, metrics=None, **kwargs):
+        if not metrics or self.metric not in metrics:
+            return
+        if metrics[self.metric] > self.best_score:
+            self.best_score = metrics[self.metric]
+            self.best_epoch = state.epoch
+            self.best_state = {
+                k: v.detach().to("cpu", copy=True)
+                for k, v in self.model.state_dict().items()
+            }
+
+    def restore(self):
+        if self.best_state is None:
+            return False
+        self.model.load_state_dict(self.best_state)
+        return True
+
+
 class WeightedTrainer(Trainer):
     """Inverse-frequency weighted cross-entropy, as in train.py."""
 
@@ -211,11 +253,8 @@ def run_one(config_name, seed, train_pool, test_sets, tokenizer, quiet=True):
         weight_decay=HPARAMS["weight_decay"],
         warmup_ratio=HPARAMS["warmup_ratio"],
         eval_strategy="epoch",
-        save_strategy="epoch",
-        save_total_limit=1,
-        load_best_model_at_end=True,
-        metric_for_best_model="macro_f1",
-        greater_is_better=True,
+        save_strategy="no",          # best weights are held in RAM — see KeepBestState
+        load_best_model_at_end=False,
         seed=seed,
         data_seed=seed,
         report_to="none",
@@ -224,17 +263,26 @@ def run_one(config_name, seed, train_pool, test_sets, tokenizer, quiet=True):
         logging_strategy="no",
     )
 
+    keep_best = KeepBestState(model)
     trainer = WeightedTrainer(
         class_weights=class_weights, model=model, args=args,
         train_dataset=train_ds, eval_dataset=dev_ds,
-        compute_metrics=compute_metrics,
+        compute_metrics=compute_metrics, callbacks=[keep_best],
     )
 
     t0 = time.time()
     trainer.train()
     train_seconds = time.time() - t0
 
+    if not keep_best.restore():
+        raise RuntimeError("no evaluation ran, so no best epoch was recorded")
+
+    # the restored model must reproduce the score that selected it
     dev_f1 = trainer.evaluate()["eval_macro_f1"]
+    if abs(dev_f1 - keep_best.best_score) > 1e-6:
+        raise RuntimeError(
+            f"restored model scores {dev_f1:.6f} but was selected at "
+            f"{keep_best.best_score:.6f} — weight restoration is broken")
 
     result = {
         "config": config_name,
@@ -244,6 +292,7 @@ def run_one(config_name, seed, train_pool, test_sets, tokenizer, quiet=True):
         "n_train": len(train_rows),
         "n_dev": len(dev_rows),
         "dev_macro_f1": float(dev_f1),
+        "best_epoch": keep_best.best_epoch,
         "train_seconds": round(train_seconds, 1),
         "splits": {},
     }
@@ -268,16 +317,7 @@ def run_one(config_name, seed, train_pool, test_sets, tokenizer, quiet=True):
             "row_ids": [r["row_id"] for r in test_rows],
         }
 
-    # checkpoints are large and disposable; the predictions are what we keep
-    for ckpt in out_dir.glob("checkpoint-*"):
-        for f in ckpt.rglob("*"):
-            if f.is_file():
-                f.unlink()
-        for d in sorted(ckpt.rglob("*"), reverse=True):
-            if d.is_dir():
-                d.rmdir()
-        ckpt.rmdir()
-
+    del keep_best.best_state
     return result
 
 
