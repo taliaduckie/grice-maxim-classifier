@@ -394,8 +394,9 @@ def main():
                 indent=2) + "\n")
 
     summarise(results)
-    print(f"\nWrote {Path(args.out).relative_to(ROOT)} "
-          f"(includes per-row predictions for error analysis)")
+    out = Path(args.out)
+    shown = out.relative_to(ROOT) if out.is_relative_to(ROOT) else out
+    print(f"\nWrote {shown} (includes per-row predictions for error analysis)")
     return 0
 
 
