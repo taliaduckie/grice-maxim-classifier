@@ -51,12 +51,12 @@ from torch.utils.data import Dataset
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
-    TrainerCallback,
     TrainingArguments,
     Trainer,
 )
 
 from labels import MAXIMS
+from training_utils import KeepBestState
 
 ROOT = Path(__file__).parent.parent
 DATA_DIR = ROOT / "data"
@@ -153,47 +153,6 @@ def bootstrap_ci(y_true, y_pred, n_boot=1000, seed=0):
     if not scores:
         return [float("nan"), float("nan")]
     return [float(np.percentile(scores, 2.5)), float(np.percentile(scores, 97.5))]
-
-
-class KeepBestState(TrainerCallback):
-    """Snapshot the best epoch's weights in memory instead of via checkpoints.
-
-    Trainer's `load_best_model_at_end` cannot be used here. In this transformers
-    version the checkpoint writer stores LayerNorm parameters under the legacy
-    `gamma`/`beta` names while the reload path looks for `weight`/`bias`, so all
-    25 LayerNorm layers are silently skipped on load. The restored model ends up
-    with the best epoch's weights everywhere except its LayerNorms, which keep
-    whatever the final epoch left behind — a combination that was never
-    evaluated. `from_pretrained` applies the rename and is unaffected; only the
-    Trainer path is broken.
-
-    Keeping a CPU copy of the state dict sidesteps the serialisation entirely.
-    Costs ~0.5 GB of RAM for roberta-base and no disk at all.
-    """
-
-    def __init__(self, model, metric="eval_macro_f1"):
-        self.model = model
-        self.metric = metric
-        self.best_score = -float("inf")
-        self.best_epoch = None
-        self.best_state = None
-
-    def on_evaluate(self, args, state, control, metrics=None, **kwargs):
-        if not metrics or self.metric not in metrics:
-            return
-        if metrics[self.metric] > self.best_score:
-            self.best_score = metrics[self.metric]
-            self.best_epoch = state.epoch
-            self.best_state = {
-                k: v.detach().to("cpu", copy=True)
-                for k, v in self.model.state_dict().items()
-            }
-
-    def restore(self):
-        if self.best_state is None:
-            return False
-        self.model.load_state_dict(self.best_state)
-        return True
 
 
 class WeightedTrainer(Trainer):

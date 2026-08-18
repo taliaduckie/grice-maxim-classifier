@@ -17,6 +17,7 @@ from transformers import (
 from sklearn.metrics import classification_report
 from dataset import GriceDataset, LABEL2ID, ID2LABEL, MODEL_NAME
 from labels import MAXIMS
+from training_utils import KeepBestState
 
 # resolve MODEL DIR situation
 OUTPUT_DIR = str(Path(__file__).parent.parent / "models" / "roberta-grice")
@@ -97,10 +98,12 @@ def train(data_path: str):
         weight_decay=0.01,  
         warmup_ratio=0.1,
         eval_strategy="epoch",
-        save_strategy="epoch",
-        load_best_model_at_end=True,
-        metric_for_best_model="macro_f1",
-        greater_is_better=True,
+        # Best-epoch weights are kept in RAM by KeepBestState rather than
+        # restored from a checkpoint. Trainer's load_best_model_at_end silently
+        # fails to restore LayerNorm parameters in this transformers version and
+        # saves a model that was never evaluated — see src/training_utils.py.
+        save_strategy="no",
+        load_best_model_at_end=False,
         logging_dir=str(Path(__file__).parent.parent / "models" / "logs"),
         report_to="none",  
         use_cpu=True,  # MPS on apple silicon + transformers = pain
@@ -117,15 +120,30 @@ def train(data_path: str):
             loss = loss_fn(logits, labels)
             return (loss, outputs) if return_outputs else loss
 
+    keep_best = KeepBestState(model)
     trainer = WeightedTrainer(
         model=model,
         args=args,
         train_dataset=train_ds,
         eval_dataset=eval_ds,
         compute_metrics=compute_metrics,
+        callbacks=[keep_best],
     )
 
     trainer.train()
+
+    # roll back to the best epoch, then confirm the restored model actually
+    # reproduces the score it was chosen for. if this ever fails, the model on
+    # disk does not match the number being reported for it.
+    if keep_best.restore():
+        recheck = trainer.evaluate()["eval_macro_f1"]
+        if abs(recheck - keep_best.best_score) > 1e-6:
+            raise RuntimeError(
+                f"restored model scores {recheck:.4f} but was selected at "
+                f"{keep_best.best_score:.4f} — refusing to save it")
+        print(f"Restored best epoch ({keep_best.best_epoch:.0f}), "
+              f"macro F1 = {keep_best.best_score:.4f}")
+
     trainer.save_model(OUTPUT_DIR)
     # save the tokenizer too or pipeline can't find it and produces
     # identical scores for every input. the model was learning fine 

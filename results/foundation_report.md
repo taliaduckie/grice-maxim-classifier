@@ -179,7 +179,53 @@ The blocking step is human: two or three people annotating
 data/test/annotations/*.csv`. Until α is known, every model number in this
 report has an unknown ceiling.
 
-## 8. Not yet done
+## 8. Two defects in the training harness
+
+Found while building the ablation runner. Both affect numbers already reported.
+
+### 8.1 The saved model is not the model that was evaluated
+
+`train.py` used `load_best_model_at_end=True`. In this transformers version the
+checkpoint writer stores LayerNorm parameters under the legacy `gamma`/`beta`
+names while the reload path looks for `weight`/`bias`. The mismatch is logged as
+"missing keys" and then ignored, so **all 25 LayerNorm layers are silently not
+restored**. Measured directly: after the reload the model's LayerNorm weights
+were unchanged by the load and differed from the checkpoint's stored values by
+up to 0.95.
+
+The restored model therefore carries best-epoch weights everywhere except its
+LayerNorms, which retain final-epoch values — a combination that was never
+evaluated, and it is what `save_model` then wrote to disk. `from_pretrained`
+applies the rename correctly, so a plain save/load round-trip is unaffected;
+only the Trainer path is broken.
+
+Consequences:
+
+- Every model in `models/` was saved this way, so `predict.py`, `app.py`,
+  `api.py`, and `comparison_results.csv` all ran against a hybrid model rather
+  than the one whose score was reported.
+- The macro F1 printed *during* training is computed on the in-memory model and
+  is correct for that epoch. This is why the bug is quiet: the number is right,
+  the artefact is wrong.
+
+Fixed in `src/training_utils.py` (`KeepBestState`), which snapshots the best
+epoch's weights in RAM and skips serialisation entirely. Both `train.py` and
+`ablations.py` now assert that the restored model reproduces the score it was
+selected for, and refuse to save it otherwise. Regression tests in
+`tests/test_training_utils.py`.
+
+### 8.2 The reported held-out score selected its own epoch
+
+`train.py` passes the same 20% split as `eval_dataset` — used every epoch for
+best-model selection — and then reports that split's macro F1 as the held-out
+result. The 0.91 in the README is therefore a selection-optimal number over ten
+epochs, not a clean held-out one, independently of the contamination in §1.
+
+The ablation runner carves a separate 15% dev split out of each run's own
+training pool for epoch selection, and touches the frozen test sets exactly once
+per run, after selection is finished.
+
+## 9. Not yet done
 
 - Item 8's RoBERTa ablation grid — the cheap models already show the shape, but
   the transformer numbers are what the paper claims.
