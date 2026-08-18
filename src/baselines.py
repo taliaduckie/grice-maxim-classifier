@@ -362,6 +362,8 @@ def main():
         ("both", "tfidf-ctx", "both", "majority", "does TF-IDF beat always-guessing?"),
         ("both", "tfidf-ctx", "both", "tfidf-utt", "does adding context help? (item 3)"),
         ("both", "tfidf-ctx", "both", "surface", "does reading the words beat counting them?"),
+        ("synthetic-only", "tfidf-char", "synthetic-only", "surface",
+         "...and on the synthetic corpus specifically? (item 6)"),
         ("synthetic-only", "tfidf-ctx", "natural-only", "tfidf-ctx", "does training domain matter? (item 4)"),
     ]
     for split in test_sets:
