@@ -1,0 +1,363 @@
+"""RoBERTa ablation grid (checklist item 8).
+
+The four configurations from the checklist table:
+
+    config  utterance  context  synthetic  natural
+    A          x          -         x         -
+    B          x          x         x         -
+    C          x          x         -         x
+    D          x          x         x         x
+
+A vs B isolates context. B vs C vs D isolates training domain. Every run is
+evaluated on both frozen test sets, so synthetic->natural transfer is read off
+the same table.
+
+Two rules this harness exists to enforce:
+
+1. **The test sets are never used for model selection.** Each run carves its own
+   stratified dev split out of its own training pool and picks the best epoch on
+   that. The frozen sets are touched exactly once per run, at the end. Using
+   eval-on-test to pick a checkpoint is how a held-out number stops being one.
+
+2. **Hyperparameters are identical across configs**, and identical to train.py.
+   The grid is an experiment about data, so nothing else may vary. Anything
+   tuned per-config would make the columns incomparable.
+
+Predictions are saved per run so error analysis (items 5, 6, 11) can be done
+later without retraining anything.
+
+Usage:
+    python3 src/ablations.py --pilot              # one cheap config, one seed
+    python3 src/ablations.py --seeds 3            # the full grid
+    python3 src/ablations.py --configs A B        # a subset
+"""
+
+import argparse
+import csv
+import json
+import os
+import sys
+import time
+from collections import Counter
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+import numpy as np
+import torch
+from sklearn.metrics import classification_report, f1_score
+from sklearn.model_selection import train_test_split
+from torch.utils.data import Dataset
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    TrainingArguments,
+    Trainer,
+)
+
+from labels import MAXIMS
+
+ROOT = Path(__file__).parent.parent
+DATA_DIR = ROOT / "data"
+TRAIN_PATH = DATA_DIR / "annotated" / "corpus_train.csv"
+TEST_NATURAL = DATA_DIR / "test" / "test_natural.csv"
+TEST_SYNTHETIC = DATA_DIR / "test" / "test_synthetic.csv"
+RESULTS_DIR = ROOT / "results"
+
+MODEL_NAME = "roberta-base"
+LABEL2ID = {m: i for i, m in enumerate(MAXIMS)}
+ID2LABEL = {i: m for m, i in LABEL2ID.items()}
+
+# Identical to train.py. Do not tune these per config.
+HPARAMS = dict(
+    num_train_epochs=10,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
+    learning_rate=1e-5,
+    weight_decay=0.01,
+    warmup_ratio=0.1,
+    max_length=128,
+)
+
+DEV_FRACTION = 0.15
+
+CONFIGS = {
+    "A": {"context": False, "sources": ["synthetic"]},
+    "B": {"context": True, "sources": ["synthetic"]},
+    "C": {"context": True, "sources": ["natural"]},
+    "D": {"context": True, "sources": ["synthetic", "natural"]},
+}
+
+SCRATCH = Path(os.environ.get(
+    "GRICE_SCRATCH",
+    "/private/tmp/claude-501/-Users-taliahonikman-grice-maxim-classifier/"
+    "14d2c303-9dff-41ee-8719-cdcf0316d29a/scratchpad/ablations",
+))
+
+
+class PairDataset(Dataset):
+    """Encodes (utterance, context) as a sequence pair, or utterance alone.
+
+    The pair encoding matters: RoBERTa sees the two turns as separate segments
+    rather than one concatenated string, which is the whole point of config B.
+    """
+
+    def __init__(self, rows, tokenizer, use_context, max_length):
+        utterances = [r["utterance"] for r in rows]
+        if use_context:
+            contexts = [r["context"] for r in rows]
+            self.encodings = tokenizer(utterances, contexts, truncation=True,
+                                       padding="max_length", max_length=max_length)
+        else:
+            self.encodings = tokenizer(utterances, truncation=True,
+                                       padding="max_length", max_length=max_length)
+        self.labels = [LABEL2ID[r["maxim"]] for r in rows]
+
+    def __len__(self):
+        return len(self.labels)
+
+    def __getitem__(self, idx):
+        return {
+            "input_ids": self.encodings["input_ids"][idx],
+            "attention_mask": self.encodings["attention_mask"][idx],
+            "labels": self.labels[idx],
+        }
+
+
+def load(path):
+    with open(path, newline="", encoding="utf-8") as f:
+        return [r for r in csv.DictReader(f) if r.get("maxim") in MAXIMS]
+
+
+def macro_f1_present(y_true, y_pred):
+    """Macro F1 over classes present in the gold set.
+
+    test_natural has no Cooperative examples; averaging over an absent class
+    would report a property of the split rather than of the model.
+    """
+    present = sorted(set(y_true))
+    return float(f1_score(y_true, y_pred, labels=present, average="macro",
+                          zero_division=0))
+
+
+def bootstrap_ci(y_true, y_pred, n_boot=1000, seed=0):
+    rng = np.random.default_rng(seed)
+    y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
+    scores = []
+    for _ in range(n_boot):
+        idx = rng.integers(0, len(y_true), len(y_true))
+        if len(set(y_true[idx])) < 2:
+            continue
+        scores.append(macro_f1_present(y_true[idx], y_pred[idx]))
+    if not scores:
+        return [float("nan"), float("nan")]
+    return [float(np.percentile(scores, 2.5)), float(np.percentile(scores, 97.5))]
+
+
+class WeightedTrainer(Trainer):
+    """Inverse-frequency weighted cross-entropy, as in train.py."""
+
+    def __init__(self, class_weights, **kwargs):
+        super().__init__(**kwargs)
+        self.class_weights = class_weights
+
+    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+        labels = inputs.pop("labels")
+        outputs = model(**inputs)
+        logits = outputs.logits
+        loss_fn = torch.nn.CrossEntropyLoss(
+            weight=self.class_weights.to(logits.device))
+        loss = loss_fn(logits, labels)
+        return (loss, outputs) if return_outputs else loss
+
+
+def run_one(config_name, seed, train_pool, test_sets, tokenizer, quiet=True):
+    cfg = CONFIGS[config_name]
+    rows = [r for r in train_pool if r["source"] in cfg["sources"]]
+
+    # dev split for epoch selection — carved from training data, never from test
+    labels = [r["maxim"] for r in rows]
+    train_rows, dev_rows = train_test_split(
+        rows, test_size=DEV_FRACTION, stratify=labels, random_state=seed)
+
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+
+    model = AutoModelForSequenceClassification.from_pretrained(
+        MODEL_NAME, num_labels=len(MAXIMS), id2label=ID2LABEL, label2id=LABEL2ID)
+
+    max_length = HPARAMS["max_length"]
+    train_ds = PairDataset(train_rows, tokenizer, cfg["context"], max_length)
+    dev_ds = PairDataset(dev_rows, tokenizer, cfg["context"], max_length)
+
+    counts = Counter(train_ds.labels)
+    n_total, n_cls = len(train_ds.labels), len(MAXIMS)
+    class_weights = torch.tensor(
+        [n_total / (n_cls * counts[i]) if counts[i] else 0.0 for i in range(n_cls)],
+        dtype=torch.float32)
+
+    def compute_metrics(eval_pred):
+        logits, y = eval_pred
+        preds = logits.argmax(axis=-1)
+        return {"macro_f1": float(f1_score(y, preds, average="macro", zero_division=0))}
+
+    out_dir = SCRATCH / f"{config_name}_seed{seed}"
+    args = TrainingArguments(
+        output_dir=str(out_dir),
+        num_train_epochs=HPARAMS["num_train_epochs"],
+        per_device_train_batch_size=HPARAMS["per_device_train_batch_size"],
+        per_device_eval_batch_size=HPARAMS["per_device_eval_batch_size"],
+        learning_rate=HPARAMS["learning_rate"],
+        weight_decay=HPARAMS["weight_decay"],
+        warmup_ratio=HPARAMS["warmup_ratio"],
+        eval_strategy="epoch",
+        save_strategy="epoch",
+        save_total_limit=1,
+        load_best_model_at_end=True,
+        metric_for_best_model="macro_f1",
+        greater_is_better=True,
+        seed=seed,
+        data_seed=seed,
+        report_to="none",
+        use_cpu=True,           # matches train.py; MPS left alone deliberately
+        disable_tqdm=quiet,
+        logging_strategy="no",
+    )
+
+    trainer = WeightedTrainer(
+        class_weights=class_weights, model=model, args=args,
+        train_dataset=train_ds, eval_dataset=dev_ds,
+        compute_metrics=compute_metrics,
+    )
+
+    t0 = time.time()
+    trainer.train()
+    train_seconds = time.time() - t0
+
+    dev_f1 = trainer.evaluate()["eval_macro_f1"]
+
+    result = {
+        "config": config_name,
+        "seed": seed,
+        "context": cfg["context"],
+        "sources": cfg["sources"],
+        "n_train": len(train_rows),
+        "n_dev": len(dev_rows),
+        "dev_macro_f1": float(dev_f1),
+        "train_seconds": round(train_seconds, 1),
+        "splits": {},
+    }
+
+    # the frozen sets are touched here, once, after selection is finished
+    for split_name, test_rows in test_sets.items():
+        ds = PairDataset(test_rows, tokenizer, cfg["context"], max_length)
+        pred_ids = trainer.predict(ds).predictions.argmax(axis=-1)
+        y_pred = [ID2LABEL[i] for i in pred_ids]
+        y_true = [r["maxim"] for r in test_rows]
+        present = sorted(set(y_true))
+        report = classification_report(y_true, y_pred, labels=present,
+                                       output_dict=True, zero_division=0)
+        result["splits"][split_name] = {
+            "macro_f1": macro_f1_present(y_true, y_pred),
+            "accuracy": float(np.mean(np.array(y_pred) == np.array(y_true))),
+            "ci95": bootstrap_ci(y_true, y_pred),
+            "per_class": {lab: report[lab] for lab in present if lab in report},
+            "predicted_distribution": dict(Counter(y_pred)),
+            "pct_predicted_cooperative": float(np.mean(np.array(y_pred) == "Cooperative")),
+            "predictions": y_pred,
+            "row_ids": [r["row_id"] for r in test_rows],
+        }
+
+    # checkpoints are large and disposable; the predictions are what we keep
+    for ckpt in out_dir.glob("checkpoint-*"):
+        for f in ckpt.rglob("*"):
+            if f.is_file():
+                f.unlink()
+        for d in sorted(ckpt.rglob("*"), reverse=True):
+            if d.is_dir():
+                d.rmdir()
+        ckpt.rmdir()
+
+    return result
+
+
+def summarise(results):
+    """Group runs by config and report mean +/- sd across seeds."""
+    by_config = {}
+    for r in results:
+        by_config.setdefault(r["config"], []).append(r)
+
+    print(f"\n{'='*88}")
+    print("ABLATION GRID — macro F1 (mean +/- sd over seeds)")
+    print(f"{'='*88}")
+    print(f"{'cfg':<5}{'context':<9}{'train data':<22}{'n':>6}"
+          f"{'test_natural':>24}{'test_synthetic':>24}")
+    print("-" * 88)
+    for name in sorted(by_config):
+        runs = by_config[name]
+        cfg = CONFIGS[name]
+        line = (f"{name:<5}{'yes' if cfg['context'] else 'no':<9}"
+                f"{'+'.join(cfg['sources']):<22}{runs[0]['n_train']:>6}")
+        for split in ("natural", "synthetic"):
+            scores = [r["splits"][split]["macro_f1"] for r in runs]
+            coop = np.mean([r["splits"][split]["pct_predicted_cooperative"] for r in runs])
+            line += f"{np.mean(scores):>12.3f} +/-{np.std(scores):<5.3f}{coop:>6.0%}"
+        print(line)
+    print("\n(%coop = share of that test set predicted Cooperative; "
+          "true rate is 0% on test_natural)")
+    return by_config
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--seeds", type=int, default=3)
+    ap.add_argument("--configs", nargs="+", default=list(CONFIGS), choices=list(CONFIGS))
+    ap.add_argument("--pilot", action="store_true",
+                    help="One config, one seed — validates the harness cheaply.")
+    ap.add_argument("--out", default=str(RESULTS_DIR / "ablations.json"))
+    args = ap.parse_args()
+
+    if args.pilot:
+        args.configs, args.seeds = ["A"], 1
+
+    train_pool = load(TRAIN_PATH)
+    test_sets = {"natural": load(TEST_NATURAL), "synthetic": load(TEST_SYNTHETIC)}
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    SCRATCH.mkdir(parents=True, exist_ok=True)
+
+    print(f"Train pool: {len(train_pool)} rows "
+          f"({sum(r['source'] == 'synthetic' for r in train_pool)} synthetic, "
+          f"{sum(r['source'] == 'natural' for r in train_pool)} natural)")
+    print(f"Test: natural={len(test_sets['natural'])}, "
+          f"synthetic={len(test_sets['synthetic'])}")
+    print(f"Configs: {', '.join(args.configs)}   Seeds: {args.seeds}")
+    print(f"Epoch selection on a {DEV_FRACTION:.0%} dev split of the training "
+          "pool. Test sets are used once per run, after selection.\n")
+
+    results = []
+    total = len(args.configs) * args.seeds
+    for i, config_name in enumerate(args.configs):
+        for seed in range(args.seeds):
+            n = i * args.seeds + seed + 1
+            print(f"[{n}/{total}] config {config_name}, seed {seed} ...", flush=True)
+            r = run_one(config_name, seed, train_pool, test_sets, tokenizer)
+            results.append(r)
+            print(f"      {r['train_seconds']:.0f}s  dev={r['dev_macro_f1']:.3f}  "
+                  f"natural={r['splits']['natural']['macro_f1']:.3f}  "
+                  f"synthetic={r['splits']['synthetic']['macro_f1']:.3f}", flush=True)
+
+            out = Path(args.out)
+            out.parent.mkdir(exist_ok=True)
+            out.write_text(json.dumps(
+                {"hparams": HPARAMS, "dev_fraction": DEV_FRACTION, "runs": results},
+                indent=2) + "\n")
+
+    summarise(results)
+    print(f"\nWrote {Path(args.out).relative_to(ROOT)} "
+          f"(includes per-row predictions for error analysis)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
