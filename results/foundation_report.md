@@ -225,7 +225,102 @@ The ablation runner carves a separate 15% dev split out of each run's own
 training pool for epoch selection, and touches the frozen test sets exactly once
 per run, after selection is finished.
 
-## 9. Not yet done
+## 9. RoBERTa ablation grid (item 8)
+
+4 configs × 3 seeds, `src/ablations.py`, raw output in `results/ablations.json`.
+Each run selects its epoch on a 15% dev split carved from its own training pool
+and touches the frozen test sets once, afterwards.
+
+| cfg | context | trained on | n | test_natural | test_synthetic | % Coop on natural |
+|---|---|---|---|---|---|---|
+| A | no | synthetic | 249 | **0.263** ± 0.017 | 0.892 ± 0.019 | 1% |
+| B | yes | synthetic | 249 | 0.132 ± 0.011 | 0.877 ± 0.020 | 0% |
+| C | yes | natural | 579 | 0.198 ± 0.039 | 0.571 ± 0.023 | 61% |
+| D | yes | synthetic + natural | 829 | 0.164 ± 0.021 | 0.833 ± 0.025 | 57% |
+
+Macro F1, mean ± sd over seeds. True Cooperative rate on `test_natural` is 0%.
+
+### 9.1 No configuration beats chance on natural data
+
+Binomial test against uniform guessing over the four classes present
+(H₀: accuracy = 0.25):
+
+| cfg | mean accuracy | p |
+|---|---|---|
+| A | 0.307 | 0.252 — ns |
+| B | 0.233 | 0.618 — ns |
+| C | 0.140 | 0.981 — ns |
+| D | 0.127 | 0.993 — ns |
+
+The best transformer configuration is 0.263 macro F1 where TF-IDF reached 0.254
+and drawing from the class priors reaches 0.212. Fine-tuning roberta-base buys
+nothing measurable on naturally occurring data.
+
+### 9.2 On synthetic data it works, and that is the contrast
+
+0.83–0.89 macro F1 across every synthetic-trained config, stable across seeds.
+Against the illiterate surface baseline's 0.599, RoBERTa is clearly extracting
+real lexical signal here. The same model, same weights, same label scheme, moved
+to real conversation: 0.26.
+
+That gap — 0.89 synthetic vs 0.26 natural — is the result worth publishing.
+
+### 9.3 What context actually does (item 3)
+
+A → B is the only change of context, and macro F1 halves (0.263 → 0.132). But
+that overstates it: accuracy moves 0.31 → 0.23, and exact McNemar per seed gives
+p = 0.39, 0.79, 0.125. **Not significant.** With 50 items there is no resolving
+power for a difference this size.
+
+What actually changes is the *shape* of the predictions. Pooled over seeds on
+`test_natural`:
+
+| cfg | predicted label distribution |
+|---|---|
+| A | Quality 53%, Relation 37%, Manner 5%, Quantity 4%, Coop 1% |
+| B | **Quality 92%**, Relation 7%, Manner 1% |
+| C | **Cooperative 61%**, Relation 17%, Quality 15%, Manner 5%, Quantity 3% |
+| D | **Cooperative 57%**, Quality 23%, Relation 15%, Quantity 5%, Manner 1% |
+| gold | Quantity 30%, Manner 24%, Relation 24%, Quality 22% |
+
+Adding context makes the model collapse onto a single class out of domain.
+Macro F1 punishes that heavily while accuracy barely registers it, which is why
+the two metrics disagree.
+
+This is not a truncation artefact. Only 18% of natural pairs exceed the 128-token
+window and no utterance exceeds it alone. Splitting the test set: on the 41
+untruncated items A beats B by +0.163 macro F1; on the 9 truncated items the gap
+is −0.012. The effect is largest exactly where truncation is absent.
+
+### 9.4 Training domain decides which class it collapses to
+
+- Synthetic-trained (A, B) → collapse onto Quality/Relation, ~0–1% Cooperative
+- Natural-trained (C, D) → collapse onto Cooperative, 57–61%
+
+Same architecture, same hyperparameters. The training register picks the
+attractor. C and D score *below* chance on natural data precisely because the
+Cooperative prior they learned is wrong for every item in this test set.
+
+Per-class detail for the strongest config (A, seed 0) shows the pattern that
+macro F1 is summarising — high precision, near-zero recall on the classes it
+avoids:
+
+| class | precision | recall | F1 | support |
+|---|---|---|---|---|
+| Quantity | 1.00 | 0.13 | 0.24 | 15 |
+| Relation | 0.32 | 0.58 | 0.41 | 12 |
+| Quality | 0.25 | 0.55 | 0.34 | 11 |
+| Manner | 0.50 | 0.08 | 0.14 | 12 |
+
+### 9.5 Caveat that limits all of §9
+
+`test_natural` has no Cooperative items (§6), so configs C and D are penalised
+on every Cooperative prediction they make. Their natural-domain numbers are a
+lower bound and the comparison against A and B is not clean. Annotating
+`test_natural_pending.csv` is what fixes this; until then, treat §9.4's direction
+as established and its magnitude as not.
+
+## 10. Not yet done
 
 - Item 8's RoBERTa ablation grid — the cheap models already show the shape, but
   the transformer numbers are what the paper claims.
