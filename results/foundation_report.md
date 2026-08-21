@@ -20,6 +20,12 @@ synthetic corpus is separable by shape alone.
 
 Those two results together are the paper. Not "we built a classifier."
 
+**Read §11 first.** The natural test set has a structural defect — its pairs are
+comment→reply, not question→answer, while the synthetic ones are 88%
+question→answer. The second result above is unaffected by this (it is entirely
+within the synthetic corpus). The first is real but its interpretation is
+contested until the set is rebuilt and the labels rechecked.
+
 ---
 
 ## 1. Contamination in the previous numbers
@@ -263,7 +269,10 @@ Against the illiterate surface baseline's 0.599, RoBERTa is clearly extracting
 real lexical signal here. The same model, same weights, same label scheme, moved
 to real conversation: 0.26.
 
-That gap — 0.89 synthetic vs 0.26 natural — is the result worth publishing.
+That gap — 0.89 synthetic vs 0.26 natural — looks like the result worth
+publishing. **See §11 before relying on it.** The natural test set turns out to
+differ from the synthetic one in discourse structure as well as register, so the
+gap confounds an intended comparison with an unintended one.
 
 ### 9.3 What context actually does (item 3)
 
@@ -406,7 +415,103 @@ coding these, and given §10.1 the honest prior is that a meaningful share of th
 is exactly why item 2's agreement study has to land before these numbers get a
 final interpretation.
 
-## 11. Not yet done
+## 11. The natural test set may not be measuring what it claims
+
+Found while inspecting the error-analysis output. This qualifies every natural
+number in §4, §9, and §10, so read it before quoting any of them.
+
+### 11.1 The pairs are not question–answer pairs
+
+| set | contexts containing a question mark |
+|---|---|
+| test_synthetic | 88% |
+| natural training pool | 31% |
+| **test_natural** | **2 / 50 (4%)** |
+
+The synthetic corpus is question → answer. The natural test set is almost
+entirely comment → reply, where the reply is a parallel anecdote rather than a
+response to any request for information.
+
+This matters because the maxims as operationalised here presuppose a question.
+"Underinformative", "irrelevant", "too much detail" are all judgments relative
+to what was asked. Where nothing was asked, there is no determinate standard,
+and an annotator is left deciding how a spontaneous contribution measures up
+against a question that was never posed.
+
+### 11.2 The real question was dropped during scraping
+
+All 50 items come from 4 AskReddit threads, and all 4 post titles *are*
+questions:
+
+- "What's a NSFW experience you're not very proud of?"
+- "Military members and veterans, what 'Military Grade' item is actually great…"
+- "What's the coolest 'restricted access' place you've ever gotten to see?"
+- "When did your gut feeling save you from a bad situation?"
+
+The scraper paired *top-level comment* with *reply to that comment*, discarding
+the post title — which is the only actual question in the exchange. The genuine
+adjacency pair is (post title, top-level comment). It is still recoverable:
+`post_title` is a column in both `test_natural.csv` and `data/raw/*.csv`.
+
+### 11.3 The label distribution shows the strain
+
+| | count |
+|---|---|
+| flouting | **47 / 50** |
+| violating | 1 |
+| none | 2 |
+| Cooperative | **0 / 50** |
+
+94% flouting and zero Cooperative is not a plausible description of a natural
+sample. Flouting is the marked case in Grice — blatant, deliberate,
+implicature-generating. A corpus in which almost every spontaneous Reddit reply
+is performing one looks like the product of an annotation pass that asked
+"which maxim is violated?" rather than "is one violated, and if so which?"
+
+Two items are also internally inconsistent: `Quality` with
+`violation_type = none`. Under `docs/annotation_guidelines.md` §3, `none` is
+reserved for Cooperative.
+
+### 11.4 Effective sample size is smaller than 50
+
+Four threads, not fifty independent draws. Items within a thread share topic,
+register, and the same annotator pass in sequence. The bootstrap CIs in §4 and
+§9 resample items as if independent, so the intervals reported there are
+**narrower than the truth**. Nothing in this report leans on a difference that
+would survive only inside those intervals, but a cluster bootstrap over threads
+is the correct method once the set is rebuilt.
+
+### 11.5 What this does and does not change
+
+**Unaffected.** The training-side confound in §3 is measured from provenance and
+label counts, not from this test set: synthetic is 19% Cooperative, natural is
+59%, and the registers differ. That stands.
+
+**Weakened.** The claim in §9.2 that "0.89 synthetic vs 0.26 natural" is the
+headline result. That gap is real but now confounds three shifts at once:
+register (intended), class prior (intended), and **discourse structure
+(unintended)** — Q→A versus comment→reply. Only the first two were meant to be
+under test.
+
+**Possibly inverted.** Configs C and D predict Cooperative on 57–61% of
+`test_natural` and score below chance for it. If a meaningful share of those
+items really are cooperative contributions, those models were partly right and
+the gold is wrong. Their below-chance scores cannot be read as evidence of the
+register shortcut until the labels are rechecked.
+
+### 11.6 The fix
+
+1. Recode `results/gold_recheck_sheet.csv` blind. This is now the critical path,
+   not a nice-to-have.
+2. Rebuild the natural pairs as (post_title, top-level comment) so they are
+   genuine adjacency pairs, and re-scrape with more than 4 threads.
+3. Re-annotate under `docs/annotation_guidelines.md`, whose §2 decision
+   procedure makes Cooperative a live option and whose §3 restricts `flouting`
+   to breaches meant to be noticed.
+4. Recompute §4, §9, §10 against the rebuilt set, with a cluster bootstrap over
+   threads.
+
+## 12. Not yet done
 
 - Item 8's RoBERTa ablation grid — the cheap models already show the shape, but
   the transformer numbers are what the paper claims.
