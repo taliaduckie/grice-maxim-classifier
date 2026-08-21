@@ -320,7 +320,93 @@ lower bound and the comparison against A and B is not clean. Annotating
 `test_natural_pending.csv` is what fixes this; until then, treat §9.4's direction
 as established and its magnitude as not.
 
-## 10. Not yet done
+## 10. Error analysis (item 11)
+
+`src/error_analysis.py`, over all 12 ablation runs. Causes are split into what
+the numbers determine and what only a reading of the item can determine; the
+script computes the first and emits coding sheets for the second.
+
+### 10.1 Nothing in the natural set is reliably classified
+
+| | test_natural | test_synthetic |
+|---|---|---|
+| items every run gets right | **0 / 50 (0%)** | 24 / 73 (33%) |
+| items no run ever gets right | **24 / 50 (48%)** | 2 / 73 (3%) |
+
+There is no item in the natural test set that all twelve configurations agree on
+and get right. Half of it is wrong under every configuration tried. Whatever the
+0.26 macro F1 is measuring, it is not a stable core of items the approach
+handles — it is scattered partial credit.
+
+### 10.2 Recall collapses class by class, and the biggest class fares worst
+
+Pooled over all runs:
+
+| class | natural recall | synthetic recall | share of natural gold |
+|---|---|---|---|
+| Quantity | **6.1%** | 95.8% | 30% |
+| Manner | **8.3%** | 82.1% | 24% |
+| Relation | 25.0% | 78.6% | 24% |
+| Quality | 47.0% | 65.7% | 22% |
+
+Quantity is the largest class in the natural test set and is recovered 6% of the
+time. On synthetic it is the *easiest* class at 96%. The ordering of difficulty
+does not merely weaken across domains — it inverts.
+
+### 10.3 Where the mass goes
+
+Most common gold → modal-prediction confusions on natural:
+
+| | count |
+|---|---|
+| Manner → Quality | 7 |
+| Quantity → Cooperative | 7 |
+| Relation → Quality | 6 |
+| Quantity → Quality | 5 |
+| Quality → Cooperative | 4 |
+
+Two sinks: **Quality** for synthetic-trained configs and **Cooperative** for
+natural-trained ones. That is §9.4's attractor effect at the item level — the
+errors are not diffuse, they drain into whichever class the training register
+favours.
+
+### 10.4 Mechanical failure flags (natural, n=50)
+
+| flag | items | share |
+|---|---|---|
+| systematically-missed-class | 27 | 54% |
+| never-correct | 24 | 48% |
+| collapse-to-modal-class | 24 | 48% |
+| config-dependent | 23 | 46% |
+| context-dominates-length | 13 | 26% |
+| truncated-at-128 | 9 | 18% |
+
+Nearly half of all natural failures are the model emitting its fallback class.
+On synthetic the dominant flag is instead `config-dependent` (42%) with almost
+no collapse — the failures there are ordinary seed and regime variance, which is
+what failure looks like when a model is actually working.
+
+### 10.5 The judgmental half is not done, on purpose
+
+`ambiguous_annotation`, `sarcasm`, `multiple_maxims`, `annotation_error` and
+`insufficient_context` are readings of an item, not properties of a prediction.
+Asserting them from a script would manufacture the finding the checklist is
+asking you to *measure*. Two sheets are written instead, covering the 99 items
+that any run got wrong:
+
+- `results/gold_recheck_sheet.csv` — item and gold label only, **no model
+  output**. Answers "is this gold label defensible?" Showing a prediction here
+  would contaminate the answer.
+- `results/error_coding_sheet.csv` — item, gold, per-config predictions, and
+  the mechanical flags. Answers "why did the model fail?"
+
+Do the blind sheet first. The quantified breakdown item 11 asks for comes from
+coding these, and given §10.1 the honest prior is that a meaningful share of the
+50 will turn out to be annotation disagreement rather than model failure — which
+is exactly why item 2's agreement study has to land before these numbers get a
+final interpretation.
+
+## 11. Not yet done
 
 - Item 8's RoBERTa ablation grid — the cheap models already show the shape, but
   the transformer numbers are what the paper claims.
