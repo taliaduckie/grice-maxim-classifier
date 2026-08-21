@@ -501,15 +501,49 @@ register shortcut until the labels are rechecked.
 
 ### 11.6 The fix
 
-1. Recode `results/gold_recheck_sheet.csv` blind. This is now the critical path,
-   not a nice-to-have.
-2. Rebuild the natural pairs as (post_title, top-level comment) so they are
-   genuine adjacency pairs, and re-scrape with more than 4 threads.
-3. Re-annotate under `docs/annotation_guidelines.md`, whose §2 decision
-   procedure makes Cooperative a live option and whose §3 restricts `flouting`
-   to breaches meant to be noticed.
-4. Recompute §4, §9, §10 against the rebuilt set, with a cluster bootstrap over
-   threads.
+**Done — pairs rebuilt with no re-scrape needed.** Every row in `data/raw/*.csv`
+turned out to be a depth-1 pair, verified rather than assumed
+(`rebuild_pairs.py` refuses to run if any context also appears as a reply). So
+every `context` already in the raw data *is* a top-level comment, and re-pairing
+it with its `post_title` recovers the adjacency pair the scrape discarded.
+
+`data/annotated/natural_qa_pairs.csv`:
+
+| | rebuilt | test_natural |
+|---|---|---|
+| pairs | 187 | 50 |
+| contexts that are questions | **100%** | 4% |
+| distinct threads | **50** | 4 |
+| distinct subreddits | 8 | 1 |
+
+Capped at 6 per thread, since thread clustering is what shrank the old set's
+effective sample size (§11.4). Labels are blank: the old (comment, reply) label
+says nothing about (question, comment), and pre-filling one would anchor the
+annotator.
+
+155 of the 187 answers already appear in `corpus_train.csv` — as *contexts*
+under the old pairing, so not duplicate rows, but a model trained on that corpus
+has read the text. They are flagged `seen_in_training=yes` and must be pulled
+from training before any of them is used as test data.
+
+**Done — scraper fixed for future runs.** `walk_comments` takes a `pairing`
+argument, defaulting to `title_toplevel`; `parent_reply` reproduces the old
+behaviour and `both` emits each. Exposed as `--pairing`. Tests in
+`tests/test_pairing.py` include one that asserts the old pairing produces
+question-free contexts and the new one does not.
+
+**Still yours:**
+
+1. Recode `results/gold_recheck_sheet.csv` blind. Critical path.
+2. Annotate `data/annotated/natural_qa_pairs.csv` under
+   `docs/annotation_guidelines.md`, whose §2 makes Cooperative a live option and
+   whose §3 restricts `flouting` to breaches meant to be noticed. Two annotators
+   minimum, then `src/agreement.py`.
+3. Re-scrape for volume with `--pairing title_toplevel` (needs
+   `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET`), if 187 proves too few once the
+   Cooperative majority is labelled honestly.
+4. Then recompute §4, §9, §10 against the rebuilt set, with a cluster bootstrap
+   over threads rather than over items.
 
 ## 12. Not yet done
 

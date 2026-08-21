@@ -353,12 +353,47 @@ def api_get(path, token):
     return None
 
 
-def walk_comments(node, post_title, sub, out):
-    """recurse the comment tree, emit parent->reply pairs (with crowd signal)"""
+def _usable(*texts):
+    """Shared length and deletion filter for any pair we emit."""
+    blob = "".join(texts).lower()
+    return (all(5 < len(t) < 500 for t in texts)
+            and "[deleted]" not in blob and "[removed]" not in blob
+            and "removed by reddit" not in blob)
+
+
+# How to turn a comment tree into (context, utterance) pairs.
+#
+#   parent_reply     top-level comment -> its reply. The original behaviour.
+#   title_toplevel   post title -> top-level comment. The genuine adjacency
+#                    pair: on AskReddit-style subs the title is the only actual
+#                    question, and a top-level comment is a direct answer to it.
+#
+# parent_reply was the default for the whole first corpus and it is what put a
+# comment->reply pair under labels like "underinformative answer" when nothing
+# had been asked — only 4% of test_natural contexts contain a question mark
+# against 88% of the synthetic ones. See results/foundation_report.md §11.
+# title_toplevel is the right default for maxim annotation; parent_reply is kept
+# because reply chains are where disagreement and sarcasm actually live.
+PAIRINGS = ("title_toplevel", "parent_reply", "both")
+
+
+def walk_comments(node, post_title, sub, out, pairing="title_toplevel", depth=0):
+    """Recurse the comment tree, emitting pairs according to `pairing`."""
     if not node or node.get("kind") != "t1":
         return
     d = node["data"]
     parent = (d.get("body") or "").replace("\n", " ").strip()
+
+    # the post title answered by this top-level comment
+    if pairing in ("title_toplevel", "both") and depth == 0:
+        title = (post_title or "").replace("\n", " ").strip()
+        if _usable(parent) and len(title) > 5:
+            out.append({"context": title, "utterance": parent,
+                        "post_title": post_title, "subreddit": sub,
+                        "pairing": "title_toplevel",
+                        "score": d.get("score", 0),
+                        "controversial": d.get("controversiality", 0) == 1})
+
     replies = d.get("replies")
     if isinstance(replies, dict):
         for child in replies["data"]["children"]:
@@ -366,20 +401,19 @@ def walk_comments(node, post_title, sub, out):
                 continue
             cd = child["data"]
             reply = (cd.get("body") or "").replace("\n", " ").strip()
-            blob = (reply + parent).lower()
-            if (5 < len(reply) < 500 and 5 < len(parent) < 500
-                    and "[deleted]" not in blob and "[removed]" not in blob
-                    and "removed by reddit" not in blob):
+            if pairing in ("parent_reply", "both") and _usable(reply, parent):
                 out.append({"context": parent, "utterance": reply,
                             "post_title": post_title, "subreddit": sub,
+                            "pairing": "parent_reply",
                             # Reddit's crowd signal: the strongest non-Cooperative
                             # prior in a Cooperative-dominated register.
                             "score": cd.get("score", 0),
                             "controversial": cd.get("controversiality", 0) == 1})
-            walk_comments(child, post_title, sub, out)
+            walk_comments(child, post_title, sub, out, pairing, depth + 1)
 
 
-def scrape(subs, per_sub, sort, output, llm_prescreen=False, model=LLM_MODEL_DEFAULT):
+def scrape(subs, per_sub, sort, output, llm_prescreen=False, model=LLM_MODEL_DEFAULT,
+           pairing="title_toplevel"):
     from predict import predict
     token = get_token()
     all_pairs = []
@@ -399,7 +433,7 @@ def scrape(subs, per_sub, sort, output, llm_prescreen=False, model=LLM_MODEL_DEF
             if not tree or len(tree) < 2:
                 continue
             for top in tree[1]["data"]["children"]:
-                walk_comments(top, pd_["title"], sub, pairs)
+                walk_comments(top, pd_["title"], sub, pairs, pairing)
             if len(pairs) >= per_sub * 6:  # gather a surplus, filter down
                 break
         # rank by likelihood of being non-Cooperative. PRIMARY signal is the
@@ -454,8 +488,8 @@ BATCH_COLS = ["utterance", "context", "subreddit", "post_title", "batch",
               "gold_maxim", "gold_violation_type", "surface_proxy_present", "notes"]
 
 
-def gather_pool(subs, per_sub, sort, token):
-    """Fetch a broad pool of parent->reply pairs (no scoring). sort=hot keeps it
+def gather_pool(subs, per_sub, sort, token, pairing="title_toplevel"):
+    """Fetch a broad pool of pairs (no scoring). sort=hot keeps it
     representative — we deliberately do NOT lead with controversial here."""
     pool = []
     for sub in subs:
@@ -473,7 +507,7 @@ def gather_pool(subs, per_sub, sort, token):
             if not tree or len(tree) < 2:
                 continue
             for top in tree[1]["data"]["children"]:
-                walk_comments(top, pd_["title"], sub, got)
+                walk_comments(top, pd_["title"], sub, got, pairing)
             if len(got) >= per_sub:
                 break
         pool.extend(got[:per_sub])
@@ -481,7 +515,8 @@ def gather_pool(subs, per_sub, sort, token):
 
 
 def build_batches(subs, pool_per_sub, sort, model, out_prefix,
-                  n_conf_viol=20, n_mid=15, n_lowconf_coop=15, n_random=40, pool=None):
+                  n_conf_viol=20, n_mid=15, n_lowconf_coop=15, n_random=40, pool=None,
+                  pairing="title_toplevel"):
     """Produce two annotation CSVs from the same three subs:
        <prefix>_prescreened.csv  — LLM-scored, stratified (confident violation /
                                    mid confidence / low-confidence Cooperative)
@@ -493,7 +528,7 @@ def build_batches(subs, pool_per_sub, sort, model, out_prefix,
     rng = random.Random(42)
     if pool is None:
         token = get_token()
-        pool = gather_pool(subs, pool_per_sub, sort, token)
+        pool = gather_pool(subs, pool_per_sub, sort, token, pairing)
     if not pool:
         print("empty pool."); return
     rng.shuffle(pool)
@@ -580,13 +615,19 @@ if __name__ == "__main__":
                     help="LLM model; claude-haiku-4-5 is ~5x cheaper for this classification")
     ap.add_argument("--out-prefix", default=str(RAW / "reddit_batch"))
     ap.add_argument("--output", default=str(RAW / "reddit_noncoop.csv"))
+    ap.add_argument("--pairing", default="title_toplevel", choices=PAIRINGS,
+                    help="title_toplevel: post title -> top-level comment, a real "
+                         "question-answer pair (default). parent_reply: the old "
+                         "comment -> reply pairing, which produced pairs with no "
+                         "question in them. both: emit each pair type.")
     a = ap.parse_args()
     if a.compare:
         compare_batches(a.compare[0], a.compare[1])
     elif a.validate:
         validate(llm_prescreen=a.llm_prescreen, model=a.model)
     elif a.build_batches:
-        build_batches(a.subs, a.pool_per_sub, a.sort, a.model, a.out_prefix)
+        build_batches(a.subs, a.pool_per_sub, a.sort, a.model, a.out_prefix,
+                      pairing=a.pairing)
     else:
         scrape(a.subs, a.per_sub, a.sort, a.output,
-               llm_prescreen=a.llm_prescreen, model=a.model)
+               llm_prescreen=a.llm_prescreen, model=a.model, pairing=a.pairing)
