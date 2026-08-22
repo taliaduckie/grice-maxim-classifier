@@ -1,30 +1,16 @@
-"""Error analysis over the saved ablation predictions (checklist item 11).
+"""Error analysis over the saved ablation predictions.
 
-The checklist asks for ~100 failures categorised by cause. Those causes split
-into two kinds, and conflating them would produce a fabricated result:
+Computes the mechanical causes: fallback to the modal class, truncation, items
+no run gets right, systematically missed classes.
 
-  mechanical   determinable from the predictions and the text alone — did the
-               model fall back on its modal class, was the pair truncated, do
-               all twelve runs fail on this item, is the whole gold class being
-               missed. This script computes these.
+Sarcasm, ambiguous annotation, multiple maxims and annotation error are readings
+of an item rather than properties of a prediction, so they get coding sheets
+instead of a guess:
 
-  judgmental   "ambiguous annotation", "sarcasm", "multiple maxims",
-               "annotation error". These are readings of the item. A script
-               asserting them would be guessing. This script emits coding
-               sheets instead.
+    gold_recheck_sheet.csv   item + gold label, no model output
+    error_coding_sheet.csv   item + gold + predictions + mechanical flags
 
-Two sheets, deliberately separate:
-
-  gold_recheck_sheet.csv   item + gold label, NO model output. Answers "is the
-                           gold label defensible?" Showing a prediction here
-                           would contaminate the judgment — you cannot ask
-                           someone whether a label is wrong while showing them
-                           what a model guessed instead.
-  error_coding_sheet.csv   item + gold + predictions + mechanical flags.
-                           Answers "why did the model fail?" Predictions are
-                           required for this one.
-
-Do the gold recheck first, and do it before reading the second sheet.
+Do the blind sheet first.
 
 Usage:
     python3 src/error_analysis.py

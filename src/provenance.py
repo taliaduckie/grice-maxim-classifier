@@ -1,18 +1,12 @@
-"""Provenance tracking: where did each corpus row actually come from?
+"""Tag each corpus row as synthetic or natural and recover its subreddit.
 
-Item 4 on the checklist says synthetic and natural examples have to stay
-separately identifiable. Right now corpus.csv is a flat 1,197-row file with no
-such marker, which means the synthetic-vs-natural ablations can't even be
-expressed, let alone run.
+corpus.csv has no provenance column, so the synthetic-vs-natural ablations can't
+be expressed. The 367 synthetic pairs are byte-identical in corpus_367.csv;
+everything else is Reddit, and the subreddit joins back from data/raw/*.csv on
+(utterance, context).
 
-Nothing is lost, though — the provenance is recoverable:
-
-  synthetic  the 367 hand-written pairs, byte-identical in corpus_367.csv
-  natural    everything else, scraped from Reddit; the subreddit is recoverable
-             by joining back against data/raw/*.csv on (utterance, context)
-
-This module is the single source of truth for that join. build_test_set.py and
-the ablation runners both import from here so they can't drift apart.
+build_test_set.py and ablations.py import the join from here so it stays
+consistent.
 """
 
 import csv
@@ -40,10 +34,8 @@ _WS = re.compile(r"\s+")
 def norm(text) -> str:
     """Whitespace- and quote-insensitive form used for all cross-file joins.
 
-    Reddit text round-trips through several CSV writers with different quoting
-    settings, so the same utterance can pick up stray outer quotes or have its
-    newlines collapsed. Matching on the raw string misses those; matching on
-    this normalized form does not.
+    The same text round-trips through several CSV writers with different
+    quoting, so it can pick up stray outer quotes or have newlines collapsed.
     """
     if text is None:
         return ""
@@ -64,12 +56,11 @@ def row_id(row) -> str:
 def repair_row(fields, n_expected, context_index=1):
     """Rejoin fields that a broken CSV writer split mid-context.
 
-    Some scraped rows were written with quoting that didn't survive a comma
-    inside the context. The trailing columns (labels, subreddit, title) are
-    always present and always last, and the utterance is always first, so
-    anything in between belongs to the context and can be glued back together.
-    Returns None when the row is short rather than long, which is a different
-    (and unrecoverable) kind of damage.
+    Some rows were written with quoting that didn't survive a comma inside the
+    context. The trailing columns are always last and the utterance always
+    first, so anything in between belongs to the context.
+
+    Returns None for short rows — that damage isn't recoverable.
     """
     if len(fields) == n_expected:
         return fields
@@ -84,8 +75,7 @@ def read_csv_tolerant(path, expected_columns=None):
     """Read a CSV, repairing over-split rows instead of dying on them.
 
     Returns (rows, n_repaired, n_dropped). pandas.read_csv raises a ParserError
-    on the first bad row and takes the other 49 down with it, which is why this
-    exists.
+    on the first bad row and loses the rest of the file with it.
     """
     with open(path, newline="", encoding="utf-8") as f:
         records = list(csv.reader(f))

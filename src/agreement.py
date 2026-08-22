@@ -1,28 +1,17 @@
-"""Inter-annotator agreement and adjudication (checklist item 2).
-
-Takes two or more filled-in copies of an annotation sheet and reports how much
-the annotators actually agreed, then writes the disagreements out as an
-adjudication sheet.
+"""Inter-annotator agreement and adjudication.
 
     python3 src/agreement.py data/test/annotations/*.csv
 
-Three coefficients, because they answer different questions:
+    percent agreement  raw match rate; inflated when one label dominates
+    Cohen / Fleiss k   chance-corrected; Cohen for 2 annotators, Fleiss for 3+.
+                       Both need every item labelled by everyone.
+    Krippendorff a     chance-corrected, tolerates missing values and any number
+                       of annotators. Report this one when annotators skipped
+                       items, which the guidelines tell them to do.
 
-  percent agreement   how often they matched. Inflated whenever one label
-                      dominates — with 60% Cooperative, two annotators who
-                      guessed at random by the marginals would agree ~40% of
-                      the time. Never report this alone.
-  Cohen / Fleiss k    agreement above chance. Cohen for exactly 2 annotators,
-                      Fleiss for 3+. Both need every item labelled by everyone.
-  Krippendorff a      agreement above chance, but tolerant of missing values
-                      and any number of annotators. This is the one to report
-                      when annotators skipped items — and they should skip
-                      items, since the guidelines tell them to.
-
-Rough reading of the numbers, following Landis & Koch (1977): <0.20 slight,
-0.21-0.40 fair, 0.41-0.60 moderate, 0.61-0.80 substantial, >0.80 almost
-perfect. For a 5-way pragmatic judgment, 0.6 is a genuinely good result and
-anything below ~0.4 means the label scheme is not yet a measurement.
+Landis & Koch (1977) rule of thumb: <0.20 slight, 0.21-0.40 fair, 0.41-0.60
+moderate, 0.61-0.80 substantial, >0.80 almost perfect. Below ~0.4 on a 5-way
+pragmatic judgment means the scheme isn't measuring anything yet.
 """
 
 import argparse
@@ -48,8 +37,8 @@ MISSING = {"", "-", "na", "n/a", "none given", "?"}
 def load_annotations(paths, field):
     """{annotator: {row_id: label}} plus the shared item text.
 
-    Blank cells are dropped rather than coerced: an unlabelled item is missing
-    data, not a label, and Krippendorff's alpha is built to handle that.
+    Blank cells are dropped, not coerced — an unlabelled item is missing data
+    rather than a label, and alpha handles that.
     """
     per_annotator, items = {}, {}
     for path in paths:
@@ -168,8 +157,8 @@ def krippendorff_alpha(per_annotator):
 def per_label_agreement(per_annotator, label_space):
     """For each label: how often did annotators who used it agree with each other?
 
-    This is where a schema problem localises. A respectable overall kappa can
-    hide one category that nobody can apply consistently.
+    A decent overall kappa can still hide one category nobody applies
+    consistently.
     """
     names = sorted(per_annotator)
     stats = {}

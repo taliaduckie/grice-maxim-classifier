@@ -132,9 +132,8 @@ def train(data_path: str):
 
     trainer.train()
 
-    # roll back to the best epoch, then confirm the restored model actually
-    # reproduces the score it was chosen for. if this ever fails, the model on
-    # disk does not match the number being reported for it.
+    # roll back to the best epoch, then check the restored model reproduces the
+    # score it was picked for — otherwise the saved model isn't the one measured.
     if keep_best.restore():
         recheck = trainer.evaluate()["eval_macro_f1"]
         if abs(recheck - keep_best.best_score) > 1e-6:

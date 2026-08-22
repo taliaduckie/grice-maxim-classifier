@@ -1,37 +1,25 @@
-"""Non-neural baselines with uncertainty (checklist items 7 and 10).
+"""Non-neural baselines with uncertainty.
 
-The question this answers: how much of the classifier's score is the classifier?
+    majority     most frequent training class
+    stratified   random draw from the training class priors
+    surface      13 numeric features (lengths, punctuation, overlap), no words
+    tfidf-utt    word 1-2 grams, utterance only
+    tfidf-ctx    word 1-2 grams, utterance + context as separate blocks
+    tfidf-char   char 3-5 grams over the utterance
 
-If TF-IDF + logistic regression lands near RoBERTa, the transformer is not
-buying pragmatic understanding. If a model given *nothing but surface
-statistics* — utterance length, context length, question marks, word overlap —
-lands near TF-IDF, then neither is, and the task as posed is mostly register
-detection. That last baseline is the diagnostic one and it is deliberately
-stupid: it cannot read.
+surface is the diagnostic one: it has no access to vocabulary, so whatever it
+scores is available from shape alone.
 
-Baselines, weakest first:
+Each model runs under three training regimes (synthetic / natural / both)
+against both frozen test sets. Hyperparameters are fixed below and were not
+tuned against the test sets.
 
-  majority        always the most frequent training class
-  stratified      random, drawn from the training class priors (chance)
-  surface         13 hand-built numeric features, no lexical content at all
-  tfidf-utt       word 1-2 grams over the utterance only
-  tfidf-ctx       word 1-2 grams over utterance + context (separate blocks)
-  tfidf-char      char 3-5 grams over the utterance, catches style not words
-
-Every model is evaluated on both frozen test sets, under the four training
-regimes of the item-8 ablation grid (synthetic / natural / both). Hyperparameters
-are fixed in this file and were never tuned against the test sets.
-
-Uncertainty:
-  - macro F1 as mean +/- sd over N bootstrap resamples of the *training* set,
-    which is the spread attributable to which examples you happened to collect
-  - 95% percentile CI from bootstrap resamples of the *test* set, which is the
-    spread attributable to which examples you happened to test on
-  - McNemar's exact test for the paired model comparisons that matter
+Reports macro F1 with a 95% percentile CI from bootstrap resamples of the test
+set, sd over bootstrap resamples of the training set, and exact McNemar for the
+paired comparisons.
 
 Usage:
-    python3 src/baselines.py
-    python3 src/baselines.py --seeds 20 --bootstrap 2000
+    python3 src/baselines.py [--seeds 20] [--bootstrap 2000]
 """
 
 import argparse
@@ -65,9 +53,7 @@ RESULTS_DIR = Path(__file__).parent.parent / "results"
 LOGREG_KWARGS = dict(max_iter=2000, class_weight="balanced", C=1.0)
 
 
-# --------------------------------------------------------------------------
-# data
-# --------------------------------------------------------------------------
+# ---- data ----
 
 def load(path):
     with open(path, newline="", encoding="utf-8") as f:
@@ -86,9 +72,7 @@ def labels_of(rows):
     return np.array([r["maxim"] for r in rows])
 
 
-# --------------------------------------------------------------------------
-# the deliberately illiterate baseline
-# --------------------------------------------------------------------------
+# ---- surface-only baseline: no vocabulary, no content words ----
 
 WORD = re.compile(r"[a-z']+")
 
@@ -96,9 +80,8 @@ WORD = re.compile(r"[a-z']+")
 def surface_features(rows):
     """Numeric features only. No vocabulary, no content words, no topic.
 
-    Anything this model gets right is available from shape alone: how long the
-    turn is, how much it echoes the question, how it's punctuated. If it scores
-    well, the labels are correlated with register rather than with pragmatics.
+    Anything this scores is available from shape alone: turn length, overlap
+    with the question, punctuation.
     """
     out = []
     for r in rows:
@@ -125,9 +108,7 @@ def surface_features(rows):
     return np.asarray(out, dtype=float)
 
 
-# --------------------------------------------------------------------------
-# models
-# --------------------------------------------------------------------------
+# ---- models ----
 
 def build_model(name, seed):
     """Return (fit_fn, predict_fn) closing over a fresh estimator."""
@@ -193,16 +174,13 @@ def build_model(name, seed):
 MODELS = ["majority", "stratified", "surface", "tfidf-utt", "tfidf-ctx", "tfidf-char"]
 
 
-# --------------------------------------------------------------------------
-# metrics
-# --------------------------------------------------------------------------
+# ---- metrics ----
 
 def present_labels(y_true):
     """Score only over classes the gold set actually contains.
 
     test_natural has no Cooperative examples, so a 5-class macro average would
-    silently fold in an undefined class and drag the number toward zero for
-    reasons that have nothing to do with the model.
+    fold in an undefined class.
     """
     return sorted(set(y_true))
 
@@ -239,9 +217,7 @@ def mcnemar(y_true, pred_a, pred_b):
     return b, c, float(binomtest(b, b + c, 0.5).pvalue)
 
 
-# --------------------------------------------------------------------------
-# evaluation
-# --------------------------------------------------------------------------
+# ---- evaluation ----
 
 def evaluate(model_name, train_rows, test_sets, seeds, n_boot):
     """Point estimate at seed 0 plus spread over training-set resamples."""

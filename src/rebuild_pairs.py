@@ -1,24 +1,19 @@
-"""Rebuild the natural pairs as genuine question->answer adjacency pairs.
+"""Rebuild the natural pairs as question->answer adjacency pairs.
 
-The problem (foundation_report.md §11): the scraper paired *top-level comment*
-with *reply to that comment* and threw away the post title. On AskReddit-style
-subreddits the post title is the only actual question in the exchange, so the
-resulting pairs are comment->reply — a reply that isn't answering anything. Only
-4% of test_natural contexts contain a question mark, against 88% of the
-synthetic ones. The maxims as operationalised here presuppose a question.
+The scraper paired top-level comment with reply and dropped the post title,
+which on AskReddit-style subs is the only actual question in the exchange. Only
+4% of test_natural contexts contain a question mark against 88% of the synthetic
+ones. See results/foundation_report.md §11.
 
-The fix needs no re-scraping. Every row in data/raw/*.csv is a depth-1 pair, so
-the `context` column *is* a top-level comment — a direct answer to the post
-title. Re-pairing (post_title, context) recovers the adjacency pair the scrape
-discarded, and `post_title` was kept all along.
+No re-scrape needed: every row in data/raw/*.csv is a depth-1 pair, so the
+context column is already a top-level comment. Re-pairing (post_title, context)
+recovers the adjacency pair.
 
-Output is an annotation sheet with the labels blank. These are new pairs: the
-old label attached to (comment, reply) says nothing about (question, comment),
-and pre-filling one would anchor the annotator (CHANGELOG, ed9a122).
+Labels come out blank — the old (comment, reply) label says nothing about
+(question, comment).
 
 Usage:
-    python3 src/rebuild_pairs.py
-    python3 src/rebuild_pairs.py --per-thread 5 --require-question
+    python3 src/rebuild_pairs.py [--per-thread 5] [--allow-non-questions]
 """
 
 import argparse
@@ -35,10 +30,9 @@ from provenance import (
 
 OUT_DIR = DATA_DIR / "annotated"
 
-# Cap per thread. test_natural drew 50 items from 4 threads, which is why its
-# effective sample size is far below 50 — items in a thread share topic,
-# register and the annotator's sequential attention. Spreading thin across many
-# threads buys more independent information per annotation hour.
+# Cap per thread. test_natural drew 50 items from only 4 threads, so its
+# effective sample size was well below 50 — items in a thread share topic and
+# register.
 PER_THREAD_DEFAULT = 6
 
 MIN_CHARS = 15
@@ -65,8 +59,7 @@ def verify_depth_one(rows):
 
     If this fails, some contexts are mid-thread comments rather than top-level
     ones, and pairing them with the post title would invent an adjacency that
-    never existed. Worth checking rather than assuming — the whole point of this
-    module is that a pairing assumption went unexamined once already.
+    never existed.
     """
     contexts = {norm(r["context"]) for r in rows}
     utterances = {norm(r["utterance"]) for r in rows}
@@ -124,10 +117,9 @@ def build(rows, per_thread, require_question):
 def contamination(pairs):
     """Flag any answer text that already appears in the training corpus.
 
-    The same comment can be a `context` in the old pairing and an `utterance`
-    here. That is not a duplicate row, but a model trained on the old corpus has
-    still read the text, so these must not go into a test split without being
-    pulled from training first.
+    The same comment can be a `context` under the old pairing and an
+    `utterance` here. Not a duplicate row, but a model trained on the old corpus
+    has read the text, so pull these from training before using them as test data.
     """
     train_path = OUT_DIR / "corpus_train.csv"
     if not train_path.exists():

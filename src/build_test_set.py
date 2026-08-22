@@ -1,21 +1,14 @@
-"""Build the frozen held-out test set (checklist item 1).
+"""Build the frozen held-out test set.
 
-Two domains, because train-on-synthetic/test-on-natural is only measurable if
-both sides exist:
+    test_natural.csv          50 human-annotated Reddit pairs
+    test_synthetic.csv        stratified 20% of the 367 hand-written pairs
+    test_natural_pending.csv  100 more natural pairs, labels stripped
 
-  test_natural.csv     the 50 human-annotated Reddit pairs (gold_annotated.csv)
-  test_synthetic.csv   a stratified 20% slice of the 367 hand-written pairs
-  test_natural_pending.csv
-                       100 further natural pairs, labels stripped, waiting on an
-                       independent human pass
+Anything appearing in those is removed from the training corpus and written to
+corpus_train.csv. 43 of the 50 gold pairs were already in corpus.csv, so scores
+previously computed on them were training scores.
 
-Everything those three files touch is removed from the training corpus and
-written to corpus_train.csv. That is the whole point: 43 of the 50 gold pairs
-are currently *in* corpus.csv, so any number computed on them today is a
-training-set number wearing a test-set hat.
-
-The manifest pins each split by row-id hash so a later run can prove the test
-set didn't quietly change underneath a result.
+manifest.json pins each split by row-id hash so later drift is detectable.
 
 Usage:
     python3 src/build_test_set.py --gold ~/Downloads/gold_annotated.csv
@@ -68,9 +61,9 @@ def normalize_vtype(vtype: str) -> str:
 def load_gold(path: Path):
     """Read the human-annotated gold file, repairing broken rows.
 
-    Returns (clean_rows, rejected). A row is rejected rather than guessed at
-    when its gold_maxim isn't one of the five labels — a shifted column is a
-    silent relabel otherwise, and a test set is the last place to tolerate that.
+    Returns (clean_rows, rejected). Rows whose gold_maxim isn't one of the five
+    labels are rejected, not guessed at: a shifted column would otherwise become
+    a silent relabel.
     """
     rows, repaired, dropped = read_csv_tolerant(path, SCRAPE_COLUMNS)
     print(f"  read {len(rows)} rows ({repaired} repaired, {dropped} unrecoverable)")

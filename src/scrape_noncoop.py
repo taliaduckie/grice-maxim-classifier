@@ -364,16 +364,14 @@ def _usable(*texts):
 # How to turn a comment tree into (context, utterance) pairs.
 #
 #   parent_reply     top-level comment -> its reply. The original behaviour.
-#   title_toplevel   post title -> top-level comment. The genuine adjacency
-#                    pair: on AskReddit-style subs the title is the only actual
-#                    question, and a top-level comment is a direct answer to it.
+#   title_toplevel   post title -> top-level comment. On AskReddit-style subs
+#                    the title is the only actual question in the exchange.
 #
-# parent_reply was the default for the whole first corpus and it is what put a
-# comment->reply pair under labels like "underinformative answer" when nothing
-# had been asked — only 4% of test_natural contexts contain a question mark
-# against 88% of the synthetic ones. See results/foundation_report.md §11.
-# title_toplevel is the right default for maxim annotation; parent_reply is kept
-# because reply chains are where disagreement and sarcasm actually live.
+# parent_reply built the first corpus, which is how comment->reply pairs ended
+# up labelled "underinformative answer" with no question in them (4% of
+# test_natural contexts have a question mark vs 88% of synthetic). See
+# results/foundation_report.md §11. parent_reply is kept because reply chains
+# are where disagreement and sarcasm live.
 PAIRINGS = ("title_toplevel", "parent_reply", "both")
 
 

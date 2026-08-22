@@ -1,7 +1,7 @@
 """Shared training helpers.
 
-Exists because of one transformers bug that both train.py and ablations.py have
-to route around. See KeepBestState.
+Exists for one transformers workaround that train.py and ablations.py both need.
+See KeepBestState.
 """
 
 import copy
@@ -21,10 +21,9 @@ class KeepBestState(TrainerCallback):
     model that was never evaluated, and it is what gets saved to disk.
 
     `from_pretrained` applies the rename correctly, so a plain save/load
-    round-trip is unaffected — only the Trainer checkpoint path is broken. That
-    is also why the bug is quiet: the metrics printed during training are
-    computed on the in-memory model and are correct; only the restored and saved
-    model is wrong.
+    round-trip is unaffected; only the Trainer checkpoint path is broken. The
+    metrics printed during training are computed on the in-memory model and are
+    correct, so nothing looks wrong at the time.
 
     Holding the state dict in RAM avoids serialisation altogether. Costs about
     0.5 GB for roberta-base and no disk.

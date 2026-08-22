@@ -1,6 +1,4 @@
-"""RoBERTa ablation grid (checklist item 8).
-
-The four configurations from the checklist table:
+"""RoBERTa ablation grid.
 
     config  utterance  context  synthetic  natural
     A          x          -         x         -
@@ -8,28 +6,20 @@ The four configurations from the checklist table:
     C          x          x         -         x
     D          x          x         x         x
 
-A vs B isolates context. B vs C vs D isolates training domain. Every run is
-evaluated on both frozen test sets, so synthetic->natural transfer is read off
-the same table.
+A vs B isolates context; B/C/D isolate training domain. Each run is evaluated on
+both frozen test sets.
 
-Two rules this harness exists to enforce:
+Each run carves its own stratified dev split from its own training pool and
+picks the best epoch on that. The frozen sets are used once per run, after
+selection is finished. Hyperparameters are identical across configs and match
+train.py, since the grid is an experiment about data.
 
-1. **The test sets are never used for model selection.** Each run carves its own
-   stratified dev split out of its own training pool and picks the best epoch on
-   that. The frozen sets are touched exactly once per run, at the end. Using
-   eval-on-test to pick a checkpoint is how a held-out number stops being one.
-
-2. **Hyperparameters are identical across configs**, and identical to train.py.
-   The grid is an experiment about data, so nothing else may vary. Anything
-   tuned per-config would make the columns incomparable.
-
-Predictions are saved per run so error analysis (items 5, 6, 11) can be done
-later without retraining anything.
+Per-run predictions are saved for later error analysis.
 
 Usage:
-    python3 src/ablations.py --pilot              # one cheap config, one seed
-    python3 src/ablations.py --seeds 3            # the full grid
-    python3 src/ablations.py --configs A B        # a subset
+    python3 src/ablations.py --pilot
+    python3 src/ablations.py --seeds 3
+    python3 src/ablations.py --configs A B
 """
 
 import argparse
@@ -99,8 +89,8 @@ SCRATCH = Path(os.environ.get(
 class PairDataset(Dataset):
     """Encodes (utterance, context) as a sequence pair, or utterance alone.
 
-    The pair encoding matters: RoBERTa sees the two turns as separate segments
-    rather than one concatenated string, which is the whole point of config B.
+    Pair encoding gives RoBERTa two segments rather than one concatenated
+    string, which is what config B is testing.
     """
 
     def __init__(self, rows, tokenizer, use_context, max_length):
@@ -134,7 +124,7 @@ def macro_f1_present(y_true, y_pred):
     """Macro F1 over classes present in the gold set.
 
     test_natural has no Cooperative examples; averaging over an absent class
-    would report a property of the split rather than of the model.
+    reports a property of the split, not the model.
     """
     present = sorted(set(y_true))
     return float(f1_score(y_true, y_pred, labels=present, average="macro",
