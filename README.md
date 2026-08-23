@@ -22,12 +22,12 @@ Also distinguishes *flouting* (deliberate, to generate implicature) from
 
 ## Model
 
-Fine-tuned `roberta-base`. Training: 10 epochs, lr=1e-5, batch size 8, class
+Fine-tuned 'roberta-base'. Training: 10 epochs, lr=1e-5, batch size 8, class
 weights, ~15 minutes on CPU.
 
 ### Paper version (367-pair synthetic corpus)
 
-The numbers in `paper.pdf` are reported on this version of the corpus.
+The numbers in 'paper.pdf' are reported on this version of the corpus.
 
 Macro F1 = **0.91** on a stratified 80/20 split (74 eval, 293 train).
 
@@ -62,13 +62,13 @@ The extended corpus was not used for the paper's main results because the paper
 analyzes the 367-pair version. It exists for follow-up work and a fairer test
 of real-world performance.
 
-Fallback: `facebook/bart-large-mnli` zero-shot baseline if no fine-tuned model
+Fallback: 'facebook/bart-large-mnli' zero-shot baseline if no fine-tuned model
 exists. Used to bootstrap annotation; performs near chance for actual inference.
 
 ## Corpus
 
-**`data/annotated/corpus.csv`** — the full 1,197-pair extended corpus. To
-reproduce the paper, take the first 367 rows (see `data/annotated/corpus_367.csv`).
+**'data/annotated/corpus.csv'** — the full 1,197-pair extended corpus. To
+reproduce the paper, take the first 367 rows (see 'data/annotated/corpus_367.csv').
 
 | Subset | Pairs | Source |
 |---|---|---|
@@ -77,12 +77,12 @@ reproduce the paper, take the first 367 rows (see `data/annotated/corpus_367.csv
 
 The synthetic 367 was built through five rounds of bootstrapping plus several
 targeted batches (sarcasm, opting-out, balancing). The Reddit additions were
-scraped via `src/scrape_reddit.py`, pre-labeled by the fine-tuned model, and
+scraped via 'src/scrape_reddit.py', pre-labeled by the fine-tuned model, and
 hand-corrected.
 
 ## Setup
 
-```bash
+'''bash
 pip install -r requirements.txt
 
 # Single utterance inference
@@ -117,11 +117,11 @@ python src/app.py
 
 # FastAPI backend
 python src/api.py
-```
+'''
 
 ## Project structure
 
-```
+'''
 grice-maxim-classifier/
 ├── src/
 │   ├── labels.py             # maxim definitions and label schema
@@ -145,11 +145,11 @@ grice-maxim-classifier/
     ├── test_labels.py
     ├── test_corpus.py
     └── test_predict.py
-```
+'''
 
 ## TODO
 
-- **Violation type prediction** — right now `violation_type` is a heuristic: cooperative = none, everything else = unknown. The corpus has enough flouting/violating/none examples to train a second head or a separate model, but the distinction is often not visible in surface form (especially for Relation, where flouting and violating cluster identically by coherence score).
-- **Held-out test set** — eval is currently part of the training loop. A true out-of-sample set would give a more honest score.
-- **Try roberta-large** — twice the parameters, probably a few F1 points for free.
-- **Adversarial set expansion** — 40 items is small. Larger adversarial coverage would let macro F1 carry real statistical weight.
+- **Violation type prediction** — right now 'violation_type' is a heuristic. Essentially cooperative = none, everything else = unknown. The corpus has enough flouting/violating/none examples to train a second head or a separate model, but the distinction is often not visible in surface form (especially for Relation, where flouting and violating cluster identically by coherence score).
+- **Held-out test set** — eval is currently part of the training loop. An actual out of sample set would give a more honest score.
+- **Try roberta-large** — twice the parameters, so probably a few F1 points for free! Worth poking.
+- **Adversarial set expansion** — 40 items is small. Larger adversarial coverage would let macro F1 carry a lot mmore statistical weight.
