@@ -35,40 +35,22 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 import numpy as np
 import torch
-from sklearn.metrics import classification_report, f1_score
+from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset
-from transformers import (
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    TrainingArguments,
-    Trainer,
-)
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from labels import MAXIMS
-from training_utils import KeepBestState
-
-ROOT = Path(__file__).parent.parent
-DATA_DIR = ROOT / "data"
-TRAIN_PATH = DATA_DIR / "annotated" / "corpus_train.csv"
-TEST_NATURAL = DATA_DIR / "test" / "test_natural.csv"
-TEST_SYNTHETIC = DATA_DIR / "test" / "test_synthetic.csv"
-RESULTS_DIR = ROOT / "results"
+from metrics import bootstrap_ci, macro_f1, present_labels
+from paths import RESULTS_DIR, TEST_NATURAL, TEST_SYNTHETIC, TRAIN_PATH, rel
+from training_utils import (
+    HPARAMS, KeepBestState, WeightedTrainer, class_weights,
+    macro_f1_metrics, training_args,
+)
 
 MODEL_NAME = "roberta-base"
 LABEL2ID = {m: i for i, m in enumerate(MAXIMS)}
 ID2LABEL = {i: m for m, i in LABEL2ID.items()}
-
-# Identical to train.py. Do not tune these per config.
-HPARAMS = dict(
-    num_train_epochs=10,
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
-    learning_rate=1e-5,
-    weight_decay=0.01,
-    warmup_ratio=0.1,
-    max_length=128,
-)
 
 DEV_FRACTION = 0.15
 
@@ -120,48 +102,6 @@ def load(path):
         return [r for r in csv.DictReader(f) if r.get("maxim") in MAXIMS]
 
 
-def macro_f1_present(y_true, y_pred):
-    """Macro F1 over classes present in the gold set.
-
-    test_natural has no Cooperative examples; averaging over an absent class
-    reports a property of the split, not the model.
-    """
-    present = sorted(set(y_true))
-    return float(f1_score(y_true, y_pred, labels=present, average="macro",
-                          zero_division=0))
-
-
-def bootstrap_ci(y_true, y_pred, n_boot=1000, seed=0):
-    rng = np.random.default_rng(seed)
-    y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
-    scores = []
-    for _ in range(n_boot):
-        idx = rng.integers(0, len(y_true), len(y_true))
-        if len(set(y_true[idx])) < 2:
-            continue
-        scores.append(macro_f1_present(y_true[idx], y_pred[idx]))
-    if not scores:
-        return [float("nan"), float("nan")]
-    return [float(np.percentile(scores, 2.5)), float(np.percentile(scores, 97.5))]
-
-
-class WeightedTrainer(Trainer):
-    """Inverse-frequency weighted cross-entropy, as in train.py."""
-
-    def __init__(self, class_weights, **kwargs):
-        super().__init__(**kwargs)
-        self.class_weights = class_weights
-
-    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
-        labels = inputs.pop("labels")
-        outputs = model(**inputs)
-        logits = outputs.logits
-        loss_fn = torch.nn.CrossEntropyLoss(
-            weight=self.class_weights.to(logits.device))
-        loss = loss_fn(logits, labels)
-        return (loss, outputs) if return_outputs else loss
-
-
 def run_one(config_name, seed, train_pool, test_sets, tokenizer, quiet=True):
     cfg = CONFIGS[config_name]
     rows = [r for r in train_pool if r["source"] in cfg["sources"]]
@@ -181,40 +121,14 @@ def run_one(config_name, seed, train_pool, test_sets, tokenizer, quiet=True):
     train_ds = PairDataset(train_rows, tokenizer, cfg["context"], max_length)
     dev_ds = PairDataset(dev_rows, tokenizer, cfg["context"], max_length)
 
-    counts = Counter(train_ds.labels)
-    n_total, n_cls = len(train_ds.labels), len(MAXIMS)
-    class_weights = torch.tensor(
-        [n_total / (n_cls * counts[i]) if counts[i] else 0.0 for i in range(n_cls)],
-        dtype=torch.float32)
-
-    def compute_metrics(eval_pred):
-        logits, y = eval_pred
-        preds = logits.argmax(axis=-1)
-        return {"macro_f1": float(f1_score(y, preds, average="macro", zero_division=0))}
-
-    out_dir = SCRATCH / f"{config_name}_seed{seed}"
-    args = TrainingArguments(
-        output_dir=str(out_dir),
-        num_train_epochs=HPARAMS["num_train_epochs"],
-        per_device_train_batch_size=HPARAMS["per_device_train_batch_size"],
-        per_device_eval_batch_size=HPARAMS["per_device_eval_batch_size"],
-        learning_rate=HPARAMS["learning_rate"],
-        weight_decay=HPARAMS["weight_decay"],
-        warmup_ratio=HPARAMS["warmup_ratio"],
-        eval_strategy="epoch",
-        save_strategy="no",          # best weights are held in RAM — see KeepBestState
-        load_best_model_at_end=False,
-        seed=seed,
-        data_seed=seed,
-        report_to="none",
-        use_cpu=True,           # matches train.py; MPS left alone deliberately
-        disable_tqdm=quiet,
-        logging_strategy="no",
-    )
+    weights = class_weights(train_ds.labels, len(MAXIMS))
+    compute_metrics = macro_f1_metrics(MAXIMS)
+    args = training_args(SCRATCH / f"{config_name}_seed{seed}", seed=seed,
+                         data_seed=seed, disable_tqdm=quiet)
 
     keep_best = KeepBestState(model)
     trainer = WeightedTrainer(
-        class_weights=class_weights, model=model, args=args,
+        weights=weights, model=model, args=args,
         train_dataset=train_ds, eval_dataset=dev_ds,
         compute_metrics=compute_metrics, callbacks=[keep_best],
     )
@@ -256,7 +170,7 @@ def run_one(config_name, seed, train_pool, test_sets, tokenizer, quiet=True):
         report = classification_report(y_true, y_pred, labels=present,
                                        output_dict=True, zero_division=0)
         result["splits"][split_name] = {
-            "macro_f1": macro_f1_present(y_true, y_pred),
+            "macro_f1": macro_f1(y_true, y_pred),
             "accuracy": float(np.mean(np.array(y_pred) == np.array(y_true))),
             "ci95": bootstrap_ci(y_true, y_pred),
             "per_class": {lab: report[lab] for lab in present if lab in report},

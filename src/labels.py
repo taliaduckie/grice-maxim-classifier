@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 
 # The five labels. Four maxims + Cooperative as the unmarked baseline.
@@ -25,6 +26,27 @@ MAXIMS = ["Cooperative", "Quantity", "Quality", "Relation", "Manner"]
 # and "unknown" for when the model genuinely can't tell — which is most of the
 # time in zero-shot. honesty is a quality maxim thing.)
 VIOLATION_TYPES = ["none", "flouting", "violating", "failed_flout", "opting_out", "clash", "unknown"]
+
+# Short forms that turn up in annotation sheets and scraper output. The gold
+# files write "flout"; the corpus writes "flouting". Both merge_corpus.py and
+# build_test_set.py normalise through here so there is one alias table.
+VTYPE_ALIASES = {
+    "flout": "flouting",
+    "violate": "violating",
+    "violation": "violating",
+    "sincere": "none",
+    "no violation": "none",
+    "": "unknown",
+}
+
+_WS = re.compile(r"\s+")
+
+
+def normalize_violation_type(vtype) -> str:
+    """Map a written violation_type onto the VIOLATION_TYPES vocabulary."""
+    v = _WS.sub(" ", str(vtype or "")).strip().strip('"').strip().lower()
+    return VTYPE_ALIASES.get(v, v)
+
 
 # Human-readable descriptions. These are for annotation documentation
 # and for anyone reading this who hasn't committed Grice (1975) to memory,

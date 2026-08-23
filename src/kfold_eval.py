@@ -1,59 +1,40 @@
 import argparse
 import sys
-import numpy as np
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import classification_report
 from torch.utils.data import Subset
-from transformers import (
-    AutoModelForSequenceClassification,
-    TrainingArguments,
-    Trainer,
-)
+from transformers import AutoModelForSequenceClassification
 
 from dataset import GriceDataset, LABEL2ID, ID2LABEL, MODEL_NAME
 from labels import MAXIMS
+from paths import TRAIN_PATH, rel
+from training_utils import (
+    HPARAMS, KeepBestState, WeightedTrainer, class_weights,
+    macro_f1_metrics, training_args,
+)
 
 
-def freeze_model(model):
-    """same freezing strategy as train.py"""
-    for name, param in model.roberta.named_parameters():
-        if "encoder.layer" in name:
-            layer_num = int(name.split("encoder.layer.")[1].split(".")[0])
-            if layer_num < 10:
-                param.requires_grad = False
-    for param in model.roberta.embeddings.parameters():
-        param.requires_grad = False
-
-
-def compute_metrics(eval_pred):
-    logits, labels = eval_pred
-    preds = logits.argmax(axis=-1)
-    report = classification_report(
-        labels, preds,
-        target_names=MAXIMS,
-        output_dict=True,
-        zero_division=0,
-    )
-    return {"macro_f1": report["macro avg"]["f1-score"]}
-
-
-def run_kfold(data_path: str, n_folds: int = 5):
-    dataset = GriceDataset(data_path, max_length=128)
+def run_kfold(data_path: str, n_folds: int = 5, seed: int = 42):
+    dataset = GriceDataset(data_path, max_length=HPARAMS["max_length"])
     n = len(dataset)
-    print(f"Loaded {n} examples. Running {n_folds}-fold cross-validation.\n")
+    print(f"Loaded {n} examples from {rel(data_path)}. "
+          f"Running {n_folds}-fold cross-validation.")
+    print(f"Hyperparameters are shared with train.py: "
+          f"{HPARAMS['num_train_epochs']} epochs, lr={HPARAMS['learning_rate']}, "
+          f"batch={HPARAMS['per_device_train_batch_size']}, fully unfrozen.\n")
 
-    skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=42)
+    compute_metrics = macro_f1_metrics(MAXIMS)
+    skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
     fold_results = []
     per_class_results = {m: [] for m in MAXIMS}
 
     for fold, (train_idx, eval_idx) in enumerate(skf.split(range(n), dataset.labels)):
-        print(f"{'='*60}")
-        print(f"FOLD {fold + 1}/{n_folds}")
-        print(f"{'='*60}")
+        print(f"{'='*60}\nFOLD {fold + 1}/{n_folds}\n{'='*60}")
         print(f"Train: {len(train_idx)}, Eval: {len(eval_idx)}")
 
         # fresh model each fold — no leakage between folds
@@ -63,79 +44,62 @@ def run_kfold(data_path: str, n_folds: int = 5):
             id2label=ID2LABEL,
             label2id=LABEL2ID,
         )
-        freeze_model(model)
 
         train_ds = Subset(dataset, train_idx.tolist())
         eval_ds = Subset(dataset, eval_idx.tolist())
+        weights = class_weights([dataset.labels[i] for i in train_idx], len(MAXIMS))
 
-        # same hyperparameters as train.py
-        args = TrainingArguments(
-            output_dir=f"/tmp/kfold_fold_{fold}",
-            num_train_epochs=20,
-            per_device_train_batch_size=8,
-            per_device_eval_batch_size=8,
-            learning_rate=2e-5,
-            weight_decay=0.01,
-            warmup_ratio=0.1,
-            eval_strategy="epoch",
-            save_strategy="no",  # don't save checkpoints — disk fills up fast
-                                 # with 5 folds x 20 epochs x 500MB each
-            report_to="none",
-            use_cpu=True,
-            logging_steps=9999,  # suppress per-step logging
-        )
-
-        trainer = Trainer(
+        keep_best = KeepBestState(model)
+        trainer = WeightedTrainer(
+            weights=weights,
             model=model,
-            args=args,
+            args=training_args(f"/tmp/kfold_fold_{fold}", seed=seed),
             train_dataset=train_ds,
             eval_dataset=eval_ds,
             compute_metrics=compute_metrics,
+            callbacks=[keep_best],
         )
 
         trainer.train()
+        keep_best.restore()
 
-        # evaluate on held-out fold
-        eval_result = trainer.evaluate()
-        macro_f1 = eval_result["eval_macro_f1"]
-        fold_results.append(macro_f1)
-
-        # per-class breakdown
         preds = trainer.predict(eval_ds)
         pred_labels = preds.predictions.argmax(axis=-1)
-        true_labels = preds.label_ids
         report = classification_report(
-            true_labels, pred_labels,
+            preds.label_ids, pred_labels,
+            labels=list(range(len(MAXIMS))),
             target_names=MAXIMS,
             output_dict=True,
             zero_division=0,
         )
+        macro_f1 = report["macro avg"]["f1-score"]
+        fold_results.append(macro_f1)
+
         print(f"\nFold {fold + 1} macro F1: {macro_f1:.4f}")
         for m in MAXIMS:
             f1 = report[m]["f1-score"]
             per_class_results[m].append(f1)
             print(f"  {m:<12} F1={f1:.3f}")
+        keep_best.release()
 
-    # summary
-    print(f"\n{'='*60}")
-    print(f"SUMMARY ({n_folds}-fold cross-validation)")
-    print(f"{'='*60}")
+    print(f"\n{'='*60}\nSUMMARY ({n_folds}-fold cross-validation)\n{'='*60}")
     print(f"Macro F1: {np.mean(fold_results):.4f} +/- {np.std(fold_results):.4f}")
     print(f"Per fold: {[f'{f:.3f}' for f in fold_results]}")
-    print(f"\nPer-class averages:")
+    print("\nPer-class averages:")
     for m in MAXIMS:
         scores = per_class_results[m]
-        print(f"  {m:<12} F1={np.mean(scores):.3f} +/- {np.std(scores):.3f}  ({[f'{s:.2f}' for s in scores]})")
+        print(f"  {m:<12} F1={np.mean(scores):.3f} +/- {np.std(scores):.3f}  "
+              f"({[f'{s:.2f}' for s in scores]})")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Stratified k-fold cross-validation for the Grice classifier.",
     )
-    parser.add_argument(
-        "--data",
-        default=str(Path(__file__).parent.parent / "data" / "annotated" / "corpus.csv"),
-    )
+    # corpus_train.csv, not corpus.csv — the latter still contains every row
+    # held out in data/test/, so cross-validating over it trains on test data.
+    parser.add_argument("--data", default=str(TRAIN_PATH))
     parser.add_argument("--folds", type=int, default=5)
+    parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
-    run_kfold(args.data, args.folds)
+    run_kfold(args.data, args.folds, args.seed)

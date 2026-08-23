@@ -1,12 +1,106 @@
-"""Shared training helpers.
+"""Shared fine-tuning machinery.
 
-Exists for one transformers workaround that train.py and ablations.py both need.
-See KeepBestState.
+train.py, kfold_eval.py and ablations.py each had their own trainer, metrics
+function and hyperparameters. They drifted: kfold_eval ran 20 epochs at 2e-5
+with the lower encoder frozen while the other two ran 10 epochs at 1e-5 fully
+unfrozen, and its docstring claimed they matched. Anything that must be the
+same across those three lives here.
 """
 
-import copy
+from collections import Counter
 
-from transformers import TrainerCallback
+import torch
+from sklearn.metrics import classification_report
+from transformers import Trainer, TrainerCallback, TrainingArguments
+
+# The one set of hyperparameters. Changing a number here changes it for
+# train.py, kfold_eval.py and the ablation grid together, which is the point.
+HPARAMS = dict(
+    num_train_epochs=10,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
+    learning_rate=1e-5,
+    weight_decay=0.01,
+    warmup_ratio=0.1,
+    max_length=128,
+)
+
+
+def class_weights(label_ids, n_classes):
+    """Inverse-frequency weights so Cooperative doesn't dominate the loss."""
+    counts = Counter(label_ids)
+    n_total = len(label_ids)
+    return torch.tensor(
+        [n_total / (n_classes * counts[i]) if counts[i] else 0.0
+         for i in range(n_classes)],
+        dtype=torch.float32,
+    )
+
+
+def macro_f1_metrics(label_names, verbose=False):
+    """compute_metrics returning macro F1 over all label ids.
+
+    The explicit `labels` argument matters: without it sklearn infers the label
+    set from the data and raises when a fold contains no examples of a class.
+    """
+    def compute(eval_pred):
+        logits, labels = eval_pred
+        preds = logits.argmax(axis=-1)
+        report = classification_report(
+            labels, preds,
+            labels=list(range(len(label_names))),
+            target_names=label_names,
+            output_dict=True,
+            zero_division=0,
+        )
+        if verbose:
+            for name in label_names:
+                if name in report:
+                    print(f"  {name}: F1={report[name]['f1-score']:.3f}")
+        return {"macro_f1": report["macro avg"]["f1-score"]}
+    return compute
+
+
+def training_args(output_dir, seed=42, **overrides):
+    """TrainingArguments with the shared hyperparameters applied.
+
+    Checkpointing is off and best-epoch restore is handled by KeepBestState —
+    see its docstring for why Trainer's own restore can't be used.
+    """
+    kwargs = dict(
+        output_dir=str(output_dir),
+        num_train_epochs=HPARAMS["num_train_epochs"],
+        per_device_train_batch_size=HPARAMS["per_device_train_batch_size"],
+        per_device_eval_batch_size=HPARAMS["per_device_eval_batch_size"],
+        learning_rate=HPARAMS["learning_rate"],
+        weight_decay=HPARAMS["weight_decay"],
+        warmup_ratio=HPARAMS["warmup_ratio"],
+        eval_strategy="epoch",
+        save_strategy="no",
+        load_best_model_at_end=False,
+        seed=seed,
+        report_to="none",
+        use_cpu=True,   # MPS on apple silicon + transformers = pain
+        logging_strategy="no",
+    )
+    kwargs.update(overrides)
+    return TrainingArguments(**kwargs)
+
+
+class WeightedTrainer(Trainer):
+    """Trainer with weighted cross-entropy."""
+
+    def __init__(self, weights=None, **kwargs):
+        super().__init__(**kwargs)
+        self.weights = weights
+
+    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+        labels = inputs.pop("labels")
+        outputs = model(**inputs)
+        logits = outputs.logits
+        weight = self.weights.to(logits.device) if self.weights is not None else None
+        loss = torch.nn.CrossEntropyLoss(weight=weight)(logits, labels)
+        return (loss, outputs) if return_outputs else loss
 
 
 class KeepBestState(TrainerCallback):

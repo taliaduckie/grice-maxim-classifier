@@ -34,7 +34,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import numpy as np
-from scipy.stats import binomtest
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, f1_score
@@ -42,12 +41,8 @@ from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.preprocessing import FunctionTransformer, StandardScaler
 
 from labels import MAXIMS
-
-DATA_DIR = Path(__file__).parent.parent / "data"
-TRAIN_PATH = DATA_DIR / "annotated" / "corpus_train.csv"
-TEST_NATURAL = DATA_DIR / "test" / "test_natural.csv"
-TEST_SYNTHETIC = DATA_DIR / "test" / "test_synthetic.csv"
-RESULTS_DIR = Path(__file__).parent.parent / "results"
+from metrics import bootstrap_ci, macro_f1, mcnemar, present_labels
+from paths import RESULTS_DIR, TEST_NATURAL, TEST_SYNTHETIC, TRAIN_PATH
 
 # Fixed. Not tuned on the test sets — see module docstring.
 LOGREG_KWARGS = dict(max_iter=2000, class_weight="balanced", C=1.0)
@@ -172,49 +167,6 @@ def build_model(name, seed):
 
 
 MODELS = ["majority", "stratified", "surface", "tfidf-utt", "tfidf-ctx", "tfidf-char"]
-
-
-# ---- metrics ----
-
-def present_labels(y_true):
-    """Score only over classes the gold set actually contains.
-
-    test_natural has no Cooperative examples, so a 5-class macro average would
-    fold in an undefined class.
-    """
-    return sorted(set(y_true))
-
-
-def macro_f1(y_true, y_pred):
-    return f1_score(y_true, y_pred, labels=present_labels(y_true),
-                    average="macro", zero_division=0)
-
-
-def bootstrap_ci(y_true, y_pred, n_boot, seed=0):
-    """95% percentile CI for macro F1 over resamples of the test set."""
-    rng = np.random.default_rng(seed)
-    n = len(y_true)
-    scores = []
-    for _ in range(n_boot):
-        idx = rng.integers(0, n, n)
-        yt, yp = y_true[idx], y_pred[idx]
-        if len(set(yt)) < 2:
-            continue
-        scores.append(macro_f1(yt, yp))
-    if not scores:
-        return (float("nan"), float("nan"))
-    return (float(np.percentile(scores, 2.5)), float(np.percentile(scores, 97.5)))
-
-
-def mcnemar(y_true, pred_a, pred_b):
-    """Exact McNemar on the two models' disagreements. Returns (b, c, p)."""
-    a_right = pred_a == y_true
-    b_right = pred_b == y_true
-    b = int(np.sum(a_right & ~b_right))   # a right, b wrong
-    c = int(np.sum(~a_right & b_right))   # b right, a wrong
-    if b + c == 0:
-        return b, c, 1.0
-    return b, c, float(binomtest(b, b + c, 0.5).pvalue)
 
 
 # ---- evaluation ----

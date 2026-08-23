@@ -1,44 +1,25 @@
 import argparse
 import sys
-import numpy as np
 from pathlib import Path
-import torch
 from torch.utils.data import Subset
 from sklearn.model_selection import train_test_split
-from collections import Counter
 
 # i refuse to write a setup py for this
 sys.path.insert(0, str(Path(__file__).parent))
-from transformers import (
-    AutoModelForSequenceClassification,
-    TrainingArguments,
-    Trainer,
-)
-from sklearn.metrics import classification_report
+from transformers import AutoModelForSequenceClassification
 from dataset import GriceDataset, LABEL2ID, ID2LABEL, MODEL_NAME
 from labels import MAXIMS
-from training_utils import KeepBestState
+from paths import MODEL_DIR, MODELS_DIR
+from training_utils import (
+    HPARAMS, KeepBestState, WeightedTrainer, class_weights,
+    macro_f1_metrics, training_args,
+)
 
-# resolve MODEL DIR situation
-OUTPUT_DIR = str(Path(__file__).parent.parent / "models" / "roberta-grice")
+OUTPUT_DIR = str(MODEL_DIR)
 
 
 def train(data_path: str):
-    def compute_metrics(eval_pred):
-        logits, labels = eval_pred
-        preds = logits.argmax(axis=-1)
-        # explicit labels arg prevents sklearn from crashing when a class is missing
-        report = classification_report(
-            labels, preds,
-            labels=list(range(len(MAXIMS))),
-            target_names=MAXIMS,
-            output_dict=True,
-            zero_division=0,
-        )
-        for maxim in MAXIMS:
-            if maxim in report:
-                print(f"  {maxim}: F1={report[maxim]['f1-score']:.3f}")
-        return {"macro_f1": report["macro avg"]["f1-score"]}
+    compute_metrics = macro_f1_metrics(MAXIMS, verbose=True)
 
     model = AutoModelForSequenceClassification.from_pretrained(
         MODEL_NAME,
@@ -53,7 +34,7 @@ def train(data_path: str):
     print(f"Training: {trainable:,} / {total:,} parameters ({trainable/total:.0%})")
 
     # max_length=128 because most utterance pairs are under 50 tokens
-    dataset = GriceDataset(data_path, max_length=128)
+    dataset = GriceDataset(data_path, max_length=HPARAMS["max_length"])
     n = len(dataset)
     print(f"Loaded {n} examples from {data_path}.")
 
@@ -76,52 +57,19 @@ def train(data_path: str):
     train_ds = Subset(dataset, train_idx)
     eval_ds  = Subset(dataset, eval_idx)
 
-    # inverse-frequency class weights
-    counts = Counter(dataset.labels)
-    n_total = len(dataset.labels)
-    n_cls = len(MAXIMS)
-    class_weights = torch.tensor([
-        n_total / (n_cls * counts[i]) for i in range(n_cls)
-    ], dtype=torch.float32)
-    print(f"Class weights: {', '.join(f'{MAXIMS[i]}={class_weights[i]:.2f}' for i in range(n_cls))}")
+    weights = class_weights(dataset.labels, len(MAXIMS))
+    print(f"Class weights: {', '.join(f'{MAXIMS[i]}={weights[i]:.2f}' for i in range(len(MAXIMS)))}")
 
     print(f"Training on {len(train_idx)} examples, evaluating on {len(eval_idx)}.")
 
-    args = TrainingArguments(
-        output_dir=OUTPUT_DIR,
-        num_train_epochs=10,
-        # bumped to 8 for less noisy gradients
-        per_device_train_batch_size=8,
-        per_device_eval_batch_size=8,
-        # 1e-5 for unfrozen. 
-        learning_rate=1e-5,
-        weight_decay=0.01,  
-        warmup_ratio=0.1,
-        eval_strategy="epoch",
-        # Best-epoch weights are kept in RAM by KeepBestState rather than
-        # restored from a checkpoint. Trainer's load_best_model_at_end silently
-        # fails to restore LayerNorm parameters in this transformers version and
-        # saves a model that was never evaluated — see src/training_utils.py.
-        save_strategy="no",
-        load_best_model_at_end=False,
-        logging_dir=str(Path(__file__).parent.parent / "models" / "logs"),
-        report_to="none",  
-        use_cpu=True,  # MPS on apple silicon + transformers = pain
-                       # CPU is slower but at least it finishes
+    args = training_args(
+        OUTPUT_DIR,
+        logging_dir=str(MODELS_DIR / "logs"),
     )
-
-    # weighted CE so Cooperative doesn't dominate
-    class WeightedTrainer(Trainer):
-        def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
-            labels = inputs.pop("labels")
-            outputs = model(**inputs)
-            logits = outputs.logits
-            loss_fn = torch.nn.CrossEntropyLoss(weight=class_weights.to(logits.device))
-            loss = loss_fn(logits, labels)
-            return (loss, outputs) if return_outputs else loss
 
     keep_best = KeepBestState(model)
     trainer = WeightedTrainer(
+        weights=weights,
         model=model,
         args=args,
         train_dataset=train_ds,

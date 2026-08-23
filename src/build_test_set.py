@@ -29,7 +29,10 @@ from provenance import (
     CORPUS_PATH, DATA_DIR, SCRAPE_COLUMNS, annotate, key,
     norm, read_csv_tolerant, row_id,
 )
-from labels import MAXIMS, VIOLATION_TYPES
+from labels import (
+    MAXIMS, VIOLATION_TYPES,
+    normalize_violation_type as normalize_vtype,
+)
 
 TEST_DIR = DATA_DIR / "test"
 
@@ -41,22 +44,6 @@ SYNTHETIC_TEST_FRACTION = 0.20
 PENDING_TEST_SIZE = 100
 
 SEED = 20260809
-
-# gold_annotated.csv writes the short forms; the corpus uses the long ones.
-VTYPE_ALIASES = {
-    "flout": "flouting",
-    "violate": "violating",
-    "violation": "violating",
-    "sincere": "none",
-    "no violation": "none",
-    "": "unknown",
-}
-
-
-def normalize_vtype(vtype: str) -> str:
-    v = norm(vtype).lower()
-    return VTYPE_ALIASES.get(v, v)
-
 
 def load_gold(path: Path):
     """Read the human-annotated gold file, repairing broken rows.

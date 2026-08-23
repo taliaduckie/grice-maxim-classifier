@@ -8,26 +8,13 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 CORPUS_PATH = Path(__file__).parent.parent / "data" / "annotated" / "corpus.csv"
 FIELDNAMES = ["utterance", "context", "maxim", "violation_type"]
-VALID_MAXIMS = {"Cooperative", "Quantity", "Quality", "Relation", "Manner"}
+from labels import MAXIMS, normalize_violation_type as normalize_vtype
+
+VALID_MAXIMS = set(MAXIMS)
 VALID_VIOLATION_TYPES = {
     "none", "flouting", "violating", "failed_flout",
     "opting_out", "clash", "unknown",
 }
-
-
-VTYPE_ALIASES = {
-    "flout": "flouting",
-    "violate": "violating",
-    "violation": "violating",
-    "sincere": "none",
-    "no violation": "none",
-    "": "unknown",
-}
-
-
-def normalize_vtype(vtype: str) -> str:
-    vtype = vtype.strip().lower()
-    return VTYPE_ALIASES.get(vtype, vtype)
 
 
 def _is_valid(row):
