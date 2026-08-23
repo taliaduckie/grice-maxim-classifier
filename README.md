@@ -11,7 +11,7 @@ Classifies across five categories:
 - **Cooperative** — fully cooperative (no apparent violation)
 
 Also distinguishes *flouting* (deliberate, to generate implicature) from
-*violating* (unintentional failure) as a secondary label where evidence permits.
+*violating* (unintentional failure) as a secondary label where evidence permits. Hopefully, anyways. Issues gotten into below!
 
 ## Theoretical grounding
 
