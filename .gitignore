@@ -4,3 +4,5 @@ __pycache__/
 .pytest_cache/
 data/annotated/bootstrap_*.csv
 CHANGELOG.md
+.DS_Store
+*.zip
