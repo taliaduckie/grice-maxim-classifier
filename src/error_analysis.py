@@ -23,15 +23,12 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 
 import numpy as np
 
-from ablations import CONFIGS, TEST_NATURAL, TEST_SYNTHETIC, load
+from ablations import CONFIGS, load
 from labels import MAXIMS
-
-ROOT = Path(__file__).parent.parent
-RESULTS_DIR = ROOT / "results"
+from paths import RESULTS_DIR, TEST_NATURAL, TEST_SYNTHETIC
 ABLATIONS = RESULTS_DIR / "ablations.json"
 
 MAX_TOKENS = 128

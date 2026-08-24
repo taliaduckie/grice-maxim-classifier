@@ -16,10 +16,9 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-DATA_DIR = Path(__file__).parent.parent / "data"
-CORPUS_PATH = DATA_DIR / "annotated" / "corpus.csv"
-SYNTHETIC_PATH = DATA_DIR / "annotated" / "corpus_367.csv"
-RAW_DIR = DATA_DIR / "raw"
+from paths import (
+    CORPUS_PATH, DATA_DIR, PROVENANCE_PATH, RAW_DIR, SYNTHETIC_PATH, rel,
+)
 
 # The nine columns the scrapers write. Rows with more fields than this are
 # almost always a context that contained an unescaped comma — see repair_row.
@@ -100,6 +99,14 @@ def read_csv_tolerant(path, expected_columns=None):
     return rows, repaired, dropped
 
 
+def load_labelled(path, valid_maxims=None):
+    """Rows from an annotated CSV whose maxim is in the schema."""
+    from labels import MAXIMS
+    valid = set(valid_maxims or MAXIMS)
+    with open(path, newline="", encoding="utf-8") as f:
+        return [r for r in csv.DictReader(f) if r.get("maxim") in valid]
+
+
 def synthetic_keys() -> set:
     """Keys of the 367 hand-written pairs."""
     with open(SYNTHETIC_PATH, newline="", encoding="utf-8") as f:
@@ -152,7 +159,8 @@ def annotate(corpus_path=CORPUS_PATH) -> list:
 
 
 def main():
-    out_path = DATA_DIR / "annotated" / "corpus_provenance.csv"
+    out_path = PROVENANCE_PATH
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     rows = annotate()
 
     fieldnames = ["utterance", "context", "maxim", "violation_type",
@@ -163,7 +171,7 @@ def main():
         w.writerows(rows)
 
     src_counts = Counter(r["source"] for r in rows)
-    print(f"Wrote {len(rows)} rows to {out_path.relative_to(DATA_DIR.parent)}")
+    print(f"Wrote {len(rows)} rows to {rel(out_path)}")
     print(f"\nProvenance: {dict(src_counts)}")
 
     unmapped = sum(1 for r in rows if r["source"] == "natural" and not r["subreddit"])

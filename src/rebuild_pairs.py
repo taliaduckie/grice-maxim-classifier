@@ -22,13 +22,9 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 
-from provenance import (
-    DATA_DIR, RAW_DIR, SCRAPE_COLUMNS, norm, read_csv_tolerant, row_id,
-)
-
-OUT_DIR = DATA_DIR / "annotated"
+from provenance import SCRAPE_COLUMNS, norm, read_csv_tolerant, row_id
+from paths import DATA_DIR, QA_PAIRS_PATH, RAW_DIR, TRAIN_PATH, rel
 
 # Cap per thread. test_natural drew 50 items from only 4 threads, so its
 # effective sample size was well below 50 — items in a thread share topic and
@@ -121,7 +117,7 @@ def contamination(pairs):
     `utterance` here. Not a duplicate row, but a model trained on the old corpus
     has read the text, so pull these from training before using them as test data.
     """
-    train_path = OUT_DIR / "corpus_train.csv"
+    train_path = TRAIN_PATH
     if not train_path.exists():
         return set()
     texts = set()
@@ -142,7 +138,7 @@ def main():
                     help="Keep threads whose title is not interrogative "
                          "(AITA, tifu). Their titles are still the discourse "
                          "purpose, but the maxims are harder to apply.")
-    ap.add_argument("--out", default=str(OUT_DIR / "natural_qa_pairs.csv"))
+    ap.add_argument("--out", default=str(QA_PAIRS_PATH))
     args = ap.parse_args()
 
     rows = load_raw()
@@ -205,7 +201,7 @@ def main():
     q = sum(1 for p in pairs if p["context"].endswith("?"))
     print(f"\nContexts that are questions: {q}/{len(pairs)} "
           f"({q/len(pairs):.0%})  — test_natural was 4%")
-    print(f"\nWrote {out_path.relative_to(DATA_DIR.parent)}")
+    print(f"\nWrote {rel(out_path)}")
     print("Labels are blank by design. Annotate under "
           "docs/annotation_guidelines.md;")
     print("the old (comment, reply) label does not transfer to "

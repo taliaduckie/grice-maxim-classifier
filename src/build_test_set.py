@@ -23,18 +23,15 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 
 from provenance import (
-    CORPUS_PATH, DATA_DIR, SCRAPE_COLUMNS, annotate, key,
-    norm, read_csv_tolerant, row_id,
+    SCRAPE_COLUMNS, annotate, key, norm, read_csv_tolerant, row_id,
 )
+from paths import CORPUS_PATH, DATA_DIR, TEST_DIR, TRAIN_PATH, rel
 from labels import (
     MAXIMS, VIOLATION_TYPES,
     normalize_violation_type as normalize_vtype,
 )
-
-TEST_DIR = DATA_DIR / "test"
 
 # Held-out fraction of the synthetic pairs. 20% of 367 is 73 rows, ~15 per
 # class — small, but the synthetic set is balanced so every class is present.
@@ -176,7 +173,7 @@ def main():
         "test_natural": TEST_DIR / "test_natural.csv",
         "test_synthetic": TEST_DIR / "test_synthetic.csv",
         "test_natural_pending": TEST_DIR / "test_natural_pending.csv",
-        "corpus_train": DATA_DIR / "annotated" / "corpus_train.csv",
+        "corpus_train": TRAIN_PATH,
     }
     write_csv(paths["test_natural"], natural_test, fieldnames)
     write_csv(paths["test_synthetic"], synthetic_test, fieldnames)

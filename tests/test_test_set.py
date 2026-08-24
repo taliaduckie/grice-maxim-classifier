@@ -11,10 +11,10 @@ from pathlib import Path
 import pytest
 
 from src.labels import MAXIMS, VIOLATION_TYPES
+from src.paths import (
+    MANIFEST_PATH, TEST_NATURAL, TEST_PENDING, TEST_SYNTHETIC, TRAIN_PATH,
+)
 from src.provenance import key, norm, read_csv_tolerant, repair_row, row_id
-
-DATA = Path("data")
-TEST_DIR = DATA / "test"
 
 
 def load(path):
@@ -25,10 +25,10 @@ def load(path):
 @pytest.fixture(scope="module")
 def splits():
     return {
-        "train": load(DATA / "annotated" / "corpus_train.csv"),
-        "natural": load(TEST_DIR / "test_natural.csv"),
-        "synthetic": load(TEST_DIR / "test_synthetic.csv"),
-        "pending": load(TEST_DIR / "test_natural_pending.csv"),
+        "train": load(TRAIN_PATH),
+        "natural": load(TEST_NATURAL),
+        "synthetic": load(TEST_SYNTHETIC),
+        "pending": load(TEST_PENDING),
     }
 
 
@@ -69,7 +69,7 @@ def test_no_duplicates_within_a_split(splits):
 # --- the manifest still describes the files on disk ------------------------
 
 def test_manifest_matches_files(splits):
-    manifest = json.loads((TEST_DIR / "manifest.json").read_text())
+    manifest = json.loads(MANIFEST_PATH.read_text())
     for name, split_key in [("natural", "test_natural"), ("synthetic", "test_synthetic"),
                             ("pending", "test_natural_pending")]:
         recorded = manifest["splits"][split_key]

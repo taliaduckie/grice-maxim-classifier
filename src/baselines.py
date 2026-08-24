@@ -31,7 +31,6 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -41,6 +40,7 @@ from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.preprocessing import FunctionTransformer, StandardScaler
 
 from labels import MAXIMS
+from provenance import load_labelled as load
 from metrics import bootstrap_ci, macro_f1, mcnemar, present_labels
 from paths import RESULTS_DIR, TEST_NATURAL, TEST_SYNTHETIC, TRAIN_PATH
 
@@ -50,10 +50,6 @@ LOGREG_KWARGS = dict(max_iter=2000, class_weight="balanced", C=1.0)
 
 # ---- data ----
 
-def load(path):
-    with open(path, newline="", encoding="utf-8") as f:
-        rows = [r for r in csv.DictReader(f) if r.get("maxim") in MAXIMS]
-    return rows
 
 
 def texts(rows, use_context):

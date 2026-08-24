@@ -1,0 +1,11 @@
+# Config only — no [project] table and no build backend, so there is nothing to
+# install and `python3 src/whatever.py` keeps working exactly as before.
+# (train.py's "i refuse to write a setup py for this" still stands.)
+#
+# pythonpath is what lets the tests import `src.provenance` while provenance.py
+# itself does `from labels import ...`. Without it every module needed its own
+# sys.path.insert; there were 18 of them.
+
+[tool.pytest.ini_options]
+pythonpath = [".", "src"]
+testpaths = ["tests"]

@@ -48,8 +48,8 @@ another across 11 fields. `pandas.read_csv` refuses the whole file; the naive
 | `data/test/test_natural.csv` | 50 | Human-annotated Reddit pairs. Frozen. |
 | `data/test/test_synthetic.csv` | 73 | Stratified 20% of the 367 hand-written pairs. Frozen. |
 | `data/test/test_natural_pending.csv` | 100 | Natural pairs, **labels stripped**, awaiting independent annotation. |
-| `data/annotated/corpus_train.csv` | 976 | Everything else: 294 synthetic + 682 natural. |
-| `data/annotated/corpus_provenance.csv` | 1197 | Full corpus with `source`, `subreddit`, `row_id`. |
+| `data/derived/corpus_train.csv` | 976 | Everything else: 294 synthetic + 682 natural. |
+| `data/derived/corpus_provenance.csv` | 1197 | Full corpus with `source`, `subreddit`, `row_id`. |
 | `data/test/manifest.json` | — | Row-id hashes per split, so drift is detectable. |
 
 221 rows were removed from training to build this. `tests/test_test_set.py`
@@ -507,7 +507,7 @@ turned out to be a depth-1 pair, verified rather than assumed
 every `context` already in the raw data *is* a top-level comment, and re-pairing
 it with its `post_title` recovers the adjacency pair the scrape discarded.
 
-`data/annotated/natural_qa_pairs.csv`:
+`data/derived/natural_qa_pairs.csv`:
 
 | | rebuilt | test_natural |
 |---|---|---|
@@ -535,7 +535,7 @@ question-free contexts and the new one does not.
 **Still yours:**
 
 1. Recode `results/gold_recheck_sheet.csv` blind. Critical path.
-2. Annotate `data/annotated/natural_qa_pairs.csv` under
+2. Annotate `data/derived/natural_qa_pairs.csv` under
    `docs/annotation_guidelines.md`, whose §2 makes Cooperative a live option and
    whose §3 restricts `flouting` to breaches meant to be noticed. Two annotators
    minimum, then `src/agreement.py`.

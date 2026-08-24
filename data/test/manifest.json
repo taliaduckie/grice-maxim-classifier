@@ -265,7 +265,7 @@
       "maxim_distribution": null
     },
     "corpus_train": {
-      "path": "data/annotated/corpus_train.csv",
+      "path": "data/derived/corpus_train.csv",
       "rows": 976,
       "sha256_16": "7eb39a15930a54d6",
       "row_ids": [

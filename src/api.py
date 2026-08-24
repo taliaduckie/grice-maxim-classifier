@@ -4,16 +4,17 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-sys.path.insert(0, str(Path(__file__).parent))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from predict import predict
+from feedback import record_correction
 from labels import MAXIMS
+from paths import CORRECTIONS_PATH
 
-FEEDBACK_PATH = Path(__file__).parent.parent / "data" / "feedback" / "corrections.csv"
+FEEDBACK_PATH = CORRECTIONS_PATH
 
 app = FastAPI(title="Grice Maxim Classifier", version="1.0.0")
 
@@ -96,27 +97,10 @@ def batch_classify(req: BatchRequest):
 
 @app.post("/correct")
 def submit_correction(req: CorrectionRequest):
-    if not req.utterance.strip():
-        raise HTTPException(400, "utterance cannot be empty")
-    if req.corrected_maxim not in MAXIMS:
-        raise HTTPException(400, f"corrected_maxim must be one of {MAXIMS}")
-
-    FEEDBACK_PATH.parent.mkdir(parents=True, exist_ok=True)
-    file_exists = FEEDBACK_PATH.exists()
-
-    with open(FEEDBACK_PATH, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=[
-            "utterance", "context", "corrected_maxim", "notes", "timestamp",
-        ])
-        if not file_exists:
-            writer.writeheader()
-        writer.writerow({
-            "utterance": req.utterance,
-            "context": req.context,
-            "corrected_maxim": req.corrected_maxim,
-            "notes": req.notes or "",
-            "timestamp": datetime.now().isoformat(),
-        })
+    try:
+        record_correction(req.utterance, req.context, req.corrected_maxim, req.notes)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
     return {"status": "saved", "message": f"saved correction: {req.corrected_maxim}"}
 

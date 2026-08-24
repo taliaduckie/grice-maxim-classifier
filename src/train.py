@@ -4,8 +4,6 @@ from pathlib import Path
 from torch.utils.data import Subset
 from sklearn.model_selection import train_test_split
 
-# i refuse to write a setup py for this
-sys.path.insert(0, str(Path(__file__).parent))
 from transformers import AutoModelForSequenceClassification
 from dataset import GriceDataset, LABEL2ID, ID2LABEL, MODEL_NAME
 from labels import MAXIMS

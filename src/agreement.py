@@ -21,12 +21,12 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 
 from labels import MAXIMS, VIOLATION_TYPES
 
-DATA_DIR = Path(__file__).parent.parent / "data"
-DEFAULT_OUT = DATA_DIR / "test" / "adjudication_sheet.csv"
+from paths import TEST_DIR
+
+DEFAULT_OUT = TEST_DIR / "adjudication_sheet.csv"
 
 # Labels an annotator may use that aren't in the primary schema.
 EXTRA_MAXIM_LABELS = ["unlabelable"]

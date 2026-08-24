@@ -31,7 +31,6 @@ import time
 from collections import Counter
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 
 import numpy as np
 import torch
@@ -41,6 +40,7 @@ from torch.utils.data import Dataset
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from labels import MAXIMS
+from provenance import load_labelled as load
 from metrics import bootstrap_ci, macro_f1, present_labels
 from paths import RESULTS_DIR, TEST_NATURAL, TEST_SYNTHETIC, TRAIN_PATH, rel
 from training_utils import (
@@ -97,9 +97,6 @@ class PairDataset(Dataset):
         }
 
 
-def load(path):
-    with open(path, newline="", encoding="utf-8") as f:
-        return [r for r in csv.DictReader(f) if r.get("maxim") in MAXIMS]
 
 
 def run_one(config_name, seed, train_pool, test_sets, tokenizer, quiet=True):

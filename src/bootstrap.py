@@ -4,7 +4,6 @@ import sys
 from pathlib import Path
 
 # same sys.path incantation. at this point it's a tradition.
-sys.path.insert(0, str(Path(__file__).parent))
 
 from zero_shot import classify
 

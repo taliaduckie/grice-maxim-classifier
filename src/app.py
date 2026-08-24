@@ -2,11 +2,11 @@ import csv
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 
 import gradio as gr
 import pandas as pd
 from predict import predict
+from feedback import record_correction
 
 FEEDBACK_PATH = Path(__file__).parent.parent / "data" / "feedback" / "corrections.csv"
 
@@ -85,25 +85,11 @@ def classify(utterance: str, context: str):
 
 
 def submit_correction(utterance: str, context: str, correct_maxim: str, notes: str) -> str:
-    if not utterance.strip() or not correct_maxim.strip():
-        return "Please enter an utterance and select a maxim."
-
-    # ensure feedback directory exists
-    FEEDBACK_PATH.parent.mkdir(parents=True, exist_ok=True)
-
-    file_exists = FEEDBACK_PATH.exists()
-    with open(FEEDBACK_PATH, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["utterance", "context", "corrected_maxim", "notes"])
-        if not file_exists:
-            writer.writeheader()
-        writer.writerow({
-            "utterance": utterance,
-            "context": context,
-            "corrected_maxim": correct_maxim,
-            "notes": notes,
-        })
-
-    return f"Correction saved. Thank you!"
+    try:
+        record_correction(utterance, context, correct_maxim, notes)
+    except ValueError as e:
+        return f"Please check your input: {e}"
+    return "Correction saved. Thank you!"
 
 
 # build the interface with tabs

@@ -5,9 +5,8 @@ import sys
 from pathlib import Path
 
 # make imports work from src/ or project root
-sys.path.insert(0, str(Path(__file__).parent))
 
-MODEL_DIR = Path(__file__).parent.parent / "models" / "roberta-grice"
+from paths import MODEL_DIR
 
 # cache so batch mode doesn't reload the model every iteration
 _pipeline = None

@@ -6,7 +6,6 @@ import sys
 import time
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 
 if not os.environ.get("ANTHROPIC_API_KEY"):
     print("ANTHROPIC_API_KEY not set")

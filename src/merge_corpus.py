@@ -4,9 +4,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 
-CORPUS_PATH = Path(__file__).parent.parent / "data" / "annotated" / "corpus.csv"
+from paths import CORPUS_PATH
 FIELDNAMES = ["utterance", "context", "maxim", "violation_type"]
 from labels import MAXIMS, normalize_violation_type as normalize_vtype
 

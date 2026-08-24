@@ -34,12 +34,9 @@ import urllib.error
 from collections import Counter
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
 from labels import MAXIMS
 
-ROOT = Path(__file__).parent.parent
-RAW = ROOT / "data" / "raw"
-CORPUS = ROOT / "data" / "annotated" / "corpus.csv"
+from paths import CORPUS_PATH as CORPUS, RAW_DIR as RAW, ROOT
 TARGET_SUBS = ["askscience", "AmItheAsshole", "MaliciousCompliance"]
 UA = "grice-maxim-classifier/1.0 (research; non-cooperative pragmatics sampling)"
 
