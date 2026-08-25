@@ -3,7 +3,7 @@
 app.py and api.py both appended to data/feedback/corrections.csv with different
 column sets — the Gradio app wrote four columns, the API wrote five including a
 timestamp. Whichever ran first defined the header, and the other then appended
-rows of the wrong width to it. One writer, one schema.
+rows of the wrong width to it.
 """
 
 import csv

@@ -2,7 +2,7 @@
 
 These two produce adjacent tables in results/foundation_report.md, so they have
 to compute macro F1 and its confidence interval the same way. They previously
-had separate copies that agreed by luck rather than by construction.
+had separate copies that happened to agree but weren't forced to.
 """
 
 import numpy as np

@@ -13,8 +13,8 @@ import torch
 from sklearn.metrics import classification_report
 from transformers import Trainer, TrainerCallback, TrainingArguments
 
-# The one set of hyperparameters. Changing a number here changes it for
-# train.py, kfold_eval.py and the ablation grid together, which is the point.
+# Shared hyperparameters — changing a number here changes it for train.py,
+# kfold_eval.py and the ablation grid at once.
 HPARAMS = dict(
     num_train_epochs=10,
     per_device_train_batch_size=8,
