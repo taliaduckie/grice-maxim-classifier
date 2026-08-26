@@ -5,7 +5,11 @@ from collections import Counter
 from pathlib import Path
 
 
-from paths import CORPUS_PATH
+import json
+
+from paths import CORPUS_PATH, MANIFEST_PATH, TRAIN_PATH, rel
+from provenance import row_id
+
 FIELDNAMES = ["utterance", "context", "maxim", "violation_type"]
 from labels import MAXIMS, normalize_violation_type as normalize_vtype
 
@@ -24,6 +28,23 @@ def _is_valid(row):
     if row["violation_type"] not in VALID_VIOLATION_TYPES:
         return False
     return True
+
+
+def _frozen_test_ids():
+    """row_ids of every item in the frozen test splits (from the manifest).
+
+    Merging one of these into corpus.csv would put a held-out item back into
+    the training pipeline the next time corpus_train.csv is regenerated with a
+    conflicting label — or tempt someone to train on corpus.csv directly.
+    """
+    if not MANIFEST_PATH.exists():
+        return set()
+    manifest = json.loads(MANIFEST_PATH.read_text())
+    ids = set()
+    for name, split in manifest["splits"].items():
+        if name != "corpus_train":
+            ids.update(split["row_ids"])
+    return ids
 
 
 def _load_corpus():
@@ -57,11 +78,16 @@ def _summary(rows, added, dupes, skipped):
     print(f"Total: {len(rows)}")
     print(f"Maxim: {dict(mc)}")
     print(f"Violation: {dict(vc)}")
+    if TRAIN_PATH.exists():
+        print(f"NOTE: {rel(TRAIN_PATH)} is now stale — regenerate with "
+              "src/build_test_set.py before training.")
 
 
 def merge_pipe_data(pipe_string: str) -> int:
     """Each line: utterance|context|maxim|violation_type"""
     existing, keys = _load_corpus()
+    frozen = _frozen_test_ids()
+    frozen_hits = 0
 
     added = 0
     dupes = 0
@@ -94,6 +120,10 @@ def merge_pipe_data(pipe_string: str) -> int:
             dupes += 1
             continue
 
+        if row_id(row) in frozen:
+            frozen_hits += 1
+            print(f"  REFUSED (frozen test item): {row['utterance'][:60]!r}")
+            continue
         existing.append(row)
         keys.add(key)
         added += 1
@@ -106,6 +136,8 @@ def merge_pipe_data(pipe_string: str) -> int:
 def merge_annotated_csv(csv_path: str) -> int:
     """CSV needs utterance, context, maxim, violation_type (or gold_* variants)"""
     existing, keys = _load_corpus()
+    frozen = _frozen_test_ids()
+    frozen_hits = 0
     added = 0
     dupes = 0
     skipped = 0
@@ -131,6 +163,10 @@ def merge_annotated_csv(csv_path: str) -> int:
                 dupes += 1
                 continue
 
+            if row_id(row) in frozen:
+                frozen_hits += 1
+                print(f"  REFUSED (frozen test item): {row['utterance'][:60]!r}")
+                continue
             existing.append(row)
             keys.add(key)
             added += 1
@@ -143,6 +179,8 @@ def merge_annotated_csv(csv_path: str) -> int:
 def merge_with_scraped(scraped_path: str, annotation_pipe_string: str) -> int:
     """Match annotations to scraped CSV by row order"""
     existing, keys = _load_corpus()
+    frozen = _frozen_test_ids()
+    frozen_hits = 0
 
     scraped = []
     with open(scraped_path) as f:
@@ -185,6 +223,10 @@ def merge_with_scraped(scraped_path: str, annotation_pipe_string: str) -> int:
             dupes += 1
             continue
 
+        if row_id(row) in frozen:
+            frozen_hits += 1
+            print(f"  REFUSED (frozen test item): {row['utterance'][:60]!r}")
+            continue
         existing.append(row)
         keys.add(key)
         added += 1

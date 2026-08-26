@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
+from paths import TRAIN_PATH
+
 
 def compute_coherence(csv_path: str, output_path: str = None):
     df = pd.read_csv(csv_path)
@@ -87,7 +89,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--data",
-        default=str(Path(__file__).parent.parent / "data" / "annotated" / "corpus.csv"),
+        default=str(TRAIN_PATH),  # not corpus.csv — that still contains the frozen test rows
         help="Path to annotated CSV.",
     )
     parser.add_argument(

@@ -116,7 +116,7 @@ def noncoop_signals(utterance: str, context: str) -> list:
 # claude-opus-4-8; for a high-volume screen, claude-haiku-4-5 is ~5x cheaper and
 # well-suited to classification — pass --model claude-haiku-4-5 to use it.
 _llm = None
-LLM_MODEL_DEFAULT = "claude-opus-4-8"
+LLM_MODEL_DEFAULT = "claude-opus-5"
 
 LLM_SYSTEM = (
     "You judge whether the REPLY in a two-turn exchange respects Grice's maxims, "
