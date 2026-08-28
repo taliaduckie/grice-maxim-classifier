@@ -70,3 +70,51 @@ def test_mcnemar_is_significant_for_a_lopsided_split():
     b = ["B"] * 30
     _, _, p = mcnemar(y, a, b)
     assert p < 0.001
+
+
+# --- cluster bootstrap -------------------------------------------------------
+
+from src.metrics import cluster_bootstrap_ci
+
+
+def _clustered(n_threads, per_thread, seed=0):
+    rng = np.random.default_rng(seed)
+    labs = np.array(["Quantity", "Manner", "Quality", "Relation"])
+    y = rng.choice(labs, n_threads * per_thread)
+    p = np.where(rng.random(len(y)) < 0.6, y, rng.choice(labs, len(y)))
+    clusters = np.repeat(np.arange(n_threads), per_thread)
+    return y, p, clusters
+
+
+def test_cluster_ci_is_wider_than_item_ci_with_few_threads():
+    """4 threads x 12 items — the situation test_natural was actually in."""
+    y, p, c = _clustered(4, 12)
+    lo_i, hi_i = bootstrap_ci(y, p, 1000)
+    lo_c, hi_c = cluster_bootstrap_ci(y, p, c, 1000)
+    assert (hi_c - lo_c) > (hi_i - lo_i)
+
+
+def test_cluster_ci_approaches_item_ci_when_every_item_is_its_own_cluster():
+    y, p, _ = _clustered(60, 1)
+    c = np.arange(60)
+    lo_i, hi_i = bootstrap_ci(y, p, 2000)
+    lo_c, hi_c = cluster_bootstrap_ci(y, p, c, 2000)
+    assert abs((hi_c - lo_c) - (hi_i - lo_i)) < 0.06
+
+
+def test_cluster_ci_brackets_the_point_estimate():
+    y, p, c = _clustered(10, 6)
+    lo, hi = cluster_bootstrap_ci(y, p, c, 500)
+    assert lo <= macro_f1(y, p) <= hi
+
+
+def test_cluster_ci_is_deterministic_for_a_seed():
+    y, p, c = _clustered(8, 5)
+    assert cluster_bootstrap_ci(y, p, c, 300, seed=3) == cluster_bootstrap_ci(y, p, c, 300, seed=3)
+
+
+def test_cluster_ci_accepts_string_cluster_ids():
+    y, p, _ = _clustered(6, 5)
+    c = np.repeat([f"thread-{i}?" for i in range(6)], 5)
+    lo, hi = cluster_bootstrap_ci(y, p, c, 200)
+    assert 0.0 <= lo <= hi <= 1.0

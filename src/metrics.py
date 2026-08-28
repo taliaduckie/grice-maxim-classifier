@@ -60,3 +60,28 @@ def mcnemar(y_true, pred_a, pred_b):
     if b + c == 0:
         return b, c, 1.0
     return b, c, float(binomtest(b, b + c, 0.5).pvalue)
+
+
+def cluster_bootstrap_ci(y_true, y_pred, clusters, n_boot=1000, seed=0):
+    """95% CI for macro F1, resampling whole clusters (threads) with replacement.
+
+    Items from one discussion share topic, register and the annotator's
+    attention, so they are not independent draws. Resampling items treats them
+    as if they were and understates the interval; resampling clusters does not.
+    With few clusters the interval is wide — that is the honest answer.
+    """
+    rng = np.random.default_rng(seed)
+    y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
+    clusters = np.asarray(clusters)
+    ids = np.unique(clusters)
+    members = {c: np.flatnonzero(clusters == c) for c in ids}
+    scores = []
+    for _ in range(n_boot):
+        picked = rng.choice(ids, size=len(ids), replace=True)
+        idx = np.concatenate([members[c] for c in picked])
+        if len(set(y_true[idx].tolist())) < 2:
+            continue
+        scores.append(macro_f1(y_true[idx], y_pred[idx]))
+    if not scores:
+        return [float("nan"), float("nan")]
+    return [float(np.percentile(scores, 2.5)), float(np.percentile(scores, 97.5))]
