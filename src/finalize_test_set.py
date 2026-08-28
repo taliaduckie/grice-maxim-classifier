@@ -134,11 +134,13 @@ def pull_from_training(test_rows, train_path):
 
     Returns (kept_rows, n_removed). The same comment can be a `context` under
     the old comment->reply pairing, so matching is on text, not row_id.
+    Case- and whitespace-insensitive: over-removing is the safe direction.
     """
-    texts = {norm(r["utterance"]) for r in test_rows}
+    fold = lambda t: norm(t).casefold()
+    texts = {fold(r["utterance"]) for r in test_rows}
     train = read(train_path)
     kept = [r for r in train
-            if norm(r["utterance"]) not in texts and norm(r["context"]) not in texts]
+            if fold(r["utterance"]) not in texts and fold(r["context"]) not in texts]
     return kept, len(train) - len(kept)
 
 
@@ -152,6 +154,7 @@ def main():
     ap.add_argument("--min-annotators", type=int, default=1,
                     help="Items seen by fewer annotators are left unresolved.")
     ap.add_argument("--out", default=str(OUT_PATH))
+    ap.add_argument("--manifest", default=str(MANIFEST_PATH))
     ap.add_argument("--no-train-pull", action="store_true",
                     help="Do not rewrite corpus_train.csv.")
     args = ap.parse_args()
@@ -214,7 +217,8 @@ def main():
             write_csv(TRAIN_PATH, kept, list(kept[0]))
 
     # ---- manifest ---------------------------------------------------------
-    manifest = json.loads(MANIFEST_PATH.read_text()) if MANIFEST_PATH.exists() else {"splits": {}}
+    manifest_path = Path(args.manifest)
+    manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {"splits": {}}
     manifest["splits"]["test_natural_v2"] = {
         "path": rel(out),
         "rows": len(resolved),
@@ -232,7 +236,7 @@ def main():
             "row_ids": sorted(r["row_id"] for r in train_rows),
             "maxim_distribution": dict(Counter(r["maxim"] for r in train_rows).most_common()),
         }
-    MANIFEST_PATH.write_text(json.dumps(manifest, indent=2) + "\n")
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
 
     # ---- report -----------------------------------------------------------
     dist = Counter(r["maxim"] for r in resolved)
@@ -254,7 +258,7 @@ def main():
     q = sum(1 for r in resolved if r["context"].endswith("?"))
     print(f"Questions  : {q}/{len(resolved)}  (old test_natural: 4%)")
     print(f"Pulled from corpus_train: {n_pulled}")
-    print(f"\nWrote {rel(out)} and updated {rel(MANIFEST_PATH)}")
+    print(f"\nWrote {rel(out)} and updated {rel(manifest_path)}")
     return 0
 
 

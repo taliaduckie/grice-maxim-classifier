@@ -86,9 +86,20 @@ def _clustered(n_threads, per_thread, seed=0):
     return y, p, clusters
 
 
-def test_cluster_ci_is_wider_than_item_ci_with_few_threads():
-    """4 threads x 12 items — the situation test_natural was actually in."""
-    y, p, c = _clustered(4, 12)
+def test_cluster_ci_is_wider_than_item_ci_with_few_correlated_threads():
+    """4 threads x 12 items where accuracy varies by thread, not by item —
+    the situation test_natural was actually in. Item resampling averages the
+    thread effect away; cluster resampling has to carry it."""
+    labs = ["Quantity", "Manner", "Quality", "Relation"]
+    y, p, c = [], [], []
+    for t, acc in enumerate([1.0, 0.9, 0.2, 0.1]):
+        rng = np.random.default_rng(t)
+        for i in range(12):
+            gold = labs[i % 4]
+            y.append(gold)
+            p.append(gold if rng.random() < acc else labs[(i + 1) % 4])
+            c.append(t)
+    y, p, c = np.array(y), np.array(p), np.array(c)
     lo_i, hi_i = bootstrap_ci(y, p, 1000)
     lo_c, hi_c = cluster_bootstrap_ci(y, p, c, 1000)
     assert (hi_c - lo_c) > (hi_i - lo_i)

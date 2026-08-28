@@ -122,7 +122,7 @@ def test_training_rows_matching_test_text_are_removed(tmp_path):
         {"utterance": "THE ANSWER", "context": "old question?", "maxim": "Quality"},
         {"utterance": "unrelated", "context": "unrelated q?", "maxim": "Cooperative"},
     ], ["utterance", "context", "maxim"])
-    test_rows = [{"utterance": "the  answer"}]     # whitespace-insensitive match
+    test_rows = [{"utterance": "the  answer"}]     # case/whitespace-insensitive
     kept, removed = F.pull_from_training(test_rows, train)
     assert removed == 2
     assert [r["utterance"] for r in kept] == ["unrelated"]

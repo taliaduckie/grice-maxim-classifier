@@ -1,0 +1,683 @@
+{
+  "model": "models/roberta-grice",
+  "bootstrap": 500,
+  "results": [
+    {
+      "split": "test_synthetic",
+      "path": "data/test/test_synthetic.csv",
+      "n": 73,
+      "classes_present": [
+        "Cooperative",
+        "Manner",
+        "Quality",
+        "Quantity",
+        "Relation"
+      ],
+      "macro_f1": 0.8784808517400287,
+      "accuracy": 0.8767123287671232,
+      "ci95_item": [
+        0.7934536291911529,
+        0.9439375352316528
+      ],
+      "ci95_cluster": null,
+      "n_threads": null,
+      "predicted_distribution": {
+        "Cooperative": 17,
+        "Relation": 15,
+        "Manner": 14,
+        "Quality": 13,
+        "Quantity": 14
+      },
+      "pct_predicted_cooperative": 0.2328767123287671,
+      "predictions": [
+        {
+          "row_id": "7c85361a9edd",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "b7d12b27d6f5",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "3b434cc5e37c",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "c58f174b5680",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "d7ab8af38b79",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "54828c3087cd",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "98dd2c6dbc6c",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "aaff0ad1c4ba",
+          "gold": "Cooperative",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "d09a740f2788",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "7be1bcc87b5e",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "7c3bacb5eecf",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "14cc335a5ee4",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "34f11f725bc6",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "bd8ca98028a7",
+          "gold": "Cooperative",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "be69ab8e1700",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "d3d71852f4dc",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "0b16912e1835",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "bdf2633b7508",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "30f271c771f8",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "9e889830e713",
+          "gold": "Manner",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "f8367766e498",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "d198189c87da",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "1bf7d877f17f",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "f6bde85df699",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "a8a48e49d5a0",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "4ffcc7315693",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "af6dff2291a9",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "cd1fb47c208a",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "f1fcac0d0ea2",
+          "gold": "Quality",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "9490dbab8229",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "59c81635305b",
+          "gold": "Quality",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "521b394cb1db",
+          "gold": "Quality",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "7e22ec0f2dd4",
+          "gold": "Quality",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "ffae8043ca71",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "a49ddd8080c5",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "5418e1c09a6c",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "e23ffc558a14",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "a46e3319686c",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "5b21d44b4572",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "38046a5a11b0",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "3b31225f7b97",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "dec4c6fec858",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "f69a7f2bf021",
+          "gold": "Quality",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "dd68d9e2286f",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "036cc91fd7df",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "22319fd2fc8c",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "c8bdcb20a7fa",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "6d1446c7bb7f",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "706c9127ba35",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "5984c18d8fae",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "0a9ee653ccd7",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "b4dc65ec9771",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "85d481402e0c",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "ad9c0321822e",
+          "gold": "Quantity",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "26fa2b9d5771",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "326b90de3f8d",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "2a71516014e9",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "65350defc05c",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "aa8f867a1ab8",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "dc53f2ee8b04",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "74521375a992",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "05d9ce29639b",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "4a095ed068c1",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "d397bcae43fc",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "2b9212ffcf5a",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "903dfaf551f1",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "9f3be19235b4",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "6ea5daf71a37",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "fba6514f0ea0",
+          "gold": "Relation",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "0d4ce0297bf0",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "7a29a76180c5",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "f7e58870c310",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "eea9ec32d4db",
+          "gold": "Relation",
+          "pred": "Relation"
+        }
+      ]
+    },
+    {
+      "split": "test_natural",
+      "path": "data/test/test_natural.csv",
+      "n": 50,
+      "classes_present": [
+        "Manner",
+        "Quality",
+        "Quantity",
+        "Relation"
+      ],
+      "macro_f1": 0.3163992869875223,
+      "accuracy": 0.26,
+      "ci95_item": [
+        0.15873031788472966,
+        0.44488236348050914
+      ],
+      "ci95_cluster": [
+        0.09090909090909091,
+        0.3777888777888778
+      ],
+      "n_threads": 4,
+      "predicted_distribution": {
+        "Cooperative": 21,
+        "Quality": 13,
+        "Relation": 10,
+        "Manner": 4,
+        "Quantity": 2
+      },
+      "pct_predicted_cooperative": 0.42,
+      "predictions": [
+        {
+          "row_id": "e1674765c0c4",
+          "gold": "Manner",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "fc28092da095",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "240a3b332012",
+          "gold": "Manner",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "0e2fde8c7f80",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "62357cb41afd",
+          "gold": "Manner",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "f568eced214b",
+          "gold": "Quality",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "b400e8155990",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "a941308fe575",
+          "gold": "Manner",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "ef2f5c84fe4c",
+          "gold": "Quantity",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "04b756a2d5bf",
+          "gold": "Quantity",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "1d6a2174b6ec",
+          "gold": "Relation",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "e8a4aa3332c3",
+          "gold": "Quality",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "660d846ca6e2",
+          "gold": "Manner",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "85a30e30fb2d",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "336737143778",
+          "gold": "Relation",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "532b0e11a861",
+          "gold": "Quantity",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "b9e5bed7673b",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "51efdb221c7d",
+          "gold": "Manner",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "b67b13f2511e",
+          "gold": "Quality",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "2a31c2e98c83",
+          "gold": "Manner",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "281cc271c234",
+          "gold": "Relation",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "ed5de577986e",
+          "gold": "Quality",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "27f5d55cdd6d",
+          "gold": "Relation",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "0c5955dc4de0",
+          "gold": "Manner",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "b06fb7f52e44",
+          "gold": "Quantity",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "5c0e139c8345",
+          "gold": "Quantity",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "568e14a44dd3",
+          "gold": "Relation",
+          "pred": "Manner"
+        },
+        {
+          "row_id": "76677a879448",
+          "gold": "Manner",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "826092046af1",
+          "gold": "Quantity",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "d590a6ba7c5c",
+          "gold": "Quantity",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "b90f565a8f61",
+          "gold": "Quantity",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "66eee8f96c7d",
+          "gold": "Quantity",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "e08a680bf1cd",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "df2c02895e6b",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "478832398720",
+          "gold": "Relation",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "12590866b7c0",
+          "gold": "Quantity",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "878bd1d21b79",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "e46cc5b2163c",
+          "gold": "Relation",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "5720a02865ae",
+          "gold": "Quantity",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "6faf64d0d495",
+          "gold": "Quantity",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "1211a1ca999c",
+          "gold": "Quantity",
+          "pred": "Quantity"
+        },
+        {
+          "row_id": "b7e8271165d0",
+          "gold": "Quality",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "cec36fe7d38c",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "157b6dd4b257",
+          "gold": "Quantity",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "cd03a54f166c",
+          "gold": "Quality",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "77e7ea2ee996",
+          "gold": "Manner",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "fbcc5e245372",
+          "gold": "Relation",
+          "pred": "Relation"
+        },
+        {
+          "row_id": "19575dcbc54e",
+          "gold": "Quality",
+          "pred": "Quality"
+        },
+        {
+          "row_id": "794c261810b2",
+          "gold": "Manner",
+          "pred": "Cooperative"
+        },
+        {
+          "row_id": "1a1de109d889",
+          "gold": "Relation",
+          "pred": "Cooperative"
+        }
+      ]
+    }
+  ]
+}
