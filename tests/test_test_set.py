@@ -160,3 +160,13 @@ def test_row_id_distinguishes_different_contexts():
     a = {"utterance": "Sure", "context": "Did you finish?"}
     b = {"utterance": "Sure", "context": "Are you coming?"}
     assert row_id(a) != row_id(b)
+
+
+def test_a_v2_set_would_be_excluded_from_training_by_text():
+    """build_test_set matches a finalized v2 by text, not row_id, because the
+    re-paired items carry different ids from the same comment's old rows."""
+    import inspect
+    from src import build_test_set
+    src = inspect.getsource(build_test_set.main)
+    assert "test_natural_v2.csv" in src
+    assert "casefold" in src

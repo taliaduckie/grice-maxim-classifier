@@ -165,8 +165,20 @@ def main():
 
     # ---- training corpus, with every test row removed ----------------------
     held_out = test_ids | {r["row_id"] for r in pending}
-    train_rows = [r for r in corpus if r["row_id"] not in held_out]
+    # a finalized v2 natural set is matched by text: its items are re-paired
+    # (question, comment), so the same comment sits under a different row_id
+    # here as a context or utterance
+    v2_path = TEST_DIR / "test_natural_v2.csv"
+    v2_texts = set()
+    if v2_path.exists():
+        with open(v2_path, newline="", encoding="utf-8") as f:
+            v2_texts = {norm(r["utterance"]).casefold() for r in csv.DictReader(f)}
+    train_rows = [r for r in corpus if r["row_id"] not in held_out
+                  and norm(r["utterance"]).casefold() not in v2_texts
+                  and norm(r["context"]).casefold() not in v2_texts]
     removed = len(corpus) - len(train_rows)
+    if v2_texts:
+        print(f"  (test_natural_v2 present: its texts are excluded from training too)")
 
     # ---- write -------------------------------------------------------------
     paths = {

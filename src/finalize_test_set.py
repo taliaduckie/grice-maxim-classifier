@@ -206,8 +206,9 @@ def main():
 
     out = Path(args.out)
     write_csv(out, resolved, OUT_COLUMNS)
+    unresolved_path = out.parent / UNRESOLVED_PATH.name
     if unresolved:
-        write_csv(UNRESOLVED_PATH, unresolved, list(unresolved[0]))
+        write_csv(unresolved_path, unresolved, list(unresolved[0]))
 
     # ---- training pull ----------------------------------------------------
     n_pulled = 0
@@ -246,7 +247,7 @@ def main():
     print(f"Resolved   : {len(resolved)} / {len(sheet)}   "
           f"({dict(src)})")
     print(f"Unresolved : {len(unresolved)}"
-          + (f"   -> {rel(UNRESOLVED_PATH)}" if unresolved else ""))
+          + (f"   -> {rel(unresolved_path)}" if unresolved else ""))
     if invalid:
         print(f"Invalid    : {len(invalid)}")
         for rid, why in invalid[:5]:
