@@ -153,3 +153,11 @@ grice-maxim-classifier/
 - **Held-out test set** — eval is currently part of the training loop. An actual out of sample set would give a more honest score.
 - **Try roberta-large** — twice the parameters, so probably a few F1 points for free! Worth poking.
 - **Adversarial set expansion** — 40 items is small. Larger adversarial coverage would let macro F1 carry a lot mmore statistical weight.
+
+## License
+
+This repository — the code, the annotated corpus, and the documentation — is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0). See [LICENSE](LICENSE) for the full text.
+
+You are free to share and adapt this material for any purpose, including commercially, as long as you give appropriate credit, link to the license, and indicate if changes were made.
+
+Reddit-sourced rows in `data/raw/` are excerpts of user-generated content used under Reddit's terms; the CC BY license covers the annotations, curation, and hand-authored examples, not the underlying Reddit text.

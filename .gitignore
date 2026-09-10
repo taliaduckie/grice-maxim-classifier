@@ -6,3 +6,6 @@ data/annotated/bootstrap_*.csv
 CHANGELOG.md
 .DS_Store
 *.zip
+
+# built artifact — regenerate with build_annotator.py
+annotator.html
