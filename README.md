@@ -152,7 +152,7 @@ grice-maxim-classifier/
 - **Violation type prediction** — right now 'violation_type' is a heuristic. Essentially cooperative = none, everything else = unknown. The corpus has enough flouting/violating/none examples to train a second head or a separate model, but the distinction is often not visible in surface form (especially for Relation, where flouting and violating cluster identically by coherence score).
 - **Held-out test set** — eval is currently part of the training loop. An actual out of sample set would give a more honest score.
 - **Try roberta-large** — twice the parameters, so probably a few F1 points for free! Worth poking.
-- **Adversarial set expansion** — 40 items is small. Larger adversarial coverage would let macro F1 carry a lot mmore statistical weight.
+- **Adversarial set expansion** — 40 items is small. Larger adversarial coverage would let macro F1 carry a lot more statistical weight.
 
 ## License
 
