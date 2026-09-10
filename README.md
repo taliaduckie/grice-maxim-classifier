@@ -139,12 +139,18 @@ grice-maxim-classifier/
 │   └── api.py                # FastAPI backend
 ├── data/
 │   ├── raw/                  # unannotated and pre-labeled CSVs
-│   └── annotated/            # gold-labeled CSV corpus
+│   ├── annotated/            # gold-labeled CSV corpus
+│   ├── derived/              # generated splits + provenance (rebuilt, not hand-edited)
+│   ├── feedback/             # corrections logged from the demo
+│   └── test/                 # frozen held-out test set + manifest
+├── docs/                     # annotation guidelines
+├── results/                  # eval outputs, baselines, reports
 ├── models/                   # saved checkpoints (gitignored)
 └── tests/
     ├── test_labels.py
     ├── test_corpus.py
-    └── test_predict.py
+    ├── test_predict.py
+    └── ...                   # one per module, 15 in all
 '''
 
 ## TODO
