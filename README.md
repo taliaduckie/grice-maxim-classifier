@@ -171,6 +171,7 @@ grice-maxim-classifier/
 │   ├── bootstrap.py          # pre-label seed pairs for annotation
 │   ├── scrape_reddit.py      # scrape comment-reply pairs from Reddit
 │   ├── merge_corpus.py       # merge new annotations into corpus
+│   ├── llm_annotate.py       # Claude as one annotator over a sheet
 │   ├── kfold_eval.py         # stratified k-fold cross-validation
 │   ├── score_corpus.py       # coherence scoring for annotation QA
 │   ├── compare_classifiers.py # RoBERTa vs Claude API comparison
@@ -196,6 +197,8 @@ grice-maxim-classifier/
 
 - **Violation type prediction** — right now 'violation_type' is a heuristic. Essentially cooperative = none, everything else = unknown. The corpus has enough flouting/violating/none examples to train a second head or a separate model, but the distinction is often not visible in surface form (especially for Relation, where flouting and violating cluster identically by coherence score).
 - **Annotate the rebuilt natural test set** — 'data/derived/natural_qa_pairs.csv', two annotators minimum, then 'src/agreement.py' and 'src/finalize_test_set.py'. Everything natural-domain above is provisional until this lands.
+- **Run Claude as a provisional third annotator** — 'src/llm_annotate.py' labels a sheet under the same guidelines a human sees and writes to 'data/test/annotations/<model>.csv'. Blocked on a valid 'ANTHROPIC_API_KEY' (the current one returns 401). Once it works: run it on 'data/derived/natural_qa_pairs.csv' and, with '--out' under 'results/', on 'results/gold_recheck_sheet.csv', then compare against the human passes with 'src/agreement.py'. Its labels are a check on the humans, not a substitute for them.
+- **Re-run the adversarial comparison** — 'src/compare_classifiers.py' still pins a 2025 Sonnet model ID and its numbers above came from a pre-LayerNorm-fix checkpoint. Update the model, re-run against the current checkpoint, and replace the 0.26 / 0.48 figures. Same API-key blocker.
 - **Try roberta-large** — twice the parameters, so probably a few F1 points for free! Worth poking.
 - **Adversarial set expansion** — 40 items is small. Larger adversarial coverage would let macro F1 carry a lot more statistical weight.
 
