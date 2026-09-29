@@ -22,53 +22,89 @@ Also distinguishes *flouting* (deliberate, to generate implicature) from
 
 ## Model
 
-Fine-tuned 'roberta-base'. Training: 10 epochs, lr=1e-5, batch size 8, class
-weights, ~15 minutes on CPU.
+Fine-tuned 'roberta-base', all layers unfrozen. Training: 10 epochs, lr=1e-5,
+batch size 8, class-weighted loss, ~15 minutes on CPU. The best epoch is
+selected on a dev split and snapshotted in memory ('training_utils.KeepBestState')
+because the Trainer's own checkpoint reload silently drops LayerNorm weights in
+this transformers version. 'train.py' refuses to save a model that does not
+reproduce the score it was selected for.
 
-### Paper version (367-pair synthetic corpus)
+### Results on the frozen test sets
 
-The numbers in 'paper.pdf' are reported on this version of the corpus.
+Evaluated with 'src/evaluate.py' against the splits frozen in
+'data/test/manifest.json'. Raw output: 'results/eval_roberta-grice.json'.
+95% CIs from 500 bootstrap resamples.
 
-Macro F1 = **0.91** on a stratified 80/20 split (74 eval, 293 train).
+| Test set | n | Macro F1 | 95% CI | Accuracy |
+|---|---|---|---|---|
+| 'test_synthetic' (hand-written, balanced) | 73 | **0.88** | [0.79, 0.94] | 0.88 |
+| 'test_natural' (Reddit, 4 threads) | 50 | 0.32 | [0.16, 0.45] items / [0.09, 0.38] threads | 0.26 |
 
-Per-class F1 (held-out fold):
+Two reference points from 'results/foundation_report.md':
 
-| Maxim | F1 |
-|---|---|
-| Quantity | 0.97 |
-| Relation | 0.97 |
-| Cooperative | 0.88 |
-| Manner | 0.88 |
-| Quality | 0.85 |
+- On 'test_natural', **no model beats chance.** Drawing labels from the class
+  priors scores 0.21 macro F1; the best of a 4-config x 3-seed RoBERTa ablation
+  grid scores 0.26, and TF-IDF + logistic regression 0.25. Every CI overlaps
+  every other and overlaps chance.
+- On 'test_synthetic', a model that cannot read words (13 features: lengths,
+  punctuation counts, word overlap) scores **0.60** macro F1. The synthetic
+  corpus is largely separable by shape.
 
-Zero-shot BART-MNLI baseline on the same fold: macro F1 = 0.13 (below chance for
-a five-class task).
+The saved checkpoint predicts Cooperative for 42% of 'test_natural', whose true
+Cooperative rate is 0%. That is the register-to-Cooperative shortcut described
+in the report: the natural half of the corpus is 59% Cooperative and written in
+a different register from the synthetic half, so "looks like Reddit" predicts
+"Cooperative" at three times base rate.
 
-On the 40-pair adversarial set designed to strip surface cues, performance drops
-to macro F1 = 0.26 (accuracy 42.5%), suggesting the held-out F1 substantially
-overstates the model's grasp of the maxims. Claude (Sonnet 4) on the same
-adversarial set reaches macro F1 = 0.48 (accuracy 55%).
+**Caveats on the natural number.** 'test_natural' is comment-to-reply, not
+question-to-answer (4% of its contexts contain a question, against 88% of the
+synthetic set), it comes from only 4 threads, and its gold labels are 94%
+flouting with zero Cooperative, which is not a plausible description of a
+natural sample. A rebuilt question-to-answer set of 187 pairs across 50 threads
+('data/derived/natural_qa_pairs.csv') is awaiting independent annotation under
+'docs/annotation_guidelines.md'. Until that lands, treat the natural-domain
+direction as established and its magnitude as not. The checkpoint's training
+data path is also not recorded in the artefact; the frozen test rows are
+excluded from 'data/derived/corpus_train.csv' by test, but a retrain from that
+file is the clean way to reproduce the table.
 
-### Extended version (1,197-pair corpus with real Reddit data)
+### Adversarial set
 
-The repo also contains an extended corpus that mixes the 367 synthetic pairs with
-~830 real comment-reply pairs scraped from Reddit. Training on the full extended
-corpus drops held-out macro F1 to ~0.77, which is the more honest number for
-real-world generalization. The drop reflects the synthetic-distribution
-inflation of the 0.91 figure: real Reddit conversation is messier, more
-ambiguous, and skews heavily Cooperative.
+On the 40-pair set designed to strip surface cues
+('data/annotated/ambiguous_exchanges.csv'), macro F1 = 0.26 (accuracy 42.5%).
+Claude (Sonnet 4) on the same items reaches macro F1 = 0.48 (accuracy 55%).
+Agreement between the two is 27.5%; RoBERTa defaults to Manner and Claude to
+Quantity on the same vague replies, which is where the taxonomy is weakest.
+Those runs used a checkpoint saved before the LayerNorm fix, so they are due
+to be re-run.
 
-The extended corpus was not used for the paper's main results because the paper
-analyzes the 367-pair version. It exists for follow-up work and a fairer test
-of real-world performance.
+### Withdrawn numbers
 
-Fallback: 'facebook/bart-large-mnli' zero-shot baseline if no fine-tuned model
-exists. Used to bootstrap annotation; performs near chance for actual inference.
+Earlier versions of this README reported macro F1 = 0.91 on the 367-pair
+synthetic corpus and ~0.77 on the 1,197-pair extended corpus. 'paper.pdf'
+reports the 0.91 figure. Both are withdrawn:
+
+- The eval split was also the split used to pick the best epoch, so the score
+  was selection-optimal over ten epochs rather than held-out.
+- 48 of the 50 human-annotated Reddit "gold" items were in the training corpus.
+- The saved models mixed best-epoch weights with final-epoch LayerNorms (see
+  above), so the artefact that was evaluated was not the one that was scored.
+
+The 0.88 on 'test_synthetic' is the replacement for 0.91. There is no honest
+replacement for 0.77 yet; the closest is the table above.
+
+Fallback: 'facebook/bart-large-mnli' zero-shot if no fine-tuned model exists.
+Used to bootstrap annotation; it scores 0.13 macro F1 on the synthetic fold,
+below chance for a five-class task.
 
 ## Corpus
 
-**'data/annotated/corpus.csv'** — the full 1,197-pair extended corpus. To
-reproduce the paper, take the first 367 rows (see 'data/annotated/corpus_367.csv').
+**'data/annotated/corpus.csv'** — the full 1,197-pair extended corpus.
+'data/annotated/corpus_367.csv' is the first 367 rows, the version the paper
+analysed. **Train from 'data/derived/corpus_train.csv'** (976 rows), which is
+the corpus with the frozen test rows removed; 'tests/test_test_set.py' fails
+if a training row and a test row ever share an id or a text.
+'data/derived/corpus_provenance.csv' tags every row with source and subreddit.
 
 | Subset | Pairs | Source |
 |---|---|---|
@@ -100,10 +136,13 @@ python src/bootstrap.py
 python src/scrape_reddit.py --subreddit askreddit --limit 50
 
 # Fine-tune
-python src/train.py --data data/annotated/corpus.csv
+python src/train.py --data data/derived/corpus_train.csv
+
+# Evaluate a checkpoint against the frozen test sets
+python src/evaluate.py --model models/roberta-grice
 
 # K-fold cross-validation
-python src/kfold_eval.py --data data/annotated/corpus.csv --folds 5
+python src/kfold_eval.py --data data/derived/corpus_train.csv --folds 5
 
 # Coherence scoring for annotation QA
 python src/score_corpus.py
@@ -156,7 +195,7 @@ grice-maxim-classifier/
 ## TODO
 
 - **Violation type prediction** — right now 'violation_type' is a heuristic. Essentially cooperative = none, everything else = unknown. The corpus has enough flouting/violating/none examples to train a second head or a separate model, but the distinction is often not visible in surface form (especially for Relation, where flouting and violating cluster identically by coherence score).
-- **Held-out test set** — eval is currently part of the training loop. An actual out of sample set would give a more honest score.
+- **Annotate the rebuilt natural test set** — 'data/derived/natural_qa_pairs.csv', two annotators minimum, then 'src/agreement.py' and 'src/finalize_test_set.py'. Everything natural-domain above is provisional until this lands.
 - **Try roberta-large** — twice the parameters, so probably a few F1 points for free! Worth poking.
 - **Adversarial set expansion** — 40 items is small. Larger adversarial coverage would let macro F1 carry a lot more statistical weight.
 
