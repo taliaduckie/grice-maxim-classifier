@@ -31,14 +31,18 @@ reproduce the score it was selected for.
 
 ### Results on the frozen test sets
 
-Evaluated with 'src/evaluate.py' against the splits frozen in
-'data/test/manifest.json'. Raw output: 'results/eval_roberta-grice.json'.
-95% CIs from 500 bootstrap resamples.
+The checkpoint in 'models/roberta-grice' was trained 2026-09-28 from
+'data/derived/corpus_train.csv' (976 rows, the corpus minus the frozen test
+rows; best epoch 9 of 10, dev macro F1 0.79). 'train.py' now writes that
+provenance to 'training_meta.json' beside the weights. Evaluated with
+'src/evaluate.py' against the splits frozen in 'data/test/manifest.json';
+raw output in 'results/eval_roberta-grice.json'. 95% CIs from 1,000
+bootstrap resamples.
 
 | Test set | n | Macro F1 | 95% CI | Accuracy |
 |---|---|---|---|---|
-| 'test_synthetic' (hand-written, balanced) | 73 | **0.88** | [0.79, 0.94] | 0.88 |
-| 'test_natural' (Reddit, 4 threads) | 50 | 0.32 | [0.16, 0.45] items / [0.09, 0.38] threads | 0.26 |
+| 'test_synthetic' (hand-written, balanced) | 73 | **0.89** | [0.81, 0.96] | 0.89 |
+| 'test_natural' (Reddit, 4 threads) | 50 | 0.11 | [0.04, 0.19] items / [0.00, 0.18] threads | 0.10 |
 
 Two reference points from 'results/foundation_report.md':
 
@@ -50,8 +54,10 @@ Two reference points from 'results/foundation_report.md':
   punctuation counts, word overlap) scores **0.60** macro F1. The synthetic
   corpus is largely separable by shape.
 
-The saved checkpoint predicts Cooperative for 42% of 'test_natural', whose true
-Cooperative rate is 0%. That is the register-to-Cooperative shortcut described
+The checkpoint predicts Cooperative for 48% of 'test_natural', whose true
+Cooperative rate is 0%, and Quality for most of the rest; Manner is never
+predicted. That is why it lands below chance, in line with the ablation grid's
+two natural-trained configs (0.14–0.23). That is the register-to-Cooperative shortcut described
 in the report: the natural half of the corpus is 59% Cooperative and written in
 a different register from the synthetic half, so "looks like Reddit" predicts
 "Cooperative" at three times base rate.
@@ -63,10 +69,7 @@ flouting with zero Cooperative, which is not a plausible description of a
 natural sample. A rebuilt question-to-answer set of 187 pairs across 50 threads
 ('data/derived/natural_qa_pairs.csv') is awaiting independent annotation under
 'docs/annotation_guidelines.md'. Until that lands, treat the natural-domain
-direction as established and its magnitude as not. The checkpoint's training
-data path is also not recorded in the artefact; the frozen test rows are
-excluded from 'data/derived/corpus_train.csv' by test, but a retrain from that
-file is the clean way to reproduce the table.
+direction as established and its magnitude as not.
 
 ### Adversarial set
 
@@ -90,8 +93,15 @@ reports the 0.91 figure. Both are withdrawn:
 - The saved models mixed best-epoch weights with final-epoch LayerNorms (see
   above), so the artefact that was evaluated was not the one that was scored.
 
-The 0.88 on 'test_synthetic' is the replacement for 0.91. There is no honest
-replacement for 0.77 yet; the closest is the table above.
+A fourth number is also withdrawn: the previous checkpoint in
+'models/roberta-grice' scored 0.32 on 'test_natural', above every run in the
+ablation grid, and its training data was never recorded. Retraining from
+'corpus_train.csv' with the test rows provably excluded gives 0.11. The gap is
+most simply explained by the old checkpoint having been trained on the full
+corpus before the test split was carved, i.e. on the test rows themselves.
+
+The 0.89 on 'test_synthetic' is the replacement for 0.91. There is no honest
+replacement for 0.77; the closest is the table above.
 
 Fallback: 'facebook/bart-large-mnli' zero-shot if no fine-tuned model exists.
 Used to bootstrap annotation; it scores 0.13 macro F1 on the synthetic fold,

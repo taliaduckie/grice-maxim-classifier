@@ -1,5 +1,8 @@
 import argparse
+import hashlib
+import json
 import sys
+from datetime import date
 from pathlib import Path
 from torch.utils.data import Subset
 from sklearn.model_selection import train_test_split
@@ -90,6 +93,16 @@ def train(data_path: str):
               f"macro F1 = {keep_best.best_score:.4f}")
 
     trainer.save_model(OUTPUT_DIR)
+    # Record what this checkpoint was trained on. Without this the artefact
+    # carries no provenance and a test-set leak is undetectable after the fact.
+    meta = {
+        "data": data_path,
+        "data_sha256_16": hashlib.sha256(Path(data_path).read_bytes()).hexdigest()[:16],
+        "n_rows": n, "n_train": len(train_idx), "n_dev": len(eval_idx),
+        "best_epoch": keep_best.best_epoch, "dev_macro_f1": keep_best.best_score,
+        "trained_on": date.today().isoformat(),
+    }
+    (Path(OUTPUT_DIR) / "training_meta.json").write_text(json.dumps(meta, indent=2) + "\n")
     # save the tokenizer too or pipeline can't find it and produces
     # identical scores for every input. the model was learning fine 
     # w 0.56 macro F1 at epoch 4(!!) but at inference time it couldn't

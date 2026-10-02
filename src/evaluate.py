@@ -100,8 +100,11 @@ def main():
 
     out = Path(args.out) if args.out else RESULTS_DIR / f"eval_{model_dir.name}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps({"model": rel(model_dir), "bootstrap": args.bootstrap,
-                               "results": results}, indent=2) + "\n")
+    meta_path = model_dir / "training_meta.json"
+    training = json.loads(meta_path.read_text()) if meta_path.exists() else None
+    out.write_text(json.dumps({"model": rel(model_dir), "training": training,
+                               "bootstrap": args.bootstrap, "results": results},
+                              indent=2) + "\n")
     print(f"\nWrote {rel(out)}")
     return 0
 
