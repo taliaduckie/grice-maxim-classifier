@@ -71,7 +71,7 @@ SCRATCH = Path(os.environ.get(
 class PairDataset(Dataset):
     """Encodes (utterance, context) as a sequence pair, or utterance alone.
 
-    Pair encoding gives RoBERTa two segments rather than one concatenated
+    This way we give RoBERTa two segments rather than one concatenated
     string, which is what config B is testing.
     """
 
@@ -157,7 +157,7 @@ def run_one(config_name, seed, train_pool, test_sets, tokenizer, quiet=True):
         "splits": {},
     }
 
-    # the frozen sets are touched here, once, after selection is finished
+    # poke the frozen sets here after they're set up 
     for split_name, test_rows in test_sets.items():
         ds = PairDataset(test_rows, tokenizer, cfg["context"], max_length)
         pred_ids = trainer.predict(ds).predictions.argmax(axis=-1)
