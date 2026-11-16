@@ -42,7 +42,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from labels import MAXIMS
 from provenance import load_labelled as load
 from metrics import bootstrap_ci, macro_f1, present_labels
-from paths import RESULTS_DIR, TEST_NATURAL, TEST_SYNTHETIC, TRAIN_PATH, rel
+from paths import RESULTS_DIR, ROOT, TEST_NATURAL, TEST_SYNTHETIC, TRAIN_PATH, rel
 from training_utils import (
     HPARAMS, KeepBestState, WeightedTrainer, class_weights,
     macro_f1_metrics, training_args,
