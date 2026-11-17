@@ -163,11 +163,11 @@ def main():
         "subreddit": r["subreddit"],
     } for r in pending]
 
-    # ---- training corpus, with every test row removed ----------------------
+    # training corpus w/ test rows removed
     held_out = test_ids | {r["row_id"] for r in pending}
     # a finalized v2 natural set is matched by text: its items are re-paired
-    # (question, comment), so the same comment sits under a different row_id
-    # here as a context or utterance
+    # (question, comment) sooooo the same comment sits under a different row_id
+    # here as a context or utteranc
     v2_path = TEST_DIR / "test_natural_v2.csv"
     v2_texts = set()
     if v2_path.exists():
