@@ -136,7 +136,7 @@ def main():
     if len(natural_test) < len(gold):
         print(f"  dropped {len(gold) - len(natural_test)} duplicate rows")
 
-    # ---- synthetic test split ---------------------------------------------
+    # synthetic test split
     corpus = annotate(CORPUS_PATH)
     synthetic = [r for r in corpus if r["source"] == "synthetic"]
     synthetic_test = stratified_sample(synthetic, fraction=SYNTHETIC_TEST_FRACTION,
