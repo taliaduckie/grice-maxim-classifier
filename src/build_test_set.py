@@ -210,7 +210,7 @@ def main():
         }
     (TEST_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
-    # ---- report ------------------------------------------------------------
+    # report disp
     print(f"\n{'='*66}\nFROZEN TEST SET\n{'='*66}")
     print(f"test_natural          {len(natural_test):>5} rows   {dist(natural_test)}")
     print(f"test_synthetic        {len(synthetic_test):>5} rows   {dist(synthetic_test)}")
