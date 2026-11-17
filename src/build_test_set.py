@@ -8,7 +8,7 @@ Anything appearing in those is removed from the training corpus and written to
 corpus_train.csv. 43 of the 50 gold pairs were already in corpus.csv, so scores
 previously computed on them were training scores.
 
-manifest.json pins each split by row-id hash so later drift is detectable.
+manifest.json pins each split by row-id hash so that later drift is detectable
 
 Usage:
     python3 src/build_test_set.py --gold ~/Downloads/gold_annotated.csv
