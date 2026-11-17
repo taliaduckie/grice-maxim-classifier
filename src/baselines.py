@@ -280,7 +280,7 @@ def main():
                             np.array(all_results[regime][best]["splits"][split]["predictions"]),
                             f"{best} on test-{split}")
 
-    # ---- the comparisons worth a significance test ------------------------
+    # comparisons worth a significance test imho
     print(f"\n\n{'='*74}\nPAIRED COMPARISONS (exact McNemar)\n{'='*74}")
     comparisons = [
         ("both", "tfidf-ctx", "both", "majority", "does TF-IDF beat always-guessing?"),
