@@ -7,16 +7,16 @@
     tfidf-ctx    word 1-2 grams, utterance + context as separate blocks
     tfidf-char   char 3-5 grams over the utterance
 
-surface is the diagnostic one: it has no access to vocabulary, so whatever it
-scores is available from shape alone.
+surface is the diagnostic one bc it has no access to vocabulary so whatever it
+scores is available from orthographic stuff alone
 
 Each model runs under three training regimes (synthetic / natural / both)
-against both frozen test sets. Hyperparameters are fixed below and were not
-tuned against the test sets.
+against both frozen test sets and hyperparams are fixed below and were not
+tuned against the test sets
 
 Reports macro F1 with a 95% percentile CI from bootstrap resamples of the test
-set, sd over bootstrap resamples of the training set, and exact McNemar for the
-paired comparisons.
+set, sd over bootstrap resamples of the training set and exact McNemar for the
+paired comparisons
 
 Usage:
     python3 src/baselines.py [--seeds 20] [--bootstrap 2000]
