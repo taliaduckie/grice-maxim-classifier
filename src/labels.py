@@ -6,30 +6,30 @@ from dataclasses import dataclass
 # without also fixing that. (Ask me how I know.)
 MAXIMS = ["Cooperative", "Quantity", "Quality", "Relation", "Manner"]
 
-# Secondary label: HOW the maxim is being violated, if it is.
-# Flouting is doing it on purpose to mean something.
-# Violating is just... failing. Which happens.
+# Secondary label fer HOW the maxim is being violated, if it is
+# (Flouting is doing it on purpose to mean something)
+# Violating is just... failing. Which happens HAHAHAA
 # Opting out is when someone says "I can't answer that" — technically
-# cooperative in the meta sense but locally non-cooperative. Tricky.
+# cooperative in the meta sense but locally non-cooperative 
 # Clash is when two maxims conflict and you have to break one to satisfy
-# the other. Less common but interesting when it shows up.
+# the other, generally less common
 # NOTE: clash is unreachable in the zero-shot path because multi_label=False
-# forces a single winner. it's here for fine-tuned models and human annotation.
-# Failed_flout is the gray zone: speaker might be deflecting on purpose but
-# there's no surface signal distinguishing it from genuine irrelevance. the
-# L+O coherence scoring pass is the empirical check — low coherence between
-# Q and A suggests the non-sequitur isn't doing communicative work, which
-# means it's either violating or a failed attempt at flouting. either way
-# it's not the clean implicature-generating move that "flouting" implies.
+# forces a single winner but it's here for fine-tuned models and human annotation
+# Failed_flout is the gray zone in that speaker might be deflecting on purpose but
+# there's no surface signal distinguishing it from genuine irrelevanc so the
+# L+O coherence scoring pass is the empirical check and low coherence between
+# Q and A suggests the non-sequitur (non sequitur?) isn't doing communicative work, which
+# means it's either violating or a failed attempt at flouting 
+# either way it's not the clean implicature-generating move that "flouting" implies
 #
 # six flavors of conversational misbehavior (plus "none" for the well-behaved
 # and "unknown" for when the model genuinely can't tell — which is most of the
-# time in zero-shot. honesty is a quality maxim thing.)
+# time in zero-shot and honesty is a quality maxim thing)
 VIOLATION_TYPES = ["none", "flouting", "violating", "failed_flout", "opting_out", "clash", "unknown"]
 
 # Short forms that turn up in annotation sheets and scraper output. The gold
-# files write "flout"; the corpus writes "flouting". Both merge_corpus.py and
-# build_test_set.py normalise through here so there is one alias table.
+# files write "flout"; the corpus writes "flouting"
+# Both merge_corpus.py and build_test_set.py normalise through here so there is one alias table
 VTYPE_ALIASES = {
     "flout": "flouting",
     "violate": "violating",
