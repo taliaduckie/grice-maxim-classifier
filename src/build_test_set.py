@@ -34,10 +34,10 @@ from labels import (
 )
 
 # Held-out fraction of the synthetic pairs. 20% of 367 is 73 rows, ~15 per
-# class — small, but the synthetic set is balanced so every class is present.
+# class — small, but the synthetic set is balanced so every class is present in da mix
 SYNTHETIC_TEST_FRACTION = 0.20
 
-# How many further natural pairs to queue up for independent annotation.
+# How many further natural pairs to queue up for independent annotation basically
 PENDING_TEST_SIZE = 100
 
 SEED = 20260809
