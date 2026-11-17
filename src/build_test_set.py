@@ -119,7 +119,7 @@ def main():
     fieldnames = ["utterance", "context", "maxim", "violation_type",
                   "source", "subreddit", "post_title", "row_id"]
 
-    # ---- natural test core -------------------------------------------------
+    # natural test core !
     print("Loading gold annotations...")
     gold, rejected = load_gold(Path(args.gold).expanduser())
     print(f"  {len(gold)} usable, {len(rejected)} rejected as malformed")
